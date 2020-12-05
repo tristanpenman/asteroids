@@ -15,11 +15,11 @@ if(MSVC)
     include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/SDL2-2.0.9/include
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/SDL2_mixer-2.0.4/include
-        )
+    )
     link_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/SDL2-2.0.9/lib/x64
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/SDL2_mixer-2.0.4/lib/x64
-        )
+    )
 else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -Wall -Wno-long-long -pedantic")
     if(EMSCRIPTEN)
@@ -31,11 +31,11 @@ else()
         include_directories(
             ${SDL2_INCLUDE_DIRS}
             ${SDL2MIXER_INCLUDE_DIRS}
-            )
+        )
         link_directories(
             ${SDL2_LIBRARY_DIRS}
             ${SDL2MIXER_LIBRARY_DIRS}
-            )
+        )
     endif()
 endif()
 
@@ -59,7 +59,7 @@ set(SRCS
     src/util.c
     src/vec.c
     src/video.c
-    )
+)
 
 file(GLOB ASSETS ${CMAKE_CURRENT_SOURCE_DIR}/assets/*)
 
@@ -69,19 +69,19 @@ if(MSVC)
         TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory
                 ${CMAKE_CURRENT_BINARY_DIR}/$(Configuration)/assets
-        )
+    )
     add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
                 ${ASSETS}
                 ${CMAKE_CURRENT_BINARY_DIR}/$(Configuration)/assets
-        )
+    )
     add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
                 ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/SDL2-2.0.9/lib/x64/SDL2.dll
                 ${CMAKE_CURRENT_BINARY_DIR}/$(Configuration)
-        )
+    )
     add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
@@ -97,7 +97,7 @@ if(MSVC)
     set_target_properties(
         ${PROJECT_NAME} PROPERTIES
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/$(Configuration)"
-        )
+    )
 else()
     add_executable(${PROJECT_NAME} ${SRCS})
     if(EMSCRIPTEN)
@@ -113,6 +113,6 @@ else()
             ${SDL2_LIBRARIES}
             ${SDL2MIXER_LIBRARIES}
             ${OS_LIBRARIES}
-            )
+        )
     endif()
 endif()
