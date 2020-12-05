@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include <SDL.h>
 
 #include "draw.h"

@@ -363,7 +363,7 @@ void explode_player(struct player *p)
 
     for (i = 0; i < SHIP_EXPLOSION_SHARDS; i++) {
         p->shards[i].angle = ((2 * M_PI) / (float) SHIP_EXPLOSION_SHARDS) * (float) i;
-        p->shards[i].rot = random_float(0 - M_PI, M_PI);
+        p->shards[i].rot = random_float(0 - (float) M_PI, (float) M_PI);
         if (p->shards[i].rot < 0.0f) {
             p->shards[i].dir = -1;
         } else {

@@ -3,7 +3,7 @@
 
 #include <SDL.h>
 
-static uint32_t simulation_time = 0.f;
+static uint32_t simulation_time = 0;
 static uint32_t ticks;
 
 /******************************************************************************
@@ -15,7 +15,7 @@ static uint32_t ticks;
 void reset_simulation_time()
 {
     ticks = SDL_GetTicks();
-    simulation_time = 0.f;
+    simulation_time = 0;
 }
 
 void produce_simulation_time()

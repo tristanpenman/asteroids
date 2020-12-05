@@ -102,7 +102,7 @@ static int window_height;
 
 static bool reset_window_metrics()
 {
-    const int old_pixel_density = pixel_density;
+    const float old_pixel_density = pixel_density;
     SDL_GL_GetDrawableSize(sdl_window, &canvas_width, &canvas_height);
     pixel_density = (float)canvas_width / (float)window_width;
     return old_pixel_density != pixel_density;
@@ -304,14 +304,14 @@ void video_clear()
     GLfloat viewport_width;
     GLfloat viewport_height;
     if (canvas_width * ratio >= canvas_height) {
-        viewport_width = canvas_height / ratio;
-        viewport_height = canvas_height;
+        viewport_width = (GLfloat) (canvas_height / ratio);
+        viewport_height = (GLfloat) canvas_height;
     } else if (canvas_height / ratio >= canvas_width) {
-        viewport_width = canvas_width;
-        viewport_height = canvas_width * ratio;
+        viewport_width = (GLfloat) canvas_width;
+        viewport_height = (GLfloat) (canvas_width * ratio);
     } else {
-        viewport_width = canvas_width;
-        viewport_height = canvas_height;
+        viewport_width = (GLfloat) canvas_width;
+        viewport_height = (GLfloat) canvas_height;
     }
 
     // Grey border around playable area
@@ -328,8 +328,8 @@ void video_clear()
     // Playable area
     const GLfloat x = (canvas_width - viewport_width) / 2.f;
     const GLfloat y = (canvas_height - viewport_height) / 2.f;
-    glScissor(x, y, viewport_width, viewport_height);
-    glViewport(x, y, viewport_width, viewport_height);
+    glScissor((GLint) x, (GLint) y, (GLsizei) viewport_width, (GLsizei) viewport_height);
+    glViewport((GLint) x, (GLint) y, (GLsizei) viewport_width, (GLsizei) viewport_height);
 #endif
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);

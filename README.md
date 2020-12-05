@@ -30,6 +30,12 @@ The project currently depends on SDL2 and SDL2_mixer, and builds are handled by 
     cmake ..
     make
 
+### Windows
+
+The project's CMake configuration can also be used to generate Visual Studio project files. However, you will need to extract the archives in [thirdparty](./thirdparty) before you can do this.
+
+Once those archives have been extracted, CMake GUI should be able to generate a VS solution using the default configuration.
+
 ### Emscripten
 
 The project can also be compiled to Javascript using Emscripten.
@@ -39,6 +45,8 @@ The project can also be compiled to Javascript using Emscripten.
     emcmake cmake ..
     emmake make
     emrun asteroids.html
+
+Emscripten builds are only supported on Linux and macOS systems.
 
 ## License
 

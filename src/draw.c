@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef _MSC_VER
+#include <SDL.h>
+#endif
+
 #include <SDL_opengl.h>
 
 #include "options.h"

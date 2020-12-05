@@ -1,6 +1,10 @@
 #include <math.h>
 #include <stdlib.h>
 
+#ifdef _MSC_VER
+#include <SDL.h>
+#endif
+
 #include "util.h"
 #include "vec.h"
 
