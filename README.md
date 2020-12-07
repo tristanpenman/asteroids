@@ -6,7 +6,7 @@ Be thrilled by this high fidelity reproduction of Atari's 1979 classic, Asteroid
 
 This is a tidied up version of an Asteroids clone that I wrote over the course of several weekends, as a way to procrastinate while studying for exams. The aim was to get the game running quickly, taking a 'less-is-more' approach. Graphics were implemented using legacy OpenGL, while window management, audio and input were all handled by SDL.
 
-I later decided to port the game to the web using Emscripten.
+I later decided to port the game to the web using Emscripten. I wrote a bit about the process as well, in [this blog post](https://tristanpenman.com/blog/posts/2018/01/08/porting-an-asteroids-clone-to-javascript/).
 
 ## Demo
 
@@ -23,7 +23,7 @@ A playable demo can be found [here](https://tristanpenman.com/demos/asteroids).
 
 ### macOS and Linux
 
-The project currently depends on SDL2 and SDL2_mixer, and builds are handled by CMake. Once those dependencies are installed, native macOS and Linux builds are relatively simple:
+The project currently depends on SDL2 and SDL2_mixer, and builds are handled by CMake. Once those dependencies are installed (e.g. using Homebrew or apt), native macOS and Linux builds are relatively simple:
 
     mkdir build
     cd build
