@@ -91,8 +91,12 @@ int mixer_load_sample_from_file(const char *path)
     const int sz = ftell(f);
     fseek(f, 0L, SEEK_SET);
     void *buffer = malloc(sz);
-    fread(buffer, sz, 1, f);
+    int result = fread(buffer, sz, 1, f);
     fclose(f);
+    if (result != 1) {
+        fprintf(stderr, "Failed to read sample from file (%s)\n", path);
+        return MIXER_INVALID_SAMPLE;
+    }
 
     // Load sample from temporary buffer, to ensure that Web Audio API is used in Emscripten
     SDL_RWops * const rw = SDL_RWFromMem(buffer, sz);

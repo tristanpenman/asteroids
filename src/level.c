@@ -376,7 +376,7 @@ void explode_asteroid(struct asteroid *a,
     struct asteroid *aa, unsigned int na,
     struct explosion *ea, unsigned int ne)
 {
-    float vel_scale;
+    float vel_scale = 1.0f;
 
     unsigned int i;
 

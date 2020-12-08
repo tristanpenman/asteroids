@@ -21,6 +21,7 @@ if(MSVC)
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/SDL2_mixer-2.0.4/lib/x64
     )
 else()
+    set(OpenGL_GL_PREFERENCE "LEGACY")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -Wall -Wno-long-long -pedantic")
     if(EMSCRIPTEN)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s USE_SDL=2 --closure 0 -Wno-gnu-zero-variadic-macro-arguments")
@@ -109,6 +110,7 @@ else()
     else()
         file(COPY ${ASSETS} DESTINATION assets)
         target_link_libraries(${PROJECT_NAME}
+            m
             ${OPENGL_LIBRARIES}
             ${SDL2_LIBRARIES}
             ${SDL2MIXER_LIBRARIES}
