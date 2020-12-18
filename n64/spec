@@ -16,11 +16,11 @@
 
 /* Use all graphic microcodes */
 beginseg
-  name"code"
-  flags BOOT OBJECT
-  entry nuBoot
+  name    "code"
+  flags   BOOT OBJECT
+  entry   nuBoot
   address NU_SPEC_BOOT_ADDR
-  stack NU_SPEC_BOOT_STACK
+  stack   NU_SPEC_BOOT_STACK
   include "codesegment.o"
   include "$(ROOT)/usr/lib/PR/rspboot.o"
   include "$(ROOT)/usr/lib/PR/gspF3DEX2.fifo.o"

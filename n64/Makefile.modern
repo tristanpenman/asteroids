@@ -1,17 +1,17 @@
 include $(ROOT)/usr/include/make/PRdefs
 
-N64KITDIR = c:\nintendo\n64kit
-NUSYSINCDIR = $(N64KITDIR)/nusys/include
-NUSYSLIBDIR = $(N64KITDIR)/nusys/lib
+NUSTDINCDIR = $(ROOT)/usr/include/nustd
+NUSYSINCDIR = $(ROOT)/usr/include/nusys
+NUSYSLIBDIR = $(ROOT)/usr/lib/nusys
 
 LIB = $(ROOT)/usr/lib
 LPR = $(LIB)/PR
 INC = $(ROOT)/usr/include
 
 LCDEFS = -DNU_DEBUG -DF3DEX_GBI_2
-LCINCS = -I. -I$(NUSYSINCDIR) -I$(ROOT)/usr/include/PR
+LCINCS = -I. -I$(NUSTDINCDIR) -I$(NUSYSINCDIR) -I$(ROOT)/usr/include/PR
 LCOPTS = -G 0
-LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnusys_d -lgultra -L$(GCCDIR)/mipse/lib -lkmc
+LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnusys_d -lultra -L$(N64_LIBGCCDIR) -lgcc -lnustd
 
 OPTIMIZER = -g
 
@@ -19,7 +19,7 @@ APP = asteroids.out
 
 TARGETS = asteroids.n64
 
-CODEFILES = gfx.c main.c stage00.c
+CODEFILES = $(wildcard *.c)
 
 CODEOBJECTS = $(CODEFILES:.c=.o) $(NUSYSLIBDIR)/nusys.o
 
@@ -40,3 +40,4 @@ $(CODESEGMENT): $(CODEOBJECTS) Makefile
 
 $(TARGETS): $(OBJECTS)
 	$(MAKEROM) spec -I$(NUSYSINCDIR) -r $(TARGETS) -e $(APP)
+	makemask $(TARGETS)
