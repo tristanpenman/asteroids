@@ -4,6 +4,7 @@
 
 #include "gfx.h"
 
+#define BUFFER 5
 #define SHIP_ACCELERATION 100.45f
 
 extern NUContData contdata[1];
@@ -12,6 +13,12 @@ extern u8 contPattern;
 static const float ratio = (float)SCREEN_HT / (float)SCREEN_WD;
 static const float factor = 1.0f / 60.0f;
 static const float degrees_to_radians = M_PI / 180.0f;
+
+static const float max_x =  (float)SCREEN_WD / 2.0f + BUFFER;
+static const float min_x = -(float)SCREEN_WD / 2.0f - BUFFER;
+
+static const float max_y =  (float)SCREEN_HT / 2.0f + BUFFER;
+static const float min_y = -(float)SCREEN_HT / 2.0f - BUFFER;
 
 static float theta;
 
@@ -36,6 +43,8 @@ void initStage00(void)
 
 void makeDL00(void)
 {
+  char conbuf[20];
+
   // Specify the display list buffer
   glistp = gfx_glist;
 
@@ -73,14 +82,26 @@ void makeDL00(void)
 
   assert(glistp - gfx_glist < GFX_GLIST_LEN);
 
-  // Activate the RSP task. Switch display buffers at the end of the task
+  // Activate the RSP task
   nuGfxTaskStart(gfx_glist, (s32)(glistp - gfx_glist) * sizeof (Gfx),
 #ifdef LINES
       NU_GFX_UCODE_L3DEX2,
 #else
       NU_GFX_UCODE_F3DEX2,
 #endif
-      NU_SC_SWAPBUFFER);
+      NU_SC_NOSWAPBUFFER);
+
+  // Change character representation positions */
+  nuDebConTextPos(0,12,23);
+  sprintf(conbuf, "pos_x=%5.1f", pos_x);
+  nuDebConCPuts(0, conbuf);
+
+  nuDebConTextPos(0,12,24);
+  sprintf(conbuf, "pos_y=%5.1f", pos_y);
+  nuDebConCPuts(0, conbuf);
+
+  // Display characters on the frame buffer
+  nuDebConDisp(NU_SC_SWAPBUFFER);
 }
 
 void updateGame00(void)
@@ -91,9 +112,9 @@ void updateGame00(void)
   // Data reading of controller 1
   nuContDataGetEx(contdata, 0);
 
-  if (contdata[0].stick_x < -0.5) {
+  if (contdata[0].stick_x < -20) {
     theta -= vel;
-  } else if (contdata[0].stick_x > 0.5) {
+  } else if (contdata[0].stick_x > 20) {
     theta += vel;
   }
 
@@ -112,6 +133,18 @@ void updateGame00(void)
 
   pos_x += vel_x * factor;
   pos_y += vel_y * factor;
+
+  if (pos_y > max_y) {
+    pos_y = min_y;
+  } else if (pos_y < min_y) {
+    pos_y = max_y;
+  }
+
+  if (pos_x > max_x) {
+    pos_x = min_x;
+  } else if (pos_x < min_x) {
+    pos_x = max_x;
+  }
 }
 
 void draw(Dynamic* dynamicp)
