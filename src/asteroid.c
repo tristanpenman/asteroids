@@ -1,14 +1,14 @@
 #include <math.h>
 #include <stdlib.h>
 
-#ifdef _MSC_VER 
+#ifdef _MSC_VER
 #include <SDL.h>
 #endif
 
 #include "types.h"
 #include "util.h"
 
-extern const float *_asteroids[];
+extern const struct shape_2d asteroid_shapes[];
 
 extern const struct vec_2d origin;
 
@@ -17,13 +17,13 @@ float calculate_asteroid_radius(unsigned int shape)
     float r;
     float r_max = 0.0f;
 
-    const float *a_data = _asteroids[shape];
+    const float *vertices = asteroid_shapes[shape].vertices;
 
     unsigned int i;
-    unsigned int n = (unsigned int)(a_data[0]);
+    unsigned int n = asteroid_shapes[shape].num_vertices;;
 
-    for (i = 1; i < n * 2 + 1; i += 2) {
-        r = sqrtf(a_data[i] * a_data[i] + a_data[i + 1] * a_data[i + 1]);
+    for (i = 0; i < n * 2; i += 2) {
+        r = sqrtf(vertices[i] * vertices[i] + vertices[i + 1] * vertices[i + 1]);
         if (r_max < r) {
             r_max = r;
         }

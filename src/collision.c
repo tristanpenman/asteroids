@@ -4,7 +4,7 @@
 #include "types.h"
 #include "vec.h"
 
-extern const float *_asteroids[];
+extern const struct shape_2d asteroid_shapes[];
 
 /******************************************************************************
  *
@@ -45,9 +45,9 @@ static bool test_asteroid_against_polygon(const struct asteroid *asteroid,
     const struct vec_2d vertices[], int num_vertices, bool wrap,
     const struct vec_2d *offset)
 {
-    const float *geometry = _asteroids[asteroid->shape];
+    const float *geometry = asteroid_shapes[asteroid->shape].vertices;
 
-    const unsigned int num_asteroid_vertices = (unsigned int)(geometry[0]);
+    const unsigned int num_asteroid_vertices = asteroid_shapes[asteroid->shape].num_vertices;
 
     const float sinr = sinf(asteroid->rot);
     const float cosr = cosf(asteroid->rot);

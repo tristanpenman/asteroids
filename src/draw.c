@@ -14,8 +14,10 @@
 #define RAD_TO_DEG (180.0 / M_PI)
 
 extern float pixel_density;
-extern GLfloat *_asteroids[];
+extern struct shape_2d asteroid_shapes[];
 extern GLfloat *_font[];
+
+extern
 
 const struct vec_2d origin = {1.0f / 2.0f,
     ((GLfloat)LOGICAL_HEIGHT_PX / (GLfloat)LOGICAL_WIDTH_PX) / 2.0f};
@@ -172,8 +174,6 @@ void draw_asteroids(const struct asteroid *aa, unsigned int n, bool dark, float 
 {
     unsigned int i;
 
-    const GLfloat *v;
-
     GLfloat tx, ty;
     GLfloat rd;
 
@@ -199,10 +199,14 @@ void draw_asteroids(const struct asteroid *aa, unsigned int n, bool dark, float 
 
             glScalef(1.0f / (GLfloat) aa->size, 1.0f / (GLfloat) aa->size, 1.0f);
 
-            v = _asteroids[aa->shape];    /* First element of each asteroid is vertex count */
 
-            glVertexPointer(2, GL_FLOAT, 0, v + 1);
-            glDrawArrays(GL_LINE_LOOP, 0, (unsigned int) v[0]);
+            const struct shape_2d *shape = &asteroid_shapes[aa->shape];
+
+            // glVertexPointer(2, GL_FLOAT, 0, shape->vertices);
+            // glDrawElements(GL_TRIANGLES, shape->num_triangles * 3, GL_UNSIGNED_BYTE, shape->triangles);
+
+            glVertexPointer(2, GL_FLOAT, 0, shape->vertices);
+            glDrawArrays(GL_LINE_LOOP, 0, shape->num_vertices);
 
             glPopMatrix();
         }
