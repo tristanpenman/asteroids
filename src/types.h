@@ -2,7 +2,6 @@
 #define __TYPES_H
 
 #include <stdbool.h>
-#include <stdint.h>
 
 #include "options.h"
 #include "vec.h"
@@ -98,14 +97,6 @@ struct score
 struct highscores
 {
     struct score entries[10];
-};
-
-struct shape_2d {
-  const float *vertices;
-  uint8_t num_vertices;
-
-  const uint8_t *triangles;
-  uint8_t num_triangles;
 };
 
 #endif

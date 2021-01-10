@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -6,17 +7,21 @@
 #include <SDL.h>
 
 #include "asteroid.h"
+#include "canvas.h"
 #include "draw.h"
 #include "highscores.h"
 #include "level.h"
 #include "loop.h"
 #include "options.h"
+#include "shape.h"
 #include "timing.h"
 #include "transition.h"
 #include "types.h"
 #include "util.h"
+#include "vec.h"
 #include "video.h"
 
+#define NUM_ASTEROID_SHAPES 4
 #define NUM_ASTEROIDS 5
 #define TIME_STEP_MILLIS 10
 
@@ -24,20 +29,39 @@ static bool enter_down;
 static bool h_down;
 static struct asteroid asteroids[NUM_ASTEROIDS];
 
+static int asteroid_shape_ids[NUM_ASTEROID_SHAPES];
+
+extern struct shape asteroid_shapes[];
+
+extern struct vec_2d unit;
+extern struct vec_2d zero;
+
 /******************************************************************************
  *
  * Public interface
  *
  *****************************************************************************/
 
-void reset_titlescreen_state()
+bool reset_titlescreen_state()
 {
     unsigned int i;
+
+    canvas_reset();
+
+    for (i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
+        asteroid_shape_ids[i] = canvas_load_shape(&asteroid_shapes[i]);
+        if (asteroid_shape_ids[i] == CANVAS_INVALID_SHAPE) {
+            return false;
+        }
+    }
+
     enter_down = false;
     h_down = false;
     for (i = 0; i < NUM_ASTEROIDS; ++i) {
         init_asteroid(&asteroids[i]);
     }
+
+    return true;
 }
 
 void titlescreen_loop()
@@ -89,7 +113,23 @@ void titlescreen_loop()
     }
 
     video_clear();
-    draw_asteroids(asteroids, NUM_ASTEROIDS, true, residual);
+
+    for (int i = 0; i < NUM_ASTEROIDS; i++) {
+        const struct vec_2d position = {
+          asteroids[i].pos.x + asteroids[i].vel.x * residual,
+          asteroids[i].pos.y + asteroids[i].vel.y * residual
+        };
+
+        assert(canvas_draw_lines(
+            asteroid_shape_ids[asteroids[i].shape],
+            position,
+            asteroids[i].rot,
+            unit
+        ));
+    }
+
+    // draw_asteroids(asteroids, NUM_ASTEROIDS, true, residual);
+
     draw_title();
     draw_instructions();
     video_swap();

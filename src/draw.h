@@ -1,15 +1,11 @@
 #ifndef __DRAW_H
 #define __DRAW_H
 
-#include <stdbool.h>
-
-struct asteroid;
 struct bullet;
 struct explosion;
 struct highscores;
 struct player;
 
-void draw_asteroids(const struct asteroid *, unsigned int n, bool dark, float residual);
 void draw_bullets(const struct bullet *, unsigned int n);
 void draw_explosions(const struct explosion *, unsigned int n);
 void draw_gameover_text();

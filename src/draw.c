@@ -9,15 +9,14 @@
 #include <SDL_opengl.h>
 
 #include "options.h"
+#include "shape.h"
 #include "types.h"
 
 #define RAD_TO_DEG (180.0 / M_PI)
 
 extern float pixel_density;
-extern struct shape_2d asteroid_shapes[];
+extern struct shape asteroid_shapes[];
 extern GLfloat *_font[];
-
-extern
 
 const struct vec_2d origin = {1.0f / 2.0f,
     ((GLfloat)LOGICAL_HEIGHT_PX / (GLfloat)LOGICAL_WIDTH_PX) / 2.0f};
@@ -169,51 +168,6 @@ static void draw_text_centered(const char *s, GLfloat size, GLfloat y)
  * Public interface
  *
  *****************************************************************************/
-
-void draw_asteroids(const struct asteroid *aa, unsigned int n, bool dark, float residual)
-{
-    unsigned int i;
-
-    GLfloat tx, ty;
-    GLfloat rd;
-
-    if (dark == true) {
-        glColor3f(0.4f, 0.4f, 0.4f);
-    } else {
-        glColor3f(1.0f, 1.0f, 1.0f);
-    }
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-
-    for (i = 0; i < n; i++, aa++) {
-        if (true == aa->visible) {
-            tx = (GLfloat) (origin.x + aa->pos.x + aa->vel.x * residual);
-            ty = (GLfloat) (origin.y + aa->pos.y + aa->vel.y * residual);
-            rd = (GLfloat) (aa->rot * RAD_TO_DEG);
-
-            glMatrixMode(GL_MODELVIEW);
-            glPushMatrix();
-
-            glTranslatef(tx, ty, 0.0f);
-            glRotatef(rd, 0.0f, 0.0f, 1.0f);
-
-            glScalef(1.0f / (GLfloat) aa->size, 1.0f / (GLfloat) aa->size, 1.0f);
-
-
-            const struct shape_2d *shape = &asteroid_shapes[aa->shape];
-
-            // glVertexPointer(2, GL_FLOAT, 0, shape->vertices);
-            // glDrawElements(GL_TRIANGLES, shape->num_triangles * 3, GL_UNSIGNED_BYTE, shape->triangles);
-
-            glVertexPointer(2, GL_FLOAT, 0, shape->vertices);
-            glDrawArrays(GL_LINE_LOOP, 0, shape->num_vertices);
-
-            glPopMatrix();
-        }
-    }
-
-    glDisableClientState(GL_VERTEX_ARRAY);
-}
 
 void draw_bullets(const struct bullet *bb, unsigned int n)
 {

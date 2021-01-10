@@ -1,10 +1,11 @@
 #include <math.h>
 
 #include "options.h"
+#include "shape.h"
 #include "types.h"
 #include "vec.h"
 
-extern const struct shape_2d asteroid_shapes[];
+extern const struct shape asteroid_shapes[];
 
 /******************************************************************************
  *

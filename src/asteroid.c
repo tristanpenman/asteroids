@@ -5,10 +5,11 @@
 #include <SDL.h>
 #endif
 
+#include "shape.h"
 #include "types.h"
 #include "util.h"
 
-extern const struct shape_2d asteroid_shapes[];
+extern const struct shape asteroid_shapes[];
 
 extern const struct vec_2d origin;
 

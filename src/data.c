@@ -1,4 +1,5 @@
 #include "options.h"
+#include "shape.h"
 #include "types.h"
 
 // ----------------------------------------------------------------------------
@@ -67,7 +68,7 @@ const uint8_t asteroid2_triangles[] = {
     8, 9, 10
 };
 
-const asteroid2_num_triangles = 10;
+const uint8_t asteroid2_num_triangles = 10;
 
 // ----------------------------------------------------------------------------
 //
@@ -146,7 +147,7 @@ const uint8_t asteroid4_num_triangles = 10;
 // Collected asteroid shapes
 //
 
-const struct shape_2d asteroid_shapes[ASTEROID_SHAPES] = {
+const struct shape asteroid_shapes[ASTEROID_SHAPES] = {
     {
         asteroid1_vertices,
         asteroid1_num_vertices,

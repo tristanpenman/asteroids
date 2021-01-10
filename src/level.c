@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,11 +6,13 @@
 #include <SDL.h>
 
 #include "asteroid.h"
+#include "canvas.h"
 #include "collision.h"
 #include "draw.h"
 #include "loop.h"
 #include "mixer.h"
 #include "options.h"
+#include "shape.h"
 #include "timing.h"
 #include "titlescreen.h"
 #include "transition.h"
@@ -23,11 +26,17 @@
 #include "initials.h"
 #endif
 
+#define NUM_ASTEROID_SHAPES 4
 #define TIME_STEP_MILLIS 5
 
 extern int explosion_channel;
 extern int phaser_channel;
 extern int thruster_channel;
+
+extern struct shape asteroid_shapes[];
+
+extern struct vec_2d unit;
+extern struct vec_2d zero;
 
 static unsigned int level;
 static unsigned int starting_asteroids;
@@ -45,6 +54,8 @@ static float next_level_countdown;
 static unsigned int asteroids_hit;
 
 static bool gameover;
+
+static int asteroid_shape_ids[NUM_ASTEROID_SHAPES];
 
 /******************************************************************************
  *
@@ -531,7 +542,7 @@ void check_collisions(struct player *p, struct asteroid *aa, unsigned int na,
  *
  *****************************************************************************/
 
-void reset_level_state(unsigned int new_level, unsigned int new_lives, unsigned int new_score)
+bool reset_level_state(unsigned int new_level, unsigned int new_lives, unsigned int new_score)
 {
     srand(SDL_GetTicks());
 
@@ -543,6 +554,15 @@ void reset_level_state(unsigned int new_level, unsigned int new_lives, unsigned 
     gameover_countdown = GAMEOVER_COUNTDOWN;
     gameover = false;
     asteroids_hit = 0;
+
+    canvas_reset();
+
+    for (int i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
+        asteroid_shape_ids[i] = canvas_load_shape(&asteroid_shapes[i]);
+        if (asteroid_shape_ids[i] == CANVAS_INVALID_SHAPE) {
+            return false;
+        }
+    }
 
     // Create some asteroids!
     starting_asteroids = num_asteroids_for_level(level);
@@ -558,6 +578,8 @@ void reset_level_state(unsigned int new_level, unsigned int new_lives, unsigned 
 
     player.lives = new_lives;
     player.score = new_score;
+
+    return true;
 }
 
 void level_loop()
@@ -642,7 +664,30 @@ void level_loop()
     const float residual = (float)residual_simulation_time() / 1000.f;
 
     video_clear();
-    draw_asteroids(asteroids, MAX_ASTEROIDS, false, residual);
+
+    for (int i = 0; i < MAX_ASTEROIDS; i++) {
+        if (!asteroids[i].visible) {
+            continue;
+        }
+
+        const struct vec_2d position = {
+            asteroids[i].pos.x + asteroids[i].vel.x * residual,
+            asteroids[i].pos.y + asteroids[i].vel.y * residual
+        };
+
+        const struct vec_2d scale = {
+            1.0f / asteroids[i].size,
+            1.0f / asteroids[i].size
+        };
+
+        assert(canvas_draw_lines(
+            asteroid_shape_ids[asteroids[i].shape],
+            position,
+            asteroids[i].rot,
+            scale
+        ));
+    }
+
     draw_bullets(bullets, MAX_BULLETS);
     draw_explosions(explosions, MAX_EXPLOSIONS);
     if (player.state == PS_NORMAL) {

@@ -44,6 +44,7 @@ find_package(OpenGL REQUIRED)
 
 set(SRCS
     src/asteroid.c
+    src/canvas.c
     src/collision.c
     src/data.c
     src/draw.c
