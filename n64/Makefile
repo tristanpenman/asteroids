@@ -19,7 +19,7 @@ APP = asteroids.out
 
 TARGETS = asteroids.n64
 
-CODEFILES = gfx.c main.c stage00.c
+CODEFILES = $(wildcard *.c)
 
 CODEOBJECTS = $(CODEFILES:.c=.o) $(NUSYSLIBDIR)/nusys.o
 

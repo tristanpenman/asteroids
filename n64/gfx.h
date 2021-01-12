@@ -11,12 +11,12 @@
 
 // The projection-matrix structure
 typedef struct {
-  Mtx projection;
+    Mtx projection;
 
-  // Modeling matrices
-  Mtx modeling;
-  Mtx rotation;
-  Mtx scale;
+    // Modeling matrices
+    Mtx modeling;
+    Mtx rotation;
+    Mtx scale;
 } Dynamic;
 
 extern Dynamic gfx_dynamic;
