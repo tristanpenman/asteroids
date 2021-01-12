@@ -19,6 +19,11 @@ void canvas_reset();
 int canvas_load_shape(const struct shape *);
 
 /**
+ * Start drawing shapes onto the canvas
+ */
+void canvas_start_drawing();
+
+/**
  * Draw the lines defined by a shape
  */
 bool canvas_draw_lines(int shape, struct vec_2d position, float rotation, struct vec_2d scale);
@@ -27,5 +32,10 @@ bool canvas_draw_lines(int shape, struct vec_2d position, float rotation, struct
  * Draw the triangles defined by a shape
  */
 bool canvas_draw_triangles(int shape, struct vec_2d position, float rotation, struct vec_2d scale);
+
+/**
+ * Finish drawing shapes to the canvas
+ */
+void canvas_finish_drawing(bool swap);
 
 #endif

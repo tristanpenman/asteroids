@@ -9,6 +9,7 @@
 #include "shape.h"
 #include "vec.h"
 
+#define MAX_TRANSFORMS 30
 #define MAX_SHAPES 64
 #define MAX_VERTICES 100
 
@@ -29,6 +30,10 @@ static struct geometry shapes[MAX_SHAPES];
 
 static int num_shapes = 0;
 static int num_vertices = 0;
+
+static Dynamic transforms[MAX_TRANSFORMS];
+
+static int num_transforms = 0;
 
 void canvas_reset()
 {
@@ -71,6 +76,20 @@ int canvas_load_shape(const struct shape *shape)
     return num_shapes++;
 }
 
+void canvas_start_drawing()
+{
+    // Specify the display list buffer
+    glistp = gfx_glist;
+
+    // The initialization of RCP
+    gfxRCPInit();
+
+    // Clear the frame buffer and the Z-buffer
+    gfxClearCfb();
+
+    num_transforms = 0;
+}
+
 bool canvas_draw_lines(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
 {
     // TODO
@@ -80,7 +99,9 @@ bool canvas_draw_lines(int shape, struct vec_2d position, float rotation, struct
 
 bool canvas_draw_triangles(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
 {
-    guOrtho(&gfx_dynamic.projection,
+    Dynamic *transform = &transforms[num_transforms++];
+
+    guOrtho(&transform->projection,
         0.0f,       // left
         SCREEN_WD,  // right
         SCREEN_HT,  // bottom
@@ -89,25 +110,25 @@ bool canvas_draw_triangles(int shape, struct vec_2d position, float rotation, st
         10.0f,      // far
         1.0f);      // scale
 
-    guTranslate(&gfx_dynamic.modeling,
+    guTranslate(&transform->modeling,
         (float)SCREEN_WD / 2.0f + position.x,
         (float)SCREEN_HT / 2.0f + position.y,
         0.0f);
-    guRotate(&gfx_dynamic.rotation, rotation, 0.0f, 0.0f, 1.0f);
+    guRotate(&transform->rotation, rotation, 0.0f, 0.0f, 1.0f);
     // Global scaling factor
     // TODO: Could this be incorporated into projection matrix?
-    guScale(&gfx_dynamic.scale, 1.0f, 1.2f, 1.f);
+    guScale(&transform->scale, 1.0f, 1.2f, 1.f);
 
     // load projection matrix
-    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(gfx_dynamic.projection)),
+    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(transform->projection)),
         G_MTX_LOAD | G_MTX_NOPUSH | G_MTX_PROJECTION);
 
     // load and transform model-view matrix
-    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(gfx_dynamic.modeling)),
+    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(transform->modeling)),
         G_MTX_LOAD | G_MTX_NOPUSH | G_MTX_MODELVIEW);
-    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(gfx_dynamic.rotation)),
+    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(transform->rotation)),
         G_MTX_MUL | G_MTX_NOPUSH | G_MTX_MODELVIEW);
-    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(gfx_dynamic.scale)),
+    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(transform->scale)),
         G_MTX_MUL | G_MTX_NOPUSH | G_MTX_MODELVIEW);
 
     // load vertices (I think this is limited to loading 32 vertices at once)
@@ -131,4 +152,16 @@ bool canvas_draw_triangles(int shape, struct vec_2d position, float rotation, st
     }
 
     return true;
+}
+
+void canvas_finish_drawing(bool swap)
+{
+    gDPFullSync(glistp++);
+    gSPEndDisplayList(glistp++);
+
+    assert(glistp - gfx_glist < GFX_GLIST_LEN);
+
+    // Activate the RSP task
+    nuGfxTaskStart(gfx_glist, (s32)(glistp - gfx_glist) * sizeof (Gfx),
+        NU_GFX_UCODE_F3DEX2, swap ? NU_SC_SWAPBUFFER : NU_SC_NOSWAPBUFFER);
 }

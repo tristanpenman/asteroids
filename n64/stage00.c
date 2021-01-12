@@ -62,32 +62,13 @@ void makeDL00(void)
 {
     char conbuf[20];
 
-    // Specify the display list buffer
-    glistp = gfx_glist;
-
-    // The initialization of RCP
-    gfxRCPInit();
-
-    // Clear the frame buffer and the Z-buffer
-    gfxClearCfb();
+    canvas_start_drawing();
 
     draw(&gfx_dynamic);
 
     canvas_draw_triangles(asteroid1, vec_2d_zero, 0, vec_2d_zero);
 
-    gDPFullSync(glistp++);
-    gSPEndDisplayList(glistp++);
-
-    assert(glistp - gfx_glist < GFX_GLIST_LEN);
-
-    // Activate the RSP task
-    nuGfxTaskStart(gfx_glist, (s32)(glistp - gfx_glist) * sizeof (Gfx),
-#ifdef LINES
-        // NU_GFX_UCODE_L3DEX2,
-#else
-        NU_GFX_UCODE_F3DEX2,
-#endif
-        NU_SC_NOSWAPBUFFER);
+    canvas_finish_drawing(false);
 
     // Change character representation positions */
     nuDebConTextPos(0,12,23);
@@ -169,7 +150,7 @@ void draw(Dynamic* dynamicp)
         (float)SCREEN_WD / 2.0f + pos_x,
         (float)SCREEN_HT / 2.0f + pos_y,
         0.0f);
-    guRotate(&(dynamicp->rotation), 0.0f, 0.0f, 0.0f, 1.0f);
+    guRotate(&(dynamicp->rotation), theta, 0.0f, 0.0f, 1.0f);
     // Global scaling factor
     // TODO: Could this be incorporated into projection matrix?
     guScale(&gfx_dynamic.scale, 1.0f, 1.2f, 1.f);
