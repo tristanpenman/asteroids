@@ -35,9 +35,6 @@ extern int thruster_channel;
 
 extern struct shape asteroid_shapes[];
 
-extern struct vec_2d unit;
-extern struct vec_2d zero;
-
 static unsigned int level;
 static unsigned int starting_asteroids;
 static unsigned int next_beat;

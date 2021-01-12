@@ -2,6 +2,16 @@
 
 #include "vec.h"
 
+const struct vec_2d vec_2d_unit = {
+    1.0f,
+    1.0f
+};
+
+const struct vec_2d vec_2d_zero = {
+    0.0f,
+    0.0f
+};
+
 float vec_2d_dot(const struct vec_2d *u, const struct vec_2d *v)
 {
     return u->x * v->x + u->y * v->y;

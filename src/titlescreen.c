@@ -33,9 +33,6 @@ static int asteroid_shape_ids[NUM_ASTEROID_SHAPES];
 
 extern struct shape asteroid_shapes[];
 
-extern struct vec_2d unit;
-extern struct vec_2d zero;
-
 /******************************************************************************
  *
  * Public interface
@@ -124,7 +121,7 @@ void titlescreen_loop()
             asteroid_shape_ids[asteroids[i].shape],
             position,
             asteroids[i].rot,
-            unit
+            vec_2d_unit
         ));
     }
 

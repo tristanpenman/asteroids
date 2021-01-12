@@ -7,16 +7,16 @@ struct vec_2d
     float y;
 };
 
+/**
+ * Unit vector (1.0, 1.0)
+ */
+extern const struct vec_2d vec_2d_unit;
 
-static struct vec_2d unit = {
-    1.0f,
-    1.0f
-};
+/**
+ * Zero vector (0.0, 0.0)
+ */
+extern const struct vec_2d vec_2d_zero;
 
-static struct vec_2d zero = {
-    0.0f,
-    0.0f
-};
 
 /**
  * Calculate the dot product of a pair of 2D (float) vectors
