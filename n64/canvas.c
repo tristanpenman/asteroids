@@ -76,18 +76,21 @@ int canvas_load_shape(const struct shape *shape)
     return num_shapes++;
 }
 
-void canvas_start_drawing()
+void canvas_start_drawing(bool clear)
 {
+    // discard transforms used for previous frame
+    num_transforms = 0;
+
     // Specify the display list buffer
     glistp = gfx_glist;
 
     // The initialization of RCP
     gfxRCPInit();
 
-    // Clear the frame buffer and the Z-buffer
-    gfxClearCfb();
-
-    num_transforms = 0;
+    if (clear) {
+        // Clear the frame buffer and the Z-buffer
+        gfxClearCfb();
+    }
 }
 
 bool canvas_draw_lines(int shape, struct vec_2d position, float rotation, struct vec_2d scale)

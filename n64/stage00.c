@@ -62,7 +62,7 @@ void makeDL00(void)
 {
     char conbuf[20];
 
-    canvas_start_drawing();
+    canvas_start_drawing(true);
 
     draw(&gfx_dynamic);
 

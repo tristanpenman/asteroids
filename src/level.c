@@ -650,7 +650,7 @@ void level_loop()
 
     const float residual = (float)residual_simulation_time() / 1000.f;
 
-    video_clear();
+    canvas_start_drawing(true);
 
     for (int i = 0; i < MAX_ASTEROIDS; i++) {
         if (!asteroids[i].visible) {
@@ -685,5 +685,5 @@ void level_loop()
     draw_score(player.score);
     draw_lives(player.lives);
 
-    video_swap();
+    canvas_finish_drawing(true);
 }

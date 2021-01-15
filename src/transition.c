@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 
+#include "canvas.h"
 #include "draw.h"
 #include "level.h"
 #include "loop.h"
@@ -46,11 +47,11 @@ void transition_loop()
     }
 
     if (elapsed < START_LEVEL_DELAY_MS) {
-        video_clear();
+        canvas_start_drawing(true);
         draw_score(score);
         draw_lives(lives);
         draw_level_title(level);
-        video_swap();
+        canvas_finish_drawing(true);
     } else {
         reset_level_state(level, lives, score);
         set_main_loop(level_loop);

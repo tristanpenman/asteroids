@@ -9,6 +9,7 @@
 #include "canvas.h"
 #include "shape.h"
 #include "vec.h"
+#include "video.h"
 
 #define MAX_SHAPES 64
 
@@ -33,6 +34,13 @@ int canvas_load_shape(struct shape *shape)
 
     shapes[num_shapes] = shape;
     return num_shapes++;
+}
+
+void canvas_start_drawing(bool clear)
+{
+    if (clear) {
+        video_clear();
+    }
 }
 
 bool canvas_draw_lines(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
@@ -87,4 +95,11 @@ bool canvas_draw_triangles(int shape, struct vec_2d position, float rotation, st
     glDisableClientState(GL_VERTEX_ARRAY);
 
     return true;
+}
+
+void canvas_finish_drawing(bool swap)
+{
+    if (swap) {
+        video_swap();
+    }
 }

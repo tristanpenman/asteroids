@@ -5,6 +5,7 @@
 
 #include <SDL.h>
 
+#include "canvas.h"
 #include "draw.h"
 #include "loop.h"
 #include "options.h"
@@ -120,9 +121,9 @@ void highscore_screen_loop()
         }
     }
 
-    video_clear();
+    canvas_start_drawing(true);
     draw_highscores(&scores);
-    video_swap();
+    canvas_finish_drawing(true);
 }
 
 void insert_new_high_score(unsigned int score, const char initials[4])

@@ -109,7 +109,7 @@ void titlescreen_loop()
         printf("%f\n", residual);
     }
 
-    video_clear();
+    canvas_start_drawing(true);
 
     for (int i = 0; i < NUM_ASTEROIDS; i++) {
         const struct vec_2d position = {
@@ -129,5 +129,6 @@ void titlescreen_loop()
 
     draw_title();
     draw_instructions();
-    video_swap();
+
+    canvas_finish_drawing(true);
 }

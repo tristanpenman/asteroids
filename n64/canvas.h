@@ -21,7 +21,7 @@ int canvas_load_shape(const struct shape *);
 /**
  * Start drawing shapes onto the canvas
  */
-void canvas_start_drawing();
+void canvas_start_drawing(bool clear);
 
 /**
  * Draw the lines defined by a shape

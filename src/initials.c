@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 
+#include "canvas.h"
 #include "draw.h"
 #include "highscores.h"
 #include "loop.h"
@@ -72,12 +73,12 @@ void initials_screen_loop()
         }
     }
 
-    video_clear();
+    canvas_start_drawing(true);
     draw_new_high_score_message();
     draw_new_high_score_input(initials);
     if (current_initial == 3) {
         draw_new_high_score_enter_to_continue();
     }
     draw_score(score);
-    video_swap();
+    canvas_finish_drawing(true);
 }
