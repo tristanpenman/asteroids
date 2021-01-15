@@ -13,7 +13,7 @@ static Vp vp = {
 };
 
 // Display list to initialise RDP
-Gfx setup_rdpstate[] = {
+static Gfx setup_rdpstate[] = {
     gsDPSetRenderMode(G_RM_OPA_SURF, G_RM_OPA_SURF2),
     gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
     gsDPSetScissor(G_SC_NON_INTERLACE, 0,0, SCREEN_WD, SCREEN_HT),
@@ -22,7 +22,7 @@ Gfx setup_rdpstate[] = {
 };
 
 // Display list to initialise RSP
-Gfx setup_rspstate[] = {
+static Gfx setup_rspstate[] = {
     gsSPViewport(&vp),
     gsSPClearGeometryMode(0xFFFFFFFF),
     gsSPSetGeometryMode(G_ZBUFFER | G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK),
@@ -30,7 +30,7 @@ Gfx setup_rspstate[] = {
     gsSPEndDisplayList()
 };
 
-void gfxRCPInit(void)
+void gfx_rcp_init(void)
 {
     // Setting the RSP segment register
     gSPSegment(glistp++, 0, 0x0);
@@ -42,7 +42,7 @@ void gfxRCPInit(void)
     gSPDisplayList(glistp++, OS_K0_TO_PHYSICAL(setup_rdpstate));
 }
 
-void gfxClearCfb(void)
+void gfx_clear_cfb(void)
 {
     // Setting addresses of the frame buffer/Z-buffer and clear them using
     // nuGfxZBuffer (the address of the Z-buffer) and nuGfxCfb_ptr (the address

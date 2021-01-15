@@ -85,11 +85,11 @@ void canvas_start_drawing(bool clear)
     glistp = gfx_glist;
 
     // The initialization of RCP
-    gfxRCPInit();
+    gfx_rcp_init();
 
     if (clear) {
         // Clear the frame buffer and the Z-buffer
-        gfxClearCfb();
+        gfx_clear_cfb();
     }
 }
 

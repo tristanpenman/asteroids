@@ -9,6 +9,7 @@
 #include "vec.h"
 
 #define BUFFER 5
+#define MAX_VERTICES 64
 #define SHIP_ACCELERATION 100.45f
 
 extern NUContData contdata[1];
@@ -36,26 +37,76 @@ static float vel_y;
 
 static uint8_t asteroid1;
 
-#define MAX_VERTICES 64
-
 static Vtx asteroid_vtx_data[MAX_VERTICES];
 
-void draw(Dynamic* dynamicp);
-void draw_asteroid(Dynamic* dynamicp);
-
-void initStage00(void)
+void draw(Dynamic* dynamicp)
 {
-    canvas_reset();
+    static Vtx shade_vtx[] =  {
+        {  0.00, -6.40, -5.0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff },
+        { -5.12,  5.76, -5.0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff },
+        {  5.12,  5.76, -5.0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff },
+        { -4.48,  4.00, -5.0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff },
+        {  4.48,  4.00, -5.0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff },
+        {  0.00,  6.40, -5.0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff }
+    };
 
-    asteroid1 = canvas_load_shape(&asteroid_shapes[0]);
+    guOrtho(&(dynamicp->projection),
+        0.0f,       // left
+        SCREEN_WD,  // right
+        SCREEN_HT,  // bottom
+        0.0f,       // top
+        1.0f,       // near
+        10.0f,      // far
+        1.0f);      // scale
 
-    theta = 0.0;
+    guTranslate(&(dynamicp->modeling),
+        (float)SCREEN_WD / 2.0f + pos_x,
+        (float)SCREEN_HT / 2.0f + pos_y,
+        0.0f);
+    guRotate(&(dynamicp->rotation), theta, 0.0f, 0.0f, 1.0f);
+    // Global scaling factor
+    // TODO: Could this be incorporated into projection matrix?
+    guScale(&gfx_dynamic.scale, 1.0f, 1.2f, 1.f);
 
-    pos_x = 0.0;
-    pos_y = 0.0;
+    // load projection matrix
+    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(dynamicp->projection)),
+        G_MTX_LOAD | G_MTX_NOPUSH | G_MTX_PROJECTION);
 
-    vel_x = 0.0;
-    vel_y = 0.0;
+    // load and transform model-view matrix
+    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(dynamicp->modeling)),
+        G_MTX_LOAD | G_MTX_NOPUSH | G_MTX_MODELVIEW);
+    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(dynamicp->rotation)),
+        G_MTX_MUL | G_MTX_NOPUSH | G_MTX_MODELVIEW);
+    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(dynamicp->scale)),
+        G_MTX_MUL | G_MTX_NOPUSH | G_MTX_MODELVIEW);
+
+    // load vertices (I think this is limited to loading 32 vertices at once)
+    gSPVertex(glistp++, &(shade_vtx[0]), 6, 0);
+
+    // Synchronizes RDP attribute updates by waiting for pixels to be processed
+    // during the rendering of primitives
+    gDPPipeSync(glistp++);
+
+    // number of pixels per cycle
+    gDPSetCycleType(glistp++, G_CYC_1CYCLE);
+
+#ifdef LINES
+    // support anti-aliased, translucent lines
+    gDPSetRenderMode(glistp++, G_RM_AA_XLU_LINE, G_RM_AA_XLU_LINE2);
+#else
+    gDPSetRenderMode(glistp++, G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF2);
+#endif
+
+    gSPClearGeometryMode(glistp++, 0xFFFFFFFF);
+    gSPSetGeometryMode(glistp++, G_SHADE | G_SHADING_SMOOTH);
+
+#ifdef LINES
+    gSPLineW3D(glistp++, 0, 1, 1.5, 0);
+    gSPLineW3D(glistp++, 0, 2, 1.5, 0);
+    gSPLineW3D(glistp++, 3, 4, 1.5, 0);
+#else
+    gSP1Triangle(glistp++, 0, 1, 2, 0);
+#endif
 }
 
 void makeDL00(void)
@@ -126,72 +177,32 @@ void updateGame00(void)
     }
 }
 
-void draw(Dynamic* dynamicp)
+/******************************************************************************
+ *
+ * Public interface
+ *
+ *****************************************************************************/
+
+void stage00_init()
 {
-    static Vtx shade_vtx[] =  {
-        {  0.00, -6.40, -5.0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff },
-        { -5.12,  5.76, -5.0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff },
-        {  5.12,  5.76, -5.0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff },
-        { -4.48,  4.00, -5.0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff },
-        {  4.48,  4.00, -5.0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff },
-        {  0.00,  6.40, -5.0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff }
-    };
+    canvas_reset();
 
-    guOrtho(&(dynamicp->projection),
-        0.0f,       // left
-        SCREEN_WD,  // right
-        SCREEN_HT,  // bottom
-        0.0f,       // top
-        1.0f,       // near
-        10.0f,      // far
-        1.0f);      // scale
+    asteroid1 = canvas_load_shape(&asteroid_shapes[0]);
 
-    guTranslate(&(dynamicp->modeling),
-        (float)SCREEN_WD / 2.0f + pos_x,
-        (float)SCREEN_HT / 2.0f + pos_y,
-        0.0f);
-    guRotate(&(dynamicp->rotation), theta, 0.0f, 0.0f, 1.0f);
-    // Global scaling factor
-    // TODO: Could this be incorporated into projection matrix?
-    guScale(&gfx_dynamic.scale, 1.0f, 1.2f, 1.f);
+    theta = 0.0;
 
-    // load projection matrix
-    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(dynamicp->projection)),
-        G_MTX_LOAD | G_MTX_NOPUSH | G_MTX_PROJECTION);
+    pos_x = 0.0;
+    pos_y = 0.0;
 
-    // load and transform model-view matrix
-    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(dynamicp->modeling)),
-        G_MTX_LOAD | G_MTX_NOPUSH | G_MTX_MODELVIEW);
-    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(dynamicp->rotation)),
-        G_MTX_MUL | G_MTX_NOPUSH | G_MTX_MODELVIEW);
-    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(dynamicp->scale)),
-        G_MTX_MUL | G_MTX_NOPUSH | G_MTX_MODELVIEW);
+    vel_x = 0.0;
+    vel_y = 0.0;
+}
 
-    // load vertices (I think this is limited to loading 32 vertices at once)
-    gSPVertex(glistp++, &(shade_vtx[0]), 6, 0);
+void stage00_loop(bool draw)
+{
+  if (draw) {
+      makeDL00();
+  }
 
-    // Synchronizes RDP attribute updates by waiting for pixels to be processed
-    // during the rendering of primitives
-    gDPPipeSync(glistp++);
-
-    // number of pixels per cycle
-    gDPSetCycleType(glistp++, G_CYC_1CYCLE);
-
-#ifdef LINES
-    // support anti-aliased, translucent lines
-    gDPSetRenderMode(glistp++, G_RM_AA_XLU_LINE, G_RM_AA_XLU_LINE2);
-#else
-    gDPSetRenderMode(glistp++, G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF2);
-#endif
-
-    gSPClearGeometryMode(glistp++, 0xFFFFFFFF);
-    gSPSetGeometryMode(glistp++, G_SHADE | G_SHADING_SMOOTH);
-
-#ifdef LINES
-    gSPLineW3D(glistp++, 0, 1, 1.5, 0);
-    gSPLineW3D(glistp++, 0, 2, 1.5, 0);
-    gSPLineW3D(glistp++, 3, 4, 1.5, 0);
-#else
-    gSP1Triangle(glistp++, 0, 1, 2, 0);
-#endif
+  updateGame00();
 }
