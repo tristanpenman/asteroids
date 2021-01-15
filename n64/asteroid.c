@@ -4,22 +4,21 @@
 #include <nusys.h>
 
 #include "asteroid.h"
+#include "data.h"
 #include "defines.h"
 #include "gfx.h"
 #include "shape.h"
 #include "util.h"
-
-extern const struct shape asteroid_shapes[];
 
 float calculate_asteroid_radius(unsigned int shape)
 {
     float r;
     float r_max = 0.0f;
 
-    const uint16_t *vertices = asteroid_shapes[shape].vertices;
+    const uint16_t *vertices = asteroid_shape_data[shape].vertices;
 
     unsigned int i;
-    unsigned int n = asteroid_shapes[shape].num_vertices;;
+    unsigned int n = asteroid_shape_data[shape].num_vertices;;
 
     for (i = 0; i < n * 2; i += 2) {
         r = sqrt(vertices[i] * vertices[i] + vertices[i + 1] * vertices[i + 1]);
@@ -71,7 +70,7 @@ void init_asteroid(struct asteroid *a)
     a->pos_prev.y = a->pos.y;
     a->visible = true;
     a->scale = 1.0f;
-    a->shape = rand() % ASTEROID_SHAPES;
+    a->shape = rand() % NUM_ASTEROID_SHAPES;
     a->radius = calculate_asteroid_radius(a->shape) * a->scale;
 }
 

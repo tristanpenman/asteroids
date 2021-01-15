@@ -4,6 +4,8 @@
 #include <stdlib.h>
 
 #include "canvas.h"
+#include "data.h"
+#include "defines.h"
 #include "gfx.h"
 #include "shape.h"
 #include "vec.h"
@@ -14,8 +16,6 @@
 
 extern NUContData contdata[1];
 extern u8 contPattern;
-
-extern const struct shape asteroid_shapes[];
 
 static const float ratio = (float)SCREEN_HT / (float)SCREEN_WD;
 static const float factor = 1.0f / 60.0f;
@@ -35,7 +35,7 @@ static float pos_y;
 static float vel_x;
 static float vel_y;
 
-static uint8_t asteroid1;
+static uint8_t asteroid_shapes[NUM_ASTEROID_SHAPES];
 
 static Vtx asteroid_vtx_data[MAX_VERTICES];
 
@@ -117,7 +117,7 @@ void makeDL00(void)
 
     draw(&gfx_dynamic);
 
-    canvas_draw_triangles(asteroid1, vec_2d_zero, 0, vec_2d_zero);
+    canvas_draw_triangles(asteroid_shapes[2], vec_2d_zero, 0, vec_2d_zero);
 
     canvas_finish_drawing(false);
 
@@ -187,7 +187,10 @@ void stage00_init()
 {
     canvas_reset();
 
-    asteroid1 = canvas_load_shape(&asteroid_shapes[0]);
+    for (int i = 0; i < NUM_ASTEROID_SHAPES; i++) {
+        asteroid_shapes[i] = canvas_load_shape(&asteroid_shape_data[i]);
+        assert(asteroid_shapes[i] != CANVAS_INVALID_SHAPE);
+    }
 
     theta = 0.0;
 
