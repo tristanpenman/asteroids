@@ -1,5 +1,6 @@
 #include <math.h>
 
+#include "asteroid.h"
 #include "options.h"
 #include "shape.h"
 #include "types.h"
@@ -52,7 +53,7 @@ static bool test_asteroid_against_polygon(const struct asteroid *asteroid,
 
     const float sinr = sinf(asteroid->rot);
     const float cosr = cosf(asteroid->rot);
-    const float scale = (float) asteroid->size;
+    const float scale = asteroid->scale;
 
     struct vec_2d a1, a2, a3, a4, a5, a6;
     const struct vec_2d *e1, *e2;
@@ -61,19 +62,19 @@ static bool test_asteroid_against_polygon(const struct asteroid *asteroid,
 
     for (i = 0; i < num_asteroid_vertices; i++) {
         if (i == 0) {
-            a1.x = (cosr * geometry[i * 2 + 1] - sinr * geometry[i * 2 + 2]) / scale;
-            a1.y = (cosr * geometry[i * 2 + 2] + sinr * geometry[i * 2 + 1]) / scale;
+            a1.x = (cosr * geometry[i * 2 + 1] - sinr * geometry[i * 2 + 2]) * scale;
+            a1.y = (cosr * geometry[i * 2 + 2] + sinr * geometry[i * 2 + 1]) * scale;
         } else {
             a1.x = a2.x;
             a1.y = a2.y;
         }
 
         if (i == num_asteroid_vertices - 1) {
-            a2.x = (cosr * geometry[1] - sinr * geometry[2]) / scale;
-            a2.y = (cosr * geometry[2] + sinr * geometry[1]) / scale;
+            a2.x = (cosr * geometry[1] - sinr * geometry[2]) * scale;
+            a2.y = (cosr * geometry[2] + sinr * geometry[1]) * scale;
         } else {
-            a2.x = (cosr * geometry[i * 2 + 3] - sinr * geometry[i * 2 + 4]) / scale;
-            a2.y = (cosr * geometry[i * 2 + 4] + sinr * geometry[i * 2 + 3]) / scale;
+            a2.x = (cosr * geometry[i * 2 + 3] - sinr * geometry[i * 2 + 4]) * scale;
+            a2.y = (cosr * geometry[i * 2 + 4] + sinr * geometry[i * 2 + 3]) * scale;
         }
 
         a3.x = a1.x + asteroid->pos.x - offset->x;

@@ -5,6 +5,7 @@
 #include <SDL.h>
 #endif
 
+#include "asteroid.h"
 #include "shape.h"
 #include "types.h"
 #include "util.h"
@@ -72,9 +73,9 @@ void init_asteroid(struct asteroid *a)
     a->pos_prev.x = a->pos.x;
     a->pos_prev.y = a->pos.y;
     a->visible = true;
-    a->size = ASIZE_LARGE;
+    a->scale = 1.0f;
     a->shape = rand() % ASTEROID_SHAPES;
-    a->radius = calculate_asteroid_radius(a->shape) / (float)(a->size);
+    a->radius = calculate_asteroid_radius(a->shape) * a->scale;
 }
 
 void update_asteroids(struct asteroid *aa, unsigned int n, float f)

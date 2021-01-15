@@ -395,24 +395,19 @@ void explode_asteroid(struct asteroid *a,
         }
     }
 
-    switch(a->size) {
-    case ASIZE_LARGE:
-        a->size = ASIZE_MEDIUM;
-        vel_scale = 1.25f;
-        break;
-
-    case ASIZE_MEDIUM:
-        a->size = ASIZE_SMALL;
-        vel_scale = 1.5f;
-        break;
-
-    case ASIZE_SMALL:
+    if (a->scale < 0.49f) {
         a->visible = false;
         return;
+    } else if (a->scale < 0.99f) {
+        a->scale = 0.25f;
+        vel_scale = 1.5f;
+    } else {
+        a->scale = 0.5f;
+        vel_scale = 1.25f;
     }
 
     a->shape = rand() % ASTEROID_SHAPES;
-    a->radius = calculate_asteroid_radius(a->shape) / (float)(a->size);
+    a->radius = calculate_asteroid_radius(a->shape) * a->scale;
 
     randomise_asteroid_velocity(a, vel_scale);
     randomise_asteroid_rotation(a);
@@ -424,9 +419,9 @@ void explode_asteroid(struct asteroid *a,
             aa[i].pos.y = a->pos.y;
             aa[i].pos_prev.x = a->pos_prev.x;
             aa[i].pos_prev.y = a->pos_prev.y;
-            aa[i].size = a->size;
+            aa[i].scale = a->scale;
             aa[i].shape = rand() % ASTEROID_SHAPES;
-            aa[i].radius = calculate_asteroid_radius(aa[i].shape) / (float)(aa[i].size);
+            aa[i].radius = calculate_asteroid_radius(aa[i].shape) * aa[i].scale;
             randomise_asteroid_velocity(&aa[i], vel_scale);
             randomise_asteroid_rotation(&aa[i]);
             break;
@@ -461,7 +456,7 @@ void check_collisions(struct player *p, struct asteroid *aa, unsigned int na,
     float dx, dy;
     unsigned int i, j;
     bool asteroid_hit = false;
-    int asize;
+    float ascale;
 
     // Check for asteroid collisions
     for (j = 0; j < na; j++) {
@@ -469,7 +464,7 @@ void check_collisions(struct player *p, struct asteroid *aa, unsigned int na,
             continue;
         }
 
-        asize = aa[j].size;
+        ascale = aa[j].scale;
 
         if (asteroid_hit == false) {
             /* Check for bullet collisions */
@@ -515,19 +510,14 @@ void check_collisions(struct player *p, struct asteroid *aa, unsigned int na,
             }
             explosion_channel = mixer_play_sample(SOUND_EXPLOSION);
 
-            switch (asize) {
-            case ASIZE_LARGE:
-                update_score(p, 20);
-                break;
-            case ASIZE_MEDIUM:
-                update_score(p, 50);
-                break;
-            case ASIZE_SMALL:
+            if (ascale < 0.49f) {
                 update_score(p, 100);
-                break;
-            default:
-                break;
+            } else if (ascale < 0.99f) {
+                update_score(p, 50);
+            } else {
+                update_score(p, 20);
             }
+
             p->hit++;
         }
     }
@@ -673,8 +663,8 @@ void level_loop()
         };
 
         const struct vec_2d scale = {
-            1.0f / asteroids[i].size,
-            1.0f / asteroids[i].size
+            asteroids[i].scale,
+            asteroids[i].scale
         };
 
         assert(canvas_draw_lines(

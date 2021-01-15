@@ -6,25 +6,6 @@
 #include "options.h"
 #include "vec.h"
 
-enum asize
-{
-    ASIZE_LARGE  = 1,
-    ASIZE_MEDIUM = 2,
-    ASIZE_SMALL  = 4
-};
-
-struct asteroid
-{
-    bool visible;
-    struct vec_2d pos;
-    struct vec_2d pos_prev;
-    struct vec_2d vel;
-    float radius;
-    float rot;
-    enum asize size;
-    int shape;
-};
-
 enum keystate
 {
     KS_UP = 0,
