@@ -147,7 +147,7 @@ const uint8_t asteroid4_num_triangles = 10;
 // Collected asteroid shapes
 //
 
-const struct shape asteroid_shapes[ASTEROID_SHAPES] = {
+const struct shape asteroid_shape_data[] = {
     {
         asteroid1_vertices,
         asteroid1_num_vertices,
@@ -173,6 +173,11 @@ const struct shape asteroid_shapes[ASTEROID_SHAPES] = {
         asteroid4_num_triangles
     }
 };
+
+// ----------------------------------------------------------------------------
+//
+// Font
+//
 
 const float
     _a[] = { 7.0f, .00f,  .06f, .00f,  .02f,  .015f, .00f, .03f,  .02f, .03f,  .06f, .03f, .03f, .00f, .03f},

@@ -8,6 +8,7 @@
 
 #include "asteroid.h"
 #include "canvas.h"
+#include "data.h"
 #include "draw.h"
 #include "highscores.h"
 #include "level.h"
@@ -31,8 +32,6 @@ static struct asteroid asteroids[NUM_ASTEROIDS];
 
 static int asteroid_shape_ids[NUM_ASTEROID_SHAPES];
 
-extern struct shape asteroid_shapes[];
-
 /******************************************************************************
  *
  * Public interface
@@ -46,7 +45,7 @@ bool reset_titlescreen_state()
     canvas_reset();
 
     for (i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
-        asteroid_shape_ids[i] = canvas_load_shape(&asteroid_shapes[i]);
+        asteroid_shape_ids[i] = canvas_load_shape(&asteroid_shape_data[i]);
         if (asteroid_shape_ids[i] == CANVAS_INVALID_SHAPE) {
             return false;
         }
@@ -55,7 +54,7 @@ bool reset_titlescreen_state()
     enter_down = false;
     h_down = false;
     for (i = 0; i < NUM_ASTEROIDS; ++i) {
-        init_asteroid(&asteroids[i]);
+        asteroid_init(&asteroids[i]);
     }
 
     return true;
@@ -100,7 +99,9 @@ void titlescreen_loop()
     // Update and consume unused simulation time
     produce_simulation_time();
     while (maybe_consume_simulation_time(TIME_STEP_MILLIS)) {
-        update_asteroids(asteroids, NUM_ASTEROIDS, TIME_STEP_MILLIS / 1000.f);
+        for (int i = 0; i < NUM_ASTEROIDS; i++) {
+            asteroid_update(&asteroids[i], TIME_STEP_MILLIS / 1000.f);
+        }
     }
 
     // Unused simulation time, used to smooth animation

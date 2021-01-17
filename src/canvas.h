@@ -16,7 +16,7 @@ void canvas_reset();
 /**
  * Load a shape so that it can be drawn using \c video_draw_shape
  */
-int canvas_load_shape(struct shape *);
+int canvas_load_shape(const struct shape *);
 
 /**
  * Start drawing shapes onto the canvas

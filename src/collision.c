@@ -1,12 +1,11 @@
 #include <math.h>
 
 #include "asteroid.h"
+#include "data.h"
 #include "options.h"
 #include "shape.h"
 #include "types.h"
 #include "vec.h"
-
-extern const struct shape asteroid_shapes[];
 
 /******************************************************************************
  *
@@ -47,9 +46,9 @@ static bool test_asteroid_against_polygon(const struct asteroid *asteroid,
     const struct vec_2d vertices[], int num_vertices, bool wrap,
     const struct vec_2d *offset)
 {
-    const float *geometry = asteroid_shapes[asteroid->shape].vertices;
+    const float *geometry = asteroid_shape_data[asteroid->shape].vertices;
 
-    const unsigned int num_asteroid_vertices = asteroid_shapes[asteroid->shape].num_vertices;
+    const unsigned int num_asteroid_vertices = asteroid_shape_data[asteroid->shape].num_vertices;
 
     const float sinr = sinf(asteroid->rot);
     const float cosr = cosf(asteroid->rot);

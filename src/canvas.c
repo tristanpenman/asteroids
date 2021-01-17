@@ -17,7 +17,7 @@
 
 extern struct vec_2d origin;
 
-static struct shape* shapes[MAX_SHAPES];
+static const struct shape* shapes[MAX_SHAPES];
 
 static int num_shapes = 0;
 
@@ -26,7 +26,7 @@ void canvas_reset()
     num_shapes = 0;
 }
 
-int canvas_load_shape(struct shape *shape)
+int canvas_load_shape(const struct shape *shape)
 {
     if (num_shapes == MAX_SHAPES) {
         return CANVAS_INVALID_SHAPE;

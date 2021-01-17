@@ -6,11 +6,10 @@
 #endif
 
 #include "asteroid.h"
+#include "data.h"
 #include "shape.h"
 #include "types.h"
 #include "util.h"
-
-extern const struct shape asteroid_shapes[];
 
 extern const struct vec_2d origin;
 
@@ -19,10 +18,10 @@ float calculate_asteroid_radius(unsigned int shape)
     float r;
     float r_max = 0.0f;
 
-    const float *vertices = asteroid_shapes[shape].vertices;
+    const float *vertices = asteroid_shape_data[shape].vertices;
 
     unsigned int i;
-    unsigned int n = asteroid_shapes[shape].num_vertices;;
+    unsigned int n = asteroid_shape_data[shape].num_vertices;
 
     for (i = 0; i < n * 2; i += 2) {
         r = sqrtf(vertices[i] * vertices[i] + vertices[i + 1] * vertices[i + 1]);
@@ -64,7 +63,7 @@ void randomise_asteroid_velocity(struct asteroid *a, float vel_scale)
     a->vel.y = 0 - cosf(rot) * speed * vel_scale;
 }
 
-void init_asteroid(struct asteroid *a)
+void asteroid_init(struct asteroid *a)
 {
     randomise_asteroid_position(a);
     randomise_asteroid_velocity(a, 1.0f);
@@ -74,23 +73,19 @@ void init_asteroid(struct asteroid *a)
     a->pos_prev.y = a->pos.y;
     a->visible = true;
     a->scale = 1.0f;
-    a->shape = rand() % ASTEROID_SHAPES;
+    a->shape = rand() % NUM_ASTEROID_SHAPES;
     a->radius = calculate_asteroid_radius(a->shape) * a->scale;
 }
 
-void update_asteroids(struct asteroid *aa, unsigned int n, float f)
+void asteroid_update(struct asteroid *a, float f)
 {
-    unsigned int i;
-    for (i = 0; i < n; i++, aa++) {
-        if (true == aa->visible) {
-            aa->pos_prev.x = aa->pos.x;
-            aa->pos_prev.y = aa->pos.y;
-            aa->pos.x += aa->vel.x * f;
-            aa->pos.y += aa->vel.y * f;
-            if (wrap_position(&aa->pos, aa->radius)) {
-                aa->pos_prev.x = aa->pos.x;
-                aa->pos_prev.y = aa->pos.y;
-            }
-        }
+    a->pos_prev.x = a->pos.x;
+    a->pos_prev.y = a->pos.y;
+    a->pos.x += a->vel.x * f;
+    a->pos.y += a->vel.y * f;
+
+    if (wrap_position(&a->pos, a->radius)) {
+        a->pos_prev.x = a->pos.x;
+        a->pos_prev.y = a->pos.y;
     }
 }

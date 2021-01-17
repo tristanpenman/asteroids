@@ -8,6 +8,7 @@
 #include "asteroid.h"
 #include "canvas.h"
 #include "collision.h"
+#include "data.h"
 #include "draw.h"
 #include "loop.h"
 #include "mixer.h"
@@ -26,14 +27,11 @@
 #include "initials.h"
 #endif
 
-#define NUM_ASTEROID_SHAPES 4
 #define TIME_STEP_MILLIS 5
 
 extern int explosion_channel;
 extern int phaser_channel;
 extern int thruster_channel;
-
-extern struct shape asteroid_shapes[];
 
 static unsigned int level;
 static unsigned int starting_asteroids;
@@ -406,7 +404,7 @@ void explode_asteroid(struct asteroid *a,
         vel_scale = 1.25f;
     }
 
-    a->shape = rand() % ASTEROID_SHAPES;
+    a->shape = rand() % NUM_ASTEROID_SHAPES;
     a->radius = calculate_asteroid_radius(a->shape) * a->scale;
 
     randomise_asteroid_velocity(a, vel_scale);
@@ -420,7 +418,7 @@ void explode_asteroid(struct asteroid *a,
             aa[i].pos_prev.x = a->pos_prev.x;
             aa[i].pos_prev.y = a->pos_prev.y;
             aa[i].scale = a->scale;
-            aa[i].shape = rand() % ASTEROID_SHAPES;
+            aa[i].shape = rand() % NUM_ASTEROID_SHAPES;
             aa[i].radius = calculate_asteroid_radius(aa[i].shape) * aa[i].scale;
             randomise_asteroid_velocity(&aa[i], vel_scale);
             randomise_asteroid_rotation(&aa[i]);
@@ -545,7 +543,7 @@ bool reset_level_state(unsigned int new_level, unsigned int new_lives, unsigned 
     canvas_reset();
 
     for (int i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
-        asteroid_shape_ids[i] = canvas_load_shape(&asteroid_shapes[i]);
+        asteroid_shape_ids[i] = canvas_load_shape(&asteroid_shape_data[i]);
         if (asteroid_shape_ids[i] == CANVAS_INVALID_SHAPE) {
             return false;
         }
@@ -555,7 +553,7 @@ bool reset_level_state(unsigned int new_level, unsigned int new_lives, unsigned 
     starting_asteroids = num_asteroids_for_level(level);
     memset(asteroids, 0, sizeof(asteroids));
     for (int i = 0; i < starting_asteroids; i++) {
-        init_asteroid(&asteroids[i]);
+        asteroid_init(&asteroids[i]);
     }
 
     memset(bullets, 0, sizeof(struct bullet) * MAX_BULLETS);
@@ -609,7 +607,12 @@ void level_loop()
         update_bullets(bullets, MAX_BULLETS, factor);
 
         // Calculate new positions for asteroids
-        update_asteroids(asteroids, MAX_ASTEROIDS, factor);
+        for (int i = 0; i < MAX_ASTEROIDS; i++) {
+            if (asteroids[i].visible) {
+                asteroid_update(&asteroids[i], factor);
+            }
+        }
+
 
         check_collisions(&player, asteroids, MAX_ASTEROIDS,
             bullets, MAX_BULLETS, explosions, MAX_EXPLOSIONS,
