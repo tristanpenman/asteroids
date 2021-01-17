@@ -17,4 +17,11 @@ struct asteroid
     int shape;
 };
 
+float calculate_asteroid_radius(unsigned int shape);
+void randomise_asteroid_rotation(struct asteroid *a);
+void randomise_asteroid_velocity(struct asteroid *a, float vel_scale);
+
+void asteroid_init(struct asteroid *a);
+void asteroid_update(struct asteroid *a, float f);
+
 #endif

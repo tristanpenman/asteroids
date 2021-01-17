@@ -15,8 +15,6 @@
 
 #define RAD_TO_DEG (180.0 / M_PI)
 
-extern struct vec_2d origin;
-
 struct geometry {
     const Vtx *vertices;
     uint8_t num_vertices;

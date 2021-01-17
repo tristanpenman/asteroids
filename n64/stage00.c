@@ -3,6 +3,7 @@
 #include <nusys.h>
 #include <stdlib.h>
 
+#include "asteroid.h"
 #include "canvas.h"
 #include "data.h"
 #include "defines.h"
@@ -11,7 +12,7 @@
 #include "vec.h"
 
 #define BUFFER 5
-#define MAX_VERTICES 64
+#define NUM_ASTEROIDS 5
 #define SHIP_ACCELERATION 100.45f
 
 extern NUContData contdata[1];
@@ -37,7 +38,7 @@ static float vel_y;
 
 static uint8_t asteroid_shapes[NUM_ASTEROID_SHAPES];
 
-static Vtx asteroid_vtx_data[MAX_VERTICES];
+static struct asteroid asteroids[NUM_ASTEROIDS];
 
 void draw(Dynamic* dynamicp)
 {
@@ -117,7 +118,9 @@ void makeDL00(void)
 
     draw(&gfx_dynamic);
 
-    canvas_draw_triangles(asteroid_shapes[2], vec_2d_zero, 0, vec_2d_zero);
+    for (int i = 0; i < NUM_ASTEROIDS; i++) {
+        canvas_draw_triangles(asteroid_shapes[asteroids[i].shape], asteroids[i].pos, 0, vec_2d_zero);
+    }
 
     canvas_finish_drawing(false);
 
@@ -175,6 +178,10 @@ void updateGame00(void)
     } else if (pos_x < min_x) {
         pos_x = max_x;
     }
+
+    for (int i = 0; i < NUM_ASTEROIDS; i++) {
+        asteroid_update(&asteroids[i], 1.f / 60.f);
+    }
 }
 
 /******************************************************************************
@@ -190,6 +197,10 @@ void stage00_init()
     for (int i = 0; i < NUM_ASTEROID_SHAPES; i++) {
         asteroid_shapes[i] = canvas_load_shape(&asteroid_shape_data[i]);
         assert(asteroid_shapes[i] != CANVAS_INVALID_SHAPE);
+    }
+
+    for (int i = 0; i < NUM_ASTEROIDS; i++) {
+        asteroid_init(&asteroids[i]);
     }
 
     theta = 0.0;

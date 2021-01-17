@@ -60,10 +60,10 @@ void randomise_asteroid_velocity(struct asteroid *a, float vel_scale)
     a->vel.y = 0 - cos(rot) * speed * vel_scale;
 }
 
-void init_asteroid(struct asteroid *a)
+void asteroid_init(struct asteroid *a)
 {
     randomise_asteroid_position(a);
-    randomise_asteroid_velocity(a, 1.0f);
+    randomise_asteroid_velocity(a, 100.0f);
     randomise_asteroid_rotation(a);
 
     a->pos_prev.x = a->pos.x;
@@ -74,19 +74,15 @@ void init_asteroid(struct asteroid *a)
     a->radius = calculate_asteroid_radius(a->shape) * a->scale;
 }
 
-void update_asteroids(struct asteroid *aa, unsigned int n, float f)
+void asteroid_update(struct asteroid *a, float f)
 {
-    unsigned int i;
-    for (i = 0; i < n; i++, aa++) {
-        if (true == aa->visible) {
-            aa->pos_prev.x = aa->pos.x;
-            aa->pos_prev.y = aa->pos.y;
-            aa->pos.x += aa->vel.x * f;
-            aa->pos.y += aa->vel.y * f;
-            if (wrap_position(&aa->pos, aa->radius)) {
-                aa->pos_prev.x = aa->pos.x;
-                aa->pos_prev.y = aa->pos.y;
-            }
-        }
+    a->pos_prev.x = a->pos.x;
+    a->pos_prev.y = a->pos.y;
+    a->pos.x += a->vel.x * f;
+    a->pos.y += a->vel.y * f;
+
+    if (wrap_position(&a->pos, a->radius)) {
+        a->pos_prev.x = a->pos.x;
+        a->pos_prev.y = a->pos.y;
     }
 }
