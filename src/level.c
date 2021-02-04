@@ -1,23 +1,22 @@
 #include <assert.h>
-#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <SDL.h>
 
-#include "asteroid.h"
 #include "canvas.h"
 #include "collision.h"
 #include "data.h"
 #include "draw.h"
+#include "entities.h"
 #include "loop.h"
+#include "mathdefs.h"
 #include "mixer.h"
 #include "options.h"
 #include "shape.h"
 #include "timing.h"
 #include "titlescreen.h"
 #include "transition.h"
-#include "types.h"
 #include "util.h"
 #include "vec.h"
 #include "video.h"

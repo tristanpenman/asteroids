@@ -1,5 +1,4 @@
-#include <math.h>
-
+#include "mathdefs.h"
 #include "vec.h"
 
 const struct vec_2d vec_2d_unit = {

@@ -15,7 +15,6 @@
 #include "mixer.h"
 #include "options.h"
 #include "titlescreen.h"
-#include "types.h"
 #include "util.h"
 #include "vec.h"
 #include "video.h"

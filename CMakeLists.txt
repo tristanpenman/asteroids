@@ -43,11 +43,11 @@ endif()
 find_package(OpenGL REQUIRED)
 
 set(SRCS
-    src/asteroid.c
     src/canvas.c
     src/collision.c
     src/data.c
     src/draw.c
+    src/entities.c
     src/game.c
     src/highscores.c
     src/initials.c

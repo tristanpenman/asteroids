@@ -1,8 +1,7 @@
 #include "data.h"
 #include "entities.h"
-#include "mathdefs.h"
-#include "options.h"
 #include "shape.h"
+#include "mathdefs.h"
 #include "vec.h"
 
 /******************************************************************************

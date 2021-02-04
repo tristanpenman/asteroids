@@ -118,7 +118,8 @@ bool canvas_draw_triangles(int shape, struct vec_2d position, float rotation, st
     guRotate(&transform->rotation, rotation, 0.0f, 0.0f, 1.0f);
     // Global scaling factor
     // TODO: Could this be incorporated into projection matrix?
-    guScale(&transform->scale, 1.0f, 1.2f, 1.f);
+    // guScale(&transform->scale, 1.0f, 1.2f, 1.f);
+    guScale(&transform->scale, 1.0f, 1.0f, 1.f);
 
     // load projection matrix
     gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(transform->projection)),

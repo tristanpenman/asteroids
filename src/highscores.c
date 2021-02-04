@@ -7,10 +7,10 @@
 
 #include "canvas.h"
 #include "draw.h"
+#include "highscores.h"
 #include "loop.h"
 #include "options.h"
 #include "titlescreen.h"
-#include "types.h"
 #include "video.h"
 
 #define HIGHSCORES_BUFFER_SIZE 100

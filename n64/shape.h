@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 struct shape {
-    const uint16_t *vertices;
+    const float *vertices;
     uint8_t num_vertices;
 
     const uint8_t *triangles;

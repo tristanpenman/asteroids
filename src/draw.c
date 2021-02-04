@@ -1,4 +1,4 @@
-#include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -8,9 +8,12 @@
 
 #include <SDL_opengl.h>
 
+#include "entities.h"
+#include "highscores.h"
+#include "mathdefs.h"
 #include "options.h"
 #include "shape.h"
-#include "types.h"
+#include "vec.h"
 
 #define RAD_TO_DEG (180.0 / M_PI)
 

@@ -8,7 +8,7 @@ LIB = $(ROOT)/usr/lib
 LPR = $(LIB)/PR
 INC = $(ROOT)/usr/include
 
-LCDEFS = -DNU_DEBUG -DF3DEX_GBI_2
+LCDEFS = -DNU_DEBUG -DF3DEX_GBI_2 -DN64
 LCINCS = -I. -I$(NUSTDINCDIR) -I$(NUSYSINCDIR) -I$(ROOT)/usr/include/PR
 LCOPTS = -G 0
 LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnusys_d -lultra -L$(N64_LIBGCCDIR) -lgcc -lnustd

@@ -6,11 +6,13 @@ Be thrilled by this high fidelity reproduction of Atari's 1979 classic, Asteroid
 
 This is a tidied up version of an Asteroids clone that I wrote over the course of several weekends, as a way to procrastinate while studying for exams. The aim was to get the game running quickly, taking a 'less-is-more' approach. Graphics were implemented using legacy OpenGL, while window management, audio and input were all handled by SDL.
 
-I later decided to port the game to the web using Emscripten. I wrote a bit about the process as well, in [this blog post](https://tristanpenman.com/blog/posts/2018/01/08/porting-an-asteroids-clone-to-javascript/).
+This project has been ported a couple of times as well. First to the web using Emscripten, which I wrote about in [this blog post](https://tristanpenman.com/blog/posts/2018/01/08/porting-an-asteroids-clone-to-javascript/). And later to the venerable Nintendo 64, the details for which can be found [here](./n64).
 
 ## Demo
 
 A playable demo can be found [here](https://tristanpenman.com/demos/asteroids).
+
+If you want to try the N64 version (using either an emulator or a flash-cast such as the Everdrive 64) you can download the ROM [here](https://tristanpenman.com/demos/asteroids/asteroids.n64).
 
 ## Dependencies
 

@@ -1,27 +1,30 @@
-#include <math.h>
 #include <stdlib.h>
 
-#include <nusys.h>
+#ifdef _MSC_VER
+#include <SDL.h>
+#endif
 
-#include "asteroid.h"
 #include "data.h"
 #include "defines.h"
-#include "gfx.h"
+#include "entities.h"
+#include "mathdefs.h"
 #include "shape.h"
 #include "util.h"
+
+extern const struct vec_2d origin;
 
 float calculate_asteroid_radius(unsigned int shape)
 {
     float r;
     float r_max = 0.0f;
 
-    const uint16_t *vertices = asteroid_shape_data[shape].vertices;
+    const float *vertices = asteroid_shape_data[shape].vertices;
 
     unsigned int i;
-    unsigned int n = asteroid_shape_data[shape].num_vertices;;
+    unsigned int n = asteroid_shape_data[shape].num_vertices;
 
     for (i = 0; i < n * 2; i += 2) {
-        r = sqrt(vertices[i] * vertices[i] + vertices[i + 1] * vertices[i + 1]);
+        r = sqrtf(vertices[i] * vertices[i] + vertices[i + 1] * vertices[i + 1]);
         if (r_max < r) {
             r_max = r;
         }
@@ -37,9 +40,9 @@ void randomise_asteroid_position(struct asteroid *a)
     float dist = 0.0f;
 
     do {
-        x = random_float(-SCREEN_WD / 2.0f, SCREEN_WD / 2.0f);
-        y = random_float(-SCREEN_HT / 2.0f, SCREEN_HT / 2.0f);
-        dist = sqrt(x * x + y * y);
+        x = random_float(0 - origin.x, origin.x);
+        y = random_float(0 - origin.y, origin.y);
+        dist = sqrtf(x * x + y * y);
     } while (dist < NO_ASTEROID_RADIUS);
 
     a->pos.x = x;
@@ -56,14 +59,14 @@ void randomise_asteroid_velocity(struct asteroid *a, float vel_scale)
     const float speed = random_float(ASTEROID_SPEED_MIN, ASTEROID_SPEED_MAX);
     const float rot = random_float(0, 2.0f * (float) M_PI);
 
-    a->vel.x = sin(rot) * speed * vel_scale;
-    a->vel.y = 0 - cos(rot) * speed * vel_scale;
+    a->vel.x = sinf(rot) * speed * vel_scale;
+    a->vel.y = 0 - cosf(rot) * speed * vel_scale;
 }
 
 void asteroid_init(struct asteroid *a)
 {
     randomise_asteroid_position(a);
-    randomise_asteroid_velocity(a, 100.0f);
+    randomise_asteroid_velocity(a, 1.0f);
     randomise_asteroid_rotation(a);
 
     a->pos_prev.x = a->pos.x;

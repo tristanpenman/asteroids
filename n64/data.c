@@ -5,7 +5,7 @@
 // Asteroid 1
 //
 
-const uint16_t asteroid1_vertices[] = {
+const float asteroid1_vertices[] = {
       8, -16,
       0, -12,
       8, -16,
@@ -36,7 +36,7 @@ const uint8_t asteroid1_num_triangles = 7;
 // Asteroid 2
 //
 
-const uint16_t asteroid2_vertices[] = {
+const float asteroid2_vertices[] = {
      -8, -16,
       0, -12,
       8, -16,
@@ -73,7 +73,7 @@ const uint8_t asteroid2_num_triangles = 10;
 // Asteroid 3
 //
 
-const uint16_t asteroid3_vertices[] = {
+const float asteroid3_vertices[] = {
     -4, -16,
      8, -16,
     16, -4,
@@ -108,7 +108,7 @@ const uint8_t asteroid3_num_triangles = 9;
 // Asteroid 4
 //
 
-const uint16_t asteroid4_vertices[] = {
+const float asteroid4_vertices[] = {
     -8, -16,
      4, -16,
     16,  -8,

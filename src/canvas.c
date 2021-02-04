@@ -1,5 +1,3 @@
-#include <math.h>
-
 #ifdef _MSC_VER
 #include <SDL.h>
 #endif
@@ -7,6 +5,7 @@
 #include <SDL_opengl.h>
 
 #include "canvas.h"
+#include "mathdefs.h"
 #include "shape.h"
 #include "vec.h"
 #include "video.h"

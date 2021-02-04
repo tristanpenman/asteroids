@@ -1,13 +1,13 @@
 #include <assert.h>
-#include <math.h>
 #include <nusys.h>
 #include <stdlib.h>
 
-#include "asteroid.h"
 #include "canvas.h"
 #include "data.h"
 #include "defines.h"
+#include "entities.h"
 #include "gfx.h"
+#include "mathdefs.h"
 #include "shape.h"
 #include "vec.h"
 
