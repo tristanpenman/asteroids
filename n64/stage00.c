@@ -180,7 +180,12 @@ void updateGame00(void)
     }
 
     for (int i = 0; i < NUM_ASTEROIDS; i++) {
-        asteroid_update(&asteroids[i], 1.f / 60.f);
+        const struct vec_2d lim = {
+          1.f   / 2.f + asteroids[i].radius,
+          0.75f / 2.f + asteroids[i].radius
+        };
+
+        asteroid_update(&asteroids[i], 1.f / 60.f, &lim);
     }
 }
 

@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include "shape.h"
 
 // ----------------------------------------------------------------------------
@@ -5,21 +7,19 @@
 // Asteroid 1
 //
 
-const float asteroid1_vertices[] = {
-      8, -16,
-      0, -12,
-      8, -16,
-     16,  -8,
-     12,   0,
-     16,   8,
-      0,  16,
-    -16,   8,
-    -16,  -8
+static const float asteroid1_vertices[] = {
+    -.02f, -.04f,
+     .00f, -.03f,
+     .02f, -.04f,
+     .04f, -.02f,
+     .03f,  .00f,
+     .04f,  .02f,
+     .00f,  .04f,
+    -.04f,  .02f,
+    -.04f, -.02f
 };
 
-const uint8_t asteroid1_num_vertices = 9;
-
-const uint8_t asteroid1_triangles[] = {
+static const uint8_t asteroid1_triangles[] = {
     0, 1, 8,
     1, 2, 3,
     1, 3, 4,
@@ -29,29 +29,25 @@ const uint8_t asteroid1_triangles[] = {
     4, 5, 6
 };
 
-const uint8_t asteroid1_num_triangles = 7;
-
 // ----------------------------------------------------------------------------
 //
 // Asteroid 2
 //
 
 const float asteroid2_vertices[] = {
-     -8, -16,
-      0, -12,
-      8, -16,
-     16,  -8,
-      8,  -4,
-     16,   4,
-      8,  16,
-     -4,  12,
-     -8,  16,
-    -16,   8,
-    -12,   0,
-    -16,  -8
+    -.02f, -.04f,
+     .00f, -.03f,
+     .02f, -.04f,
+     .04f, -.02f,
+     .02f, -.01f,
+     .04f,  .01f,
+     .02f,  .04f,
+    -.01f,  .03f,
+    -.02f,  .04f,
+    -.04f,  .02f,
+    -.03f,  .00f,
+    -.04f, -.02f
 };
-
-const uint8_t asteroid2_num_vertices = 12;
 
 const uint8_t asteroid2_triangles[] = {
     0, 1, 11,
@@ -66,28 +62,24 @@ const uint8_t asteroid2_triangles[] = {
     8, 9, 10
 };
 
-const uint8_t asteroid2_num_triangles = 10;
-
 // ----------------------------------------------------------------------------
 //
 // Asteroid 3
 //
 
 const float asteroid3_vertices[] = {
-    -4, -16,
-     8, -16,
-    16, -4,
-    16,  4,
-     8,  16,
-     0,  16,
-     0,  4,
-    -8,  16,
-   -16,  4,
-    -8,  0,
-   -16, -4
+    -.01f, -.04f,
+     .02f, -.04f,
+     .04f, -.01f,
+     .04f,  .01f,
+     .02f,  .04f,
+     .00f,  .04f,
+     .00f,  .01f,
+    -.02f,  .04f,
+    -.04f,  .01f,
+    -.02f,  .00f,
+    -.04f, -.01f
 };
-
-const uint8_t asteroid3_num_vertices = 11;
 
 const uint8_t asteroid3_triangles[] = {
     0, 1, 9,
@@ -101,29 +93,25 @@ const uint8_t asteroid3_triangles[] = {
     7, 8, 9
 };
 
-const uint8_t asteroid3_num_triangles = 9;
-
 // ----------------------------------------------------------------------------
 //
 // Asteroid 4
 //
 
 const float asteroid4_vertices[] = {
-    -8, -16,
-     4, -16,
-    16,  -8,
-    16,  -4,
-     4,   0,
-    16,   8,
-     8,  16,
-     4,  12,
-    -8,  16,
-   -16,   4,
-   -16,  -4,
-    -4,  -8
+  -.02f, -.04f,
+   .01f, -.04f,
+   .04f, -.02f,
+   .04f, -.01f,
+   .01f,  .00f,
+   .04f,  .02f,
+   .02f,  .04f,
+   .01f,  .03f,
+  -.02f,  .04f,
+  -.04f,  .01f,
+  -.04f, -.01f,
+  -.01f, -.02f
 };
-
-const uint8_t asteroid4_num_vertices = 12;
 
 const uint8_t asteroid4_triangles[] = {
     0, 1, 11,
@@ -138,8 +126,6 @@ const uint8_t asteroid4_triangles[] = {
     9, 10, 11
 };
 
-const uint8_t asteroid4_num_triangles = 10;
-
 // ----------------------------------------------------------------------------
 //
 // Collected asteroid shapes
@@ -148,26 +134,26 @@ const uint8_t asteroid4_num_triangles = 10;
 const struct shape asteroid_shape_data[] = {
     {
         asteroid1_vertices,
-        asteroid1_num_vertices,
+        sizeof(asteroid1_vertices) / sizeof(float) / 2,
         asteroid1_triangles,
-        asteroid1_num_triangles
+        sizeof(asteroid1_triangles) / sizeof(uint8_t) / 3
     },
     {
         asteroid2_vertices,
-        asteroid2_num_vertices,
+        sizeof(asteroid2_vertices) / sizeof(float) / 2,
         asteroid2_triangles,
-        asteroid2_num_triangles
+        sizeof(asteroid2_triangles) / sizeof(uint8_t) / 3
     },
     {
         asteroid3_vertices,
-        asteroid3_num_vertices,
+        sizeof(asteroid3_vertices) / sizeof(float) / 2,
         asteroid3_triangles,
-        asteroid3_num_triangles
+        sizeof(asteroid3_triangles) / sizeof(uint8_t) / 3
     },
     {
         asteroid4_vertices,
-        asteroid4_num_vertices,
+        sizeof(asteroid4_vertices) / sizeof(float) / 2,
         asteroid4_triangles,
-        asteroid4_num_triangles
+        sizeof(asteroid4_triangles) / sizeof(uint8_t) / 3
     }
 };

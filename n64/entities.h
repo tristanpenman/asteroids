@@ -86,6 +86,6 @@ void randomise_asteroid_rotation(struct asteroid *a);
 void randomise_asteroid_velocity(struct asteroid *a, float vel_scale);
 
 void asteroid_init(struct asteroid *a);
-void asteroid_update(struct asteroid *a, float f);
+void asteroid_update(struct asteroid *a, float f, const struct vec_2d *lim);
 
 #endif

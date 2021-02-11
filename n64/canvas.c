@@ -5,6 +5,7 @@
 #include <nusys.h>
 
 #include "canvas.h"
+#include "defines.h"
 #include "gfx.h"
 #include "shape.h"
 #include "vec.h"
@@ -54,8 +55,8 @@ int canvas_load_shape(const struct shape *shape)
 
         memset(vertex, 0, sizeof(Vtx));
 
-        vertex->v.ob[0] = shape->vertices[i * 2];
-        vertex->v.ob[1] = shape->vertices[i * 2 + 1];
+        vertex->v.ob[0] = shape->vertices[i * 2] * (float)SCREEN_WD;
+        vertex->v.ob[1] = shape->vertices[i * 2 + 1] * (float)SCREEN_WD;
         vertex->v.ob[2] = -5;
 
         vertex->v.cn[0] = 0xFF;
@@ -103,18 +104,19 @@ bool canvas_draw_triangles(int shape, struct vec_2d position, float rotation, st
     Dynamic *transform = &transforms[num_transforms++];
 
     guOrtho(&transform->projection,
-        0.0f,       // left
-        SCREEN_WD,  // right
-        SCREEN_HT,  // bottom
-        0.0f,       // top
+        -SCREEN_WD / 2.f,  // left
+         SCREEN_WD / 2.f,  // right
+         SCREEN_HT / 2.f,  // bottom
+        -SCREEN_HT / 2.f,  // top
         1.0f,       // near
         10.0f,      // far
         1.0f);      // scale
 
     guTranslate(&transform->modeling,
-        (float)SCREEN_WD / 2.0f + position.x,
-        (float)SCREEN_HT / 2.0f + position.y,
+        position.x * SCREEN_WD,
+        position.y * SCREEN_WD,
         0.0f);
+
     guRotate(&transform->rotation, rotation, 0.0f, 0.0f, 1.0f);
     // Global scaling factor
     // TODO: Could this be incorporated into projection matrix?

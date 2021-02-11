@@ -1,5 +1,5 @@
-#ifndef _GFX_H
-#define _GFX_H
+#ifndef __GFX_H
+#define __GFX_H
 
 #include <nusys.h>
 
