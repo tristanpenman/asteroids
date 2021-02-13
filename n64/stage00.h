@@ -1,7 +1,7 @@
 #ifndef __STAGE00_H
 #define __STAGE00_H
 
-#include <stdbool.h>
+#include "types.h"
 
 void stage00_init();
 

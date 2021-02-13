@@ -42,6 +42,8 @@ void canvas_reset()
 
 int canvas_load_shape(const struct shape *shape)
 {
+    int i;
+
     if (num_shapes == MAX_SHAPES) {
         return CANVAS_INVALID_SHAPE;
     }
@@ -50,7 +52,7 @@ int canvas_load_shape(const struct shape *shape)
         return CANVAS_INVALID_SHAPE;
     }
 
-    for (int i = 0; i < shape->num_vertices; i++) {
+    for (i = 0; i < shape->num_vertices; i++) {
         Vtx *vertex = &vertices[num_vertices + i];
 
         memset(vertex, 0, sizeof(Vtx));
@@ -150,9 +152,12 @@ bool canvas_draw_triangles(int shape, struct vec_2d position, float rotation, st
     gSPClearGeometryMode(glistp++, 0xFFFFFFFF);
     gSPSetGeometryMode(glistp++, G_SHADE | G_SHADING_SMOOTH);
 
-    const uint8_t *triangles = shapes[shape].triangles;
-    for (int i = 0; i < shapes[shape].num_triangles * 3 - 2; i += 3) {
-        gSP1Triangle(glistp++, triangles[i], triangles[i + 1], triangles[i + 2], 0);
+    {
+        const uint8_t *triangles = shapes[shape].triangles;
+        int i;
+        for (i = 0; i < shapes[shape].num_triangles * 3 - 2; i += 3) {
+            gSP1Triangle(glistp++, triangles[i], triangles[i + 1], triangles[i + 2], 0);
+        }
     }
 
     return true;

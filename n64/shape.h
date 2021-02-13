@@ -1,7 +1,7 @@
 #ifndef __SHAPE_H
 #define __SHAPE_H
 
-#include <stdint.h>
+#include "types.h"
 
 struct shape {
     const float *vertices;

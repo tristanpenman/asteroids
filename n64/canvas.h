@@ -1,12 +1,12 @@
 #ifndef __CANVAS_H
 #define __CANVAS_H
 
-#include <stdbool.h>
+#include "types.h"
+#include "vec.h"
 
 #define CANVAS_INVALID_SHAPE -1
 
 struct shape;
-struct vec_2d;
 
 /**
  * Unload all previously loaded shapes

@@ -1,7 +1,7 @@
 #ifndef __LOOP_H
 #define __LOOP_H
 
-#include <stdbool.h>
+#include "types.h"
 
 typedef void (*main_loop_fn_t)(bool draw);
 

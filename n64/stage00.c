@@ -112,13 +112,14 @@ void draw(Dynamic* dynamicp)
 
 void makeDL00(void)
 {
+    int i;
     char conbuf[20];
 
     canvas_start_drawing(true);
 
     draw(&gfx_dynamic);
 
-    for (int i = 0; i < NUM_ASTEROIDS; i++) {
+    for (i = 0; i < NUM_ASTEROIDS; i++) {
         canvas_draw_triangles(asteroid_shapes[asteroids[i].shape], asteroids[i].pos, 0, vec_2d_zero);
     }
 
@@ -139,6 +140,9 @@ void makeDL00(void)
 
 void updateGame00(void)
 {
+    int i;
+    struct vec_2d lim;
+
     static float vel = 5.0;
     static float rot;
 
@@ -179,11 +183,9 @@ void updateGame00(void)
         pos_x = max_x;
     }
 
-    for (int i = 0; i < NUM_ASTEROIDS; i++) {
-        const struct vec_2d lim = {
-          1.f   / 2.f + asteroids[i].radius,
-          0.75f / 2.f + asteroids[i].radius
-        };
+    for (i = 0; i < NUM_ASTEROIDS; i++) {
+        lim.x = 1.f / 2.f + asteroids[i].radius;
+        lim.y = 0.75f / 2.f + asteroids[i].radius;
 
         asteroid_update(&asteroids[i], 1.f / 60.f, &lim);
     }
@@ -197,14 +199,15 @@ void updateGame00(void)
 
 void stage00_init()
 {
+    int i;
+
     canvas_reset();
 
-    for (int i = 0; i < NUM_ASTEROID_SHAPES; i++) {
+    for (i = 0; i < NUM_ASTEROID_SHAPES; i++) {
         asteroid_shapes[i] = canvas_load_shape(&asteroid_shape_data[i]);
-        assert(asteroid_shapes[i] != CANVAS_INVALID_SHAPE);
     }
 
-    for (int i = 0; i < NUM_ASTEROIDS; i++) {
+    for (i = 0; i < NUM_ASTEROIDS; i++) {
         asteroid_init(&asteroids[i]);
     }
 

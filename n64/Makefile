@@ -40,3 +40,4 @@ $(CODESEGMENT): $(CODEOBJECTS) Makefile
 
 $(TARGETS): $(OBJECTS)
 	$(MAKEROM) spec -I$(NUSYSINCDIR) -r $(TARGETS) -e $(APP)
+	makemask $(TARGETS)
