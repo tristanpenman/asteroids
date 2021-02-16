@@ -8,7 +8,10 @@
 #define NUM_ASTEROID_SHAPES 4
 
 // player
+#define SHIP_ACCELERATION 0.45f
 #define SHIP_EXPLOSION_SHARDS 5
 #define SHIP_PIVOT 0.025f
+#define SHIP_RADIUS 0.038f
+#define SHIP_ROTATION_SPEED 4.0f
 
 #endif

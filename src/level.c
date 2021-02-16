@@ -7,6 +7,7 @@
 #include "canvas.h"
 #include "collision.h"
 #include "data.h"
+#include "defines.h"
 #include "draw.h"
 #include "entities.h"
 #include "loop.h"
