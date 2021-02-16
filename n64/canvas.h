@@ -14,7 +14,7 @@ struct shape;
 void canvas_reset();
 
 /**
- * Load a shape so that it can be drawn using \c video_draw_shape
+ * Load a shape so that it can be drawn using \c canvas_draw_lines or \c canvas_draw_triangles
  */
 int canvas_load_shape(const struct shape *);
 
