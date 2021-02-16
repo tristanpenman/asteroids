@@ -92,6 +92,15 @@ void canvas_start_drawing(bool clear)
         // Clear the frame buffer and the Z-buffer
         gfx_clear_cfb();
     }
+
+    // TODO: not sure how important these are. Disabling them seems to make things smoother
+
+    // Synchronizes RDP attribute updates by waiting for pixels to be processed
+    // during the rendering of primitives
+    gDPPipeSync(glistp++);
+
+    // number of pixels per cycle
+    gDPSetCycleType(glistp++, G_CYC_1CYCLE);
 }
 
 bool canvas_draw_lines(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
@@ -114,16 +123,9 @@ bool canvas_draw_triangles(int shape, struct vec_2d position, float rotation, st
         10.0f,      // far
         1.0f);      // scale
 
-    guTranslate(&transform->modeling,
-        position.x * SCREEN_WD,
-        position.y * SCREEN_WD,
-        0.0f);
-
+    guTranslate(&transform->modeling, position.x * SCREEN_WD, position.y * SCREEN_WD, 0.0f);
     guRotate(&transform->rotation, rotation, 0.0f, 0.0f, 1.0f);
-    // Global scaling factor
-    // TODO: Could this be incorporated into projection matrix?
-    // guScale(&transform->scale, 1.0f, 1.2f, 1.f);
-    guScale(&transform->scale, 1.0f, 1.0f, 1.f);
+    guScale(&transform->scale, scale.x, scale.y, 1.f);
 
     // load projection matrix
     gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&(transform->projection)),

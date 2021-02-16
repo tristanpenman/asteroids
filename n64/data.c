@@ -33,7 +33,7 @@ static const uint8_t asteroid1_triangles[] = {
 // Asteroid 2
 //
 
-const float asteroid2_vertices[] = {
+static const float asteroid2_vertices[] = {
     -.02f, -.04f,
      .00f, -.03f,
      .02f, -.04f,
@@ -48,7 +48,7 @@ const float asteroid2_vertices[] = {
     -.04f, -.02f
 };
 
-const uint8_t asteroid2_triangles[] = {
+static const uint8_t asteroid2_triangles[] = {
     0, 1, 11,
     1, 2, 4,
     1, 4, 7,
@@ -66,7 +66,7 @@ const uint8_t asteroid2_triangles[] = {
 // Asteroid 3
 //
 
-const float asteroid3_vertices[] = {
+static const float asteroid3_vertices[] = {
     -.01f, -.04f,
      .02f, -.04f,
      .04f, -.01f,
@@ -80,7 +80,7 @@ const float asteroid3_vertices[] = {
     -.04f, -.01f
 };
 
-const uint8_t asteroid3_triangles[] = {
+static const uint8_t asteroid3_triangles[] = {
     0, 1, 9,
     0, 9, 10,
     1, 2, 6,
@@ -97,7 +97,7 @@ const uint8_t asteroid3_triangles[] = {
 // Asteroid 4
 //
 
-const float asteroid4_vertices[] = {
+static const float asteroid4_vertices[] = {
   -.02f, -.04f,
    .01f, -.04f,
    .04f, -.02f,
@@ -112,7 +112,7 @@ const float asteroid4_vertices[] = {
   -.01f, -.02f
 };
 
-const uint8_t asteroid4_triangles[] = {
+static const uint8_t asteroid4_triangles[] = {
     0, 1, 11,
     1, 2, 11,
     2, 3, 11,
@@ -155,4 +155,29 @@ const struct shape asteroid_shape_data[] = {
         asteroid4_triangles,
         sizeof(asteroid4_triangles) / sizeof(uint8_t) / 3
     }
+};
+
+// ----------------------------------------------------------------------------
+//
+// Player
+//
+
+static const float player_vertices[] = {
+    0.000f, -0.020f,
+   -0.016f,  0.018f,
+    0.016f,  0.018f,
+    0.014f,  0.0125f,
+   -0.014f,  0.0125f,
+    0.000f,  0.02f
+};
+
+static const uint8_t player_triangles[] = {
+    0, 1, 2
+};
+
+const struct shape player_shape_data = {
+    player_vertices,
+    sizeof(player_vertices) / sizeof(float) / 2,
+    player_triangles,
+    sizeof(player_triangles) / sizeof(uint8_t) / 2
 };

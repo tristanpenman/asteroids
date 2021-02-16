@@ -8,8 +8,8 @@ Gfx* glistp;
 
 // Conversion from (-1,-1,-1)-(1,1,1), with a 2-bit decimal suffix
 static Vp vp = {
-    SCREEN_WD*2, SCREEN_HT*2, G_MAXZ/2, 0,	// Scale
-    SCREEN_WD*2, SCREEN_HT*2, G_MAXZ/2, 0,	// Translate
+    SCREEN_WD * 2, SCREEN_HT * 2, G_MAXZ / 2, 0,  // Scale
+    SCREEN_WD * 2, SCREEN_HT * 2, G_MAXZ / 2, 0,  // Translate
 };
 
 // Display list to initialise RDP
