@@ -7,8 +7,8 @@ struct shape {
     const float *vertices;
     uint8_t num_vertices;
 
-    const uint8_t *triangles;
-    uint8_t num_triangles;
+    const uint8_t *line_segments;
+    uint8_t num_line_segments;
 };
 
 #endif

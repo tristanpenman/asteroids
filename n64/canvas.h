@@ -24,14 +24,9 @@ int canvas_load_shape(const struct shape *);
 void canvas_start_drawing(bool clear);
 
 /**
- * Draw the lines defined by a shape
+ * Draw the lines segments defined by a shape
  */
-bool canvas_draw_lines(int shape, struct vec_2d position, float rotation, struct vec_2d scale);
-
-/**
- * Draw the triangles defined by a shape
- */
-bool canvas_draw_triangles(int shape, struct vec_2d position, float rotation, struct vec_2d scale);
+bool canvas_draw_line_segments(int shape, struct vec_2d position, float rotation, struct vec_2d scale);
 
 /**
  * Finish drawing shapes to the canvas

@@ -40,7 +40,9 @@ static float vel_y;
 
 // shapes
 static uint8_t asteroid_shapes[NUM_ASTEROID_SHAPES];
-static uint8_t player_shape;
+
+static uint8_t player_frame_1_shape;
+static uint8_t player_frame_2_shape;
 
 void makeDL00(void)
 {
@@ -52,11 +54,10 @@ void makeDL00(void)
     };
 
     canvas_start_drawing(true);
-
-    canvas_draw_triangles(player_shape, player_pos, theta, vec_2d_unit);
+    canvas_draw_line_segments(player_frame_1_shape, player_pos, theta, vec_2d_unit);
 
     for (i = 0; i < NUM_ASTEROIDS; i++) {
-        canvas_draw_triangles(asteroid_shapes[asteroids[i].shape], asteroids[i].pos, 0, vec_2d_unit);
+        canvas_draw_line_segments(asteroid_shapes[asteroids[i].shape], asteroids[i].pos, 0, vec_2d_unit);
     }
 
     canvas_finish_drawing(false);
@@ -78,7 +79,6 @@ void updateGame00(void)
 {
     int i;
     struct vec_2d lim;
-
     static float rot;
 
     // Data reading of controller 1
@@ -138,7 +138,8 @@ void stage00_init()
 
     canvas_reset();
 
-    player_shape = canvas_load_shape(&player_shape_data);
+    player_frame_1_shape = canvas_load_shape(&player_frame_1_shape_data);
+    player_frame_2_shape = canvas_load_shape(&player_frame_2_shape_data);
 
     for (i = 0; i < NUM_ASTEROID_SHAPES; i++) {
         asteroid_shapes[i] = canvas_load_shape(&asteroid_shape_data[i]);

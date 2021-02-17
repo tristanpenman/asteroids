@@ -20,8 +20,8 @@ struct geometry {
     const Vtx *vertices;
     uint8_t num_vertices;
 
-    const uint8_t *triangles;
-    uint8_t num_triangles;
+    const uint8_t *line_segments;
+    uint8_t num_line_segments;
 };
 
 static Vtx vertices[MAX_VERTICES];
@@ -69,8 +69,8 @@ int canvas_load_shape(const struct shape *shape)
 
     shapes[num_shapes].vertices = &vertices[num_vertices];
     shapes[num_shapes].num_vertices = shape->num_vertices;
-    shapes[num_shapes].triangles = shape->triangles;
-    shapes[num_shapes].num_triangles = shape->num_triangles;
+    shapes[num_shapes].line_segments = shape->line_segments;
+    shapes[num_shapes].num_line_segments = shape->num_line_segments;
 
     num_vertices += shape->num_vertices;
 
@@ -103,14 +103,7 @@ void canvas_start_drawing(bool clear)
     gDPSetCycleType(glistp++, G_CYC_1CYCLE);
 }
 
-bool canvas_draw_lines(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
-{
-    // TODO
-
-    return false;
-}
-
-bool canvas_draw_triangles(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
+bool canvas_draw_line_segments(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
 {
     Dynamic *transform = &transforms[num_transforms++];
 
@@ -142,23 +135,24 @@ bool canvas_draw_triangles(int shape, struct vec_2d position, float rotation, st
     // load vertices (I think this is limited to loading 32 vertices at once)
     gSPVertex(glistp++, shapes[shape].vertices, shapes[shape].num_vertices, 0);
 
-    // Synchronizes RDP attribute updates by waiting for pixels to be processed
-    // during the rendering of primitives
-    gDPPipeSync(glistp++);
-
-    // number of pixels per cycle
-    gDPSetCycleType(glistp++, G_CYC_1CYCLE);
-
-    gDPSetRenderMode(glistp++, G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF2);
+    // support anti-aliased, translucent lines
+    gDPSetRenderMode(glistp++, G_RM_AA_XLU_LINE, G_RM_AA_XLU_LINE2);
 
     gSPClearGeometryMode(glistp++, 0xFFFFFFFF);
     gSPSetGeometryMode(glistp++, G_SHADE | G_SHADING_SMOOTH);
 
     {
-        const uint8_t *triangles = shapes[shape].triangles;
+        const uint8_t *line_segments = shapes[shape].line_segments;
         int i;
-        for (i = 0; i < shapes[shape].num_triangles * 3 - 2; i += 3) {
-            gSP1Triangle(glistp++, triangles[i], triangles[i + 1], triangles[i + 2], 0);
+        if (line_segments) {
+            for (i = 0; i < shapes[shape].num_line_segments * 2; i += 2) {
+                gSPLineW3D(glistp++, line_segments[i], line_segments[i + 1], 0.5, 0);
+            }
+        } else {
+            const size_t num_vertices = shapes[shape].num_vertices;
+            for (i = 0; i < shapes[shape].num_vertices; i++) {
+                gSPLineW3D(glistp++, i, (i + 1) % num_vertices, 0.5, 0);
+            }
         }
     }
 
@@ -174,5 +168,5 @@ void canvas_finish_drawing(bool swap)
 
     // Activate the RSP task
     nuGfxTaskStart(gfx_glist, (s32)(glistp - gfx_glist) * sizeof (Gfx),
-        NU_GFX_UCODE_F3DEX2, swap ? NU_SC_SWAPBUFFER : NU_SC_NOSWAPBUFFER);
+        NU_GFX_UCODE_L3DEX2, swap ? NU_SC_SWAPBUFFER : NU_SC_NOSWAPBUFFER);
 }
