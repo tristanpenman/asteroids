@@ -103,7 +103,7 @@ bool is_high_score(unsigned int score)
     return false;
 }
 
-void highscore_screen_loop()
+void highscores_loop(bool draw)
 {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -111,7 +111,7 @@ void highscore_screen_loop()
         case SDL_KEYUP:
             if (event.key.keysym.sym == SDLK_KP_ENTER ||
                 event.key.keysym.sym == SDLK_RETURN) {
-                reset_titlescreen_state();
+                titlescreen_init();
                 set_main_loop(titlescreen_loop);
                 return;
             }
@@ -119,6 +119,10 @@ void highscore_screen_loop()
         case SDL_QUIT:
             exit(EXIT_SUCCESS);
         }
+    }
+
+    if (!draw) {
+        return;
     }
 
     canvas_start_drawing(true);

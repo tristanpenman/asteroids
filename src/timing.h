@@ -1,8 +1,7 @@
 #ifndef __TIMING_H
 #define __TIMING_H
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "types.h"
 
 /**
  * Reset residual simulation time to zero

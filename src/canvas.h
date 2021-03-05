@@ -1,7 +1,7 @@
 #ifndef __CANVAS_H
 #define __CANVAS_H
 
-#include <stdbool.h>
+#include "types.h"
 
 #define CANVAS_INVALID_SHAPE -1
 

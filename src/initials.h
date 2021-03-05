@@ -1,8 +1,10 @@
 #ifndef __INITIALS_H
 #define __INITIALS_H
 
-void reset_initials_screen_state(unsigned int new_score);
+#include "types.h"
 
-void initials_screen_loop();
+void initials_init(unsigned int new_score);
+
+void initials_loop(bool draw);
 
 #endif

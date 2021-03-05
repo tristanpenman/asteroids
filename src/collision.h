@@ -1,7 +1,7 @@
 #ifndef __COLLISION_H
 #define __COLLISION_H
 
-#include <stdbool.h>
+#include "types.h"
 
 struct asteroid;
 struct bullet;

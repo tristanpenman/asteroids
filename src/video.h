@@ -1,7 +1,7 @@
 #ifndef __VIDEO_H
 #define __VIDEO_H
 
-#include <stdbool.h>
+#include "types.h"
 
 /**
  * Initialise SDL's video subsystem and create a window with an OpenGL context

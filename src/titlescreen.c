@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -37,7 +36,7 @@ static int asteroid_shape_ids[NUM_ASTEROID_SHAPES];
  *
  *****************************************************************************/
 
-bool reset_titlescreen_state()
+bool titlescreen_init()
 {
     unsigned int i;
 
@@ -59,7 +58,7 @@ bool reset_titlescreen_state()
     return true;
 }
 
-void titlescreen_loop()
+void titlescreen_loop(bool draw)
 {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -77,12 +76,12 @@ void titlescreen_loop()
                 event.key.keysym.sym == SDLK_KP_ENTER ||
                 event.key.keysym.sym == SDLK_RETURN)) {
                 enter_down = false;
-                reset_transition_state(1, 3, 0);
+                transition_init(1, 3, 0);
                 set_main_loop(transition_loop);
                 return;
 #ifndef __EMSCRIPTEN__
             } else if (h_down == true && event.key.keysym.sym == SDLK_h) {
-                set_main_loop(highscore_screen_loop);
+                set_main_loop(highscores_loop);
                 return;
             } else if (event.key.keysym.sym == SDLK_ESCAPE) {
                 cancel_main_loop(EXIT_SUCCESS);
@@ -101,6 +100,10 @@ void titlescreen_loop()
         for (int i = 0; i < NUM_ASTEROIDS; i++) {
             asteroid_update(&asteroids[i], TIME_STEP_MILLIS / 1000.f);
         }
+    }
+
+    if (!draw) {
+        return;
     }
 
     // Unused simulation time, used to smooth animation

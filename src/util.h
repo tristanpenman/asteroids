@@ -1,7 +1,7 @@
 #ifndef __UTIL_H
 #define __UTIL_H
 
-#include <stdbool.h>
+#include "types.h"
 
 struct vec_2d;
 

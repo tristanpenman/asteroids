@@ -1,8 +1,10 @@
 #ifndef __TRANSITION_H
 #define __TRANSITION_H
 
-void reset_transition_state(unsigned int next_level, unsigned int lives, unsigned int score);
+#include "types.h"
 
-void transition_loop();
+void transition_init(unsigned int next_level, unsigned int lives, unsigned int score);
+
+void transition_loop(bool draw);
 
 #endif

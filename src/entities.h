@@ -1,9 +1,8 @@
 #ifndef __ENTITIES_H
 #define __ENTITIES_H
 
-#include <stdbool.h>
-
 #include "defines.h"
+#include "types.h"
 #include "vec.h"
 
 struct explosion

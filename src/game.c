@@ -93,7 +93,7 @@ void game_cleanup()
 
 void game_play()
 {
-    reset_titlescreen_state();
+    titlescreen_init();
     set_main_loop(titlescreen_loop);
     run_main_loop();
 }

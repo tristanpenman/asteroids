@@ -22,7 +22,7 @@ static float elapsed = 0.f;
  *
  *****************************************************************************/
 
-void reset_transition_state(unsigned int next_level, unsigned int next_lives, unsigned int next_score)
+void transition_init(unsigned int next_level, unsigned int next_lives, unsigned int next_score)
 {
     level = next_level;
     lives = next_lives;
@@ -30,7 +30,7 @@ void reset_transition_state(unsigned int next_level, unsigned int next_lives, un
     elapsed = 0.f;
 }
 
-void transition_loop()
+void transition_loop(bool draw)
 {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -46,14 +46,19 @@ void transition_loop()
         elapsed += residual;
     }
 
-    if (elapsed < START_LEVEL_DELAY_MS) {
-        canvas_start_drawing(true);
-        draw_score(score);
-        draw_lives(lives);
-        draw_level_title(level);
-        canvas_finish_drawing(true);
-    } else {
-        reset_level_state(level, lives, score);
+    if (elapsed >= START_LEVEL_DELAY_MS) {
+        level_init(level, lives, score);
         set_main_loop(level_loop);
+        return;
     }
+
+    if (!draw) {
+        return;
+    }
+
+    canvas_start_drawing(true);
+    draw_score(score);
+    draw_lives(lives);
+    draw_level_title(level);
+    canvas_finish_drawing(true);
 }

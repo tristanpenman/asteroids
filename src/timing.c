@@ -1,7 +1,6 @@
-#include <stdbool.h>
-#include <stdint.h>
-
 #include <SDL.h>
+
+#include "types.h"
 
 static uint32_t simulation_time = 0;
 static uint32_t ticks;
@@ -33,7 +32,7 @@ void produce_simulation_time()
 bool maybe_consume_simulation_time(uint32_t millis)
 {
     if (millis > simulation_time) {
-      return false;
+        return false;
     }
 
     simulation_time -= millis;

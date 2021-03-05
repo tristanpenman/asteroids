@@ -15,14 +15,14 @@ static int current_initial;
 static char initials[4];
 static unsigned int score;
 
-void reset_initials_screen_state(unsigned int new_score)
+void initials_init(unsigned int new_score)
 {
     current_initial = 0;
     memcpy(initials, "_  ", 4);
     score = new_score;
 }
 
-void initials_screen_loop()
+void initials_loop(bool draw)
 {
     int i = 0;
     SDL_Event event;
@@ -30,7 +30,7 @@ void initials_screen_loop()
         switch (event.type) {
         case SDL_KEYUP:
             if (event.key.keysym.sym == SDLK_ESCAPE) {
-                reset_titlescreen_state();
+                titlescreen_init();
                 set_main_loop(titlescreen_loop);
                 return;
             } else if (current_initial == 3 && (
@@ -38,7 +38,7 @@ void initials_screen_loop()
                     event.key.keysym.sym == SDLK_RETURN)) {
                 insert_new_high_score(score, initials);
                 dump_highscores();
-                reset_titlescreen_state();
+                titlescreen_init();
                 set_main_loop(titlescreen_loop);
                 return;
             } else if (current_initial < 3 &&
@@ -71,6 +71,10 @@ void initials_screen_loop()
         } else if (initials[current_initial] == '_') {
             initials[current_initial] = ' ';
         }
+    }
+
+    if (!draw) {
+        return;
     }
 
     canvas_start_drawing(true);

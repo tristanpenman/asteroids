@@ -188,11 +188,11 @@ void update_player(struct player *p, float factor)
                 reset_player(p);
 #ifndef __EMSCRIPTEN__
             } else if (is_high_score(p->score)) {
-                reset_initials_screen_state(p->score);
-                set_main_loop(initials_screen_loop);
+                initials_init(p->score);
+                set_main_loop(initials_loop);
 #endif
             } else {
-                reset_titlescreen_state();
+                titlescreen_init();
                 set_main_loop(titlescreen_loop);
             }
         }
@@ -527,7 +527,7 @@ void check_collisions(struct player *p, struct asteroid *aa, unsigned int na,
  *
  *****************************************************************************/
 
-bool reset_level_state(unsigned int new_level, unsigned int new_lives, unsigned int new_score)
+bool level_init(unsigned int new_level, unsigned int new_lives, unsigned int new_score)
 {
     srand(SDL_GetTicks());
 
@@ -567,14 +567,14 @@ bool reset_level_state(unsigned int new_level, unsigned int new_lives, unsigned 
     return true;
 }
 
-void level_loop()
+void level_loop(bool draw)
 {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
         case SDL_KEYUP:
             if (event.key.keysym.sym == SDLK_ESCAPE) {
-                reset_titlescreen_state();
+                titlescreen_init();
                 set_main_loop(titlescreen_loop);
                 return;
             }
@@ -644,11 +644,15 @@ void level_loop()
         }
 
         if (next_level_countdown <= 0.f) {
-            reset_transition_state(level + 1, player.lives, player.score);
+            transition_init(level + 1, player.lives, player.score);
             set_main_loop(transition_loop);
         }
 
         update_explosions(explosions, MAX_EXPLOSIONS, factor);
+    }
+
+    if (!draw) {
+        return;
     }
 
     const float residual = (float)residual_simulation_time() / 1000.f;

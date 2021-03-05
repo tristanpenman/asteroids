@@ -1,7 +1,9 @@
 #ifndef __LOOP_H
 #define __LOOP_H
 
-typedef void (*main_loop_fn_t)();
+#include "types.h"
+
+typedef void (*main_loop_fn_t)(bool draw);
 
 /**
  * Set the function that will be called on the next iteration of the event loop
@@ -20,7 +22,7 @@ void run_main_loop();
 
 /**
  * Cancel next iteration of the event loop
- * 
+ *
  * Execution will continue until the current iteration of the event loop has
  * completed, at which point the program will terminate.
  *

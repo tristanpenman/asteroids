@@ -1,10 +1,10 @@
 #ifndef __TITLESCREEN_H
 #define __TITLESCREEN_H
 
-#include <stdbool.h>
+#include "types.h"
 
-bool reset_titlescreen_state();
+bool titlescreen_init();
 
-void titlescreen_loop();
+void titlescreen_loop(bool draw);
 
 #endif
