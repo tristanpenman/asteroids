@@ -2,9 +2,13 @@
 
 #include <nusys.h>
 
+#include "level.h"
 #include "loop.h"
-#include "stage00.h"
 #include "vec.h"
+
+#define INITIAL_LEVEL 1
+#define INITIAL_LIVES 3
+#define INITIAL_SCORE 0
 
 // Read data from one controller
 NUContData contdata[1];
@@ -22,7 +26,7 @@ void mainproc(void)
 
   srand(500);
 
-  stage00_init();
-  set_main_loop(stage00_loop);
+  level_init(INITIAL_LEVEL, INITIAL_LIVES, INITIAL_SCORE);
+  set_main_loop(level_loop);
   run_main_loop();
 }

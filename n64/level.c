@@ -44,7 +44,7 @@ static uint8_t asteroid_shapes[NUM_ASTEROID_SHAPES];
 static uint8_t player_frame_1_shape;
 static uint8_t player_frame_2_shape;
 
-void makeDL00(void)
+void level_draw()
 {
     int i;
     char conbuf[20];
@@ -75,7 +75,7 @@ void makeDL00(void)
     nuDebConDisp(NU_SC_SWAPBUFFER);
 }
 
-void updateGame00(void)
+void level_update()
 {
     int i;
     struct vec_2d lim;
@@ -132,7 +132,7 @@ void updateGame00(void)
  *
  *****************************************************************************/
 
-void stage00_init()
+void level_init(unsigned int level, unsigned int lives, unsigned int score)
 {
     int i;
 
@@ -156,11 +156,11 @@ void stage00_init()
     vel_y = 0.0;
 }
 
-void stage00_loop(bool draw)
+void level_loop(bool draw)
 {
-    if (draw) {
-        makeDL00();
-    }
+    level_update();
 
-    updateGame00();
+    if (draw) {
+        level_draw();
+    }
 }
