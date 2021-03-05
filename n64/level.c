@@ -32,11 +32,7 @@ static const float min_y = -ratio / 2.0f - SHIP_RADIUS;
 static struct asteroid asteroids[NUM_ASTEROIDS];
 
 // player state
-static float theta;
-static float pos_x;
-static float pos_y;
-static float vel_x;
-static float vel_y;
+struct player player;
 
 // shapes
 static uint8_t asteroid_shapes[NUM_ASTEROID_SHAPES];
@@ -44,17 +40,31 @@ static uint8_t asteroid_shapes[NUM_ASTEROID_SHAPES];
 static uint8_t player_frame_1_shape;
 static uint8_t player_frame_2_shape;
 
+/******************************************************************************
+ *
+ * Collision helpers
+ *
+ *****************************************************************************/
+
+void check_collisions(struct player *p, struct asteroid *aa, unsigned int na,
+    unsigned int *asteroids_hit)
+{
+    // TODO
+}
+
+/******************************************************************************
+ *
+ * Update logic
+ *
+ *****************************************************************************/
+
 void level_draw()
 {
     int i;
     char conbuf[20];
-    const struct vec_2d player_pos = {
-      pos_x,
-      pos_y
-    };
 
     canvas_start_drawing(true);
-    canvas_draw_line_segments(player_frame_1_shape, player_pos, theta, vec_2d_unit);
+    canvas_draw_line_segments(player_frame_1_shape, player.pos, player.rot, vec_2d_unit);
 
     for (i = 0; i < NUM_ASTEROIDS; i++) {
         canvas_draw_line_segments(asteroid_shapes[asteroids[i].shape], asteroids[i].pos, 0, vec_2d_unit);
@@ -64,11 +74,11 @@ void level_draw()
 
     // Change character representation positions */
     nuDebConTextPos(0,12,23);
-    sprintf(conbuf, "pos_x=%7.3f", pos_x);
+    sprintf(conbuf, "pos_x=%7.3f", player.pos.x);
     nuDebConCPuts(0, conbuf);
 
     nuDebConTextPos(0,12,24);
-    sprintf(conbuf, "pos_y=%7.3f", pos_y);
+    sprintf(conbuf, "pos_y=%7.3f", player.pos.y);
     nuDebConCPuts(0, conbuf);
 
     // Display characters on the frame buffer
@@ -85,37 +95,37 @@ void level_update()
     nuContDataGetEx(contdata, 0);
 
     if (contdata[0].stick_x < -20) {
-        theta -= SHIP_ROTATION_SPEED;
+        player.rot -= SHIP_ROTATION_SPEED;
     } else if (contdata[0].stick_x > 20) {
-        theta += SHIP_ROTATION_SPEED;
+        player.rot += SHIP_ROTATION_SPEED;
     }
 
-    if (theta > 360.0) {
-        theta -= 360.0;
-    } else if (theta < 0.0) {
-        theta += 360.0;
+    if (player.rot > 360.0) {
+        player.rot -= 360.0;
+    } else if (player.rot < 0.0) {
+        player.rot += 360.0;
     }
 
-    rot = theta * degrees_to_radians;
+    rot = player.rot * degrees_to_radians;
 
     if (contdata[0].button & B_BUTTON) {
-        vel_x += sinf(rot) * SHIP_ACCELERATION * factor;
-        vel_y -= cosf(rot) * SHIP_ACCELERATION * factor;
+        player.vel.x += sinf(rot) * SHIP_ACCELERATION * factor;
+        player.vel.y -= cosf(rot) * SHIP_ACCELERATION * factor;
     }
 
-    pos_x += vel_x * factor;
-    pos_y += vel_y * factor;
+    player.pos.x += player.vel.x * factor;
+    player.pos.y += player.vel.y * factor;
 
-    if (pos_y > max_y) {
-        pos_y = min_y;
-    } else if (pos_y < min_y) {
-        pos_y = max_y;
+    if (player.pos.y > max_y) {
+        player.pos.y = min_y;
+    } else if (player.pos.y < min_y) {
+        player.pos.y = max_y;
     }
 
-    if (pos_x > max_x) {
-        pos_x = min_x;
-    } else if (pos_x < min_x) {
-        pos_x = max_x;
+    if (player.pos.x > max_x) {
+        player.pos.x = min_x;
+    } else if (player.pos.x < min_x) {
+        player.pos.x = max_x;
     }
 
     for (i = 0; i < NUM_ASTEROIDS; i++) {
@@ -123,6 +133,11 @@ void level_update()
         lim.y = 0.75f / 2.f + asteroids[i].radius;
 
         asteroid_update(&asteroids[i], 1.f / 60.f, &lim);
+    }
+
+    {
+        unsigned int asteroids_hit = 0;
+        check_collisions(&player, asteroids, NUM_ASTEROIDS, &asteroids_hit);
     }
 }
 
@@ -149,11 +164,11 @@ void level_init(unsigned int level, unsigned int lives, unsigned int score)
         asteroid_init(&asteroids[i]);
     }
 
-    theta = 0.0;
-    pos_x = 0.0;
-    pos_y = 0.0;
-    vel_x = 0.0;
-    vel_y = 0.0;
+    player.rot = 0;
+    player.pos.x = 0;
+    player.pos.y = 0;
+    player.vel.x = 0;
+    player.vel.y = 0;
 }
 
 void level_loop(bool draw)
