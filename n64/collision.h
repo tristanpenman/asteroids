@@ -1,13 +1,17 @@
 #ifndef __COLLISION_H
 #define __COLLISION_H
 
-#include <stdbool.h>
+#include "types.h"
 
-struct asteroid;
-struct bullet;
-struct player;
+struct shape;
+struct vec_2d;
 
-bool test_asteroid_bullet_collision(struct bullet* b, struct asteroid *a);
-bool test_asteroid_ship_collision(struct player *p, struct asteroid *a);
+bool collision_test_shape_line_segment(
+    const struct shape *a, const struct vec_2d *a_pos, float a_rot, float a_scale,
+    const struct vec_2d *line_start, const struct vec_2d *line_end);
+
+bool collision_test_shapes(
+    const struct shape *a, const struct vec_2d *a_pos, float a_rot, float a_scale,
+    const struct shape *b, const struct vec_2d *b_pos, float b_rot, float b_scale);
 
 #endif
