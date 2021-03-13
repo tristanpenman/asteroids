@@ -18,15 +18,14 @@ extern NUContData contdata[1];
 extern u8 contPattern;
 
 // useful constants
-static const float ratio = (float)SCREEN_HT / (float)SCREEN_WD;
 static const float factor = 1.0f / 60.0f;
 static const float degrees_to_radians = M_PI / 180.0f;
 
 // ship wrapping constants
 static const float max_x =  1.0 / 2.0f + SHIP_RADIUS;
 static const float min_x = -1.0 / 2.0f - SHIP_RADIUS;
-static const float max_y =  ratio / 2.0f + SHIP_RADIUS;
-static const float min_y = -ratio / 2.0f - SHIP_RADIUS;
+static const float max_y =  SCREEN_RATIO / 2.0f + SHIP_RADIUS;
+static const float min_y = -SCREEN_RATIO / 2.0f - SHIP_RADIUS;
 
 // asteroid state
 static struct asteroid asteroids[NUM_ASTEROIDS];
