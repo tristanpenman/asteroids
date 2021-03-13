@@ -120,7 +120,7 @@ void titlescreen_loop(bool draw)
           asteroids[i].pos.y + asteroids[i].vel.y * residual
         };
 
-        assert(canvas_draw_lines(
+        assert(canvas_draw_line_segments(
             asteroid_shape_ids[asteroids[i].shape],
             position,
             asteroids[i].rot,
