@@ -14,6 +14,7 @@
 #include "loop.h"
 #include "mixer.h"
 #include "options.h"
+#include "sandbox.h"
 #include "titlescreen.h"
 #include "util.h"
 #include "vec.h"
@@ -70,13 +71,13 @@ static void mixer_channel_complete(int channel)
  *
  *****************************************************************************/
 
-bool game_init(bool audio_enabled)
+bool game_init(bool silent)
 {
 #ifndef __EMSCRIPTEN__
     fprintf(stdout, "load_highscores...\n");
     load_highscores();
 #endif
-    if (audio_enabled) {
+    if (!silent) {
         mixer_set_channel_completion_handler(mixer_channel_complete);
         fprintf(stdout, "load_samples...\n");
         if (!load_samples()) {
@@ -91,9 +92,15 @@ void game_cleanup()
     mixer_set_channel_completion_handler(NULL);
 }
 
-void game_play()
+void game_play(bool sandbox)
 {
-    titlescreen_init();
-    set_main_loop(titlescreen_loop);
+    if (sandbox) {
+        sandbox_init();
+        set_main_loop(sandbox_loop);
+    } else {
+        titlescreen_init();
+        set_main_loop(titlescreen_loop);
+    }
+
     run_main_loop();
 }

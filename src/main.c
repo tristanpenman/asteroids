@@ -15,6 +15,7 @@
 
 #define FULLSCREEN_FLAG "--fullscreen"
 #define HELP_FLAG "--help"
+#define SANDBOX_FLAG "--sandbox"
 #define SILENT_FLAG "--silent"
 
 void cleanup(void)
@@ -31,6 +32,7 @@ void help(void)
     printf("\nAvailable options:\n\n");
     printf("  " FULLSCREEN_FLAG "\n");
     printf("  " HELP_FLAG "\n");
+    printf("  " SANDBOX_FLAG "\n");
     printf("  " SILENT_FLAG "\n");
     exit(0);
 }
@@ -38,16 +40,19 @@ void help(void)
 int main(int argc, char **argv)
 {
     bool fullscreen = false;
+    bool sandbox = false;
     bool silent = false;
 
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
-            if (strcmp(argv[i], SILENT_FLAG) == 0) {
-                silent = true;
-            } else if (strcmp(argv[i], FULLSCREEN_FLAG) == 0) {
+            if (strcmp(argv[i], FULLSCREEN_FLAG) == 0) {
                 fullscreen = true;
             } else if (strcmp(argv[i], HELP_FLAG) == 0) {
                 help();
+            } else if (strcmp(argv[i], SANDBOX_FLAG) == 0) {
+                sandbox = true;
+            } else if (strcmp(argv[i], SILENT_FLAG) == 0) {
+                silent = true;
             } else {
                 fprintf(stderr, "unrecognised option: %s\n", argv[i]);
             }
@@ -75,12 +80,12 @@ int main(int argc, char **argv)
     }
 
     fprintf(stdout, "game_init...\n");
-    if (false == game_init(!silent)) {
+    if (false == game_init(silent)) {
         exit(1);
     }
 
     fprintf(stdout, "game_play...\n");
-    game_play();
+    game_play(sandbox);
 
     return 0;
 }

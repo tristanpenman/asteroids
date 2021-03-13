@@ -3,8 +3,8 @@
 
 #include "types.h"
 
-bool game_init(bool audio_enabled);
-void game_play();
+bool game_init(bool silent);
+void game_play(bool sandbox);
 void game_cleanup();
 
 #endif
