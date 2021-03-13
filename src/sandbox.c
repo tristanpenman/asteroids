@@ -12,6 +12,7 @@
 #define TIME_STEP_MILLIS 10
 
 static int asteroid_shape_ids[NUM_ASTEROID_SHAPES];
+static int box_shape_id;
 
 static struct vec_2d pos1;
 static struct vec_2d pos2;
@@ -34,6 +35,11 @@ bool sandbox_init()
         if (asteroid_shape_ids[i] == CANVAS_INVALID_SHAPE) {
             return false;
         }
+    }
+
+    box_shape_id = canvas_load_shape(&box_shape_data);
+    if (box_shape_id == CANVAS_INVALID_SHAPE) {
+        return false;
     }
 
     pos1.x = -0.2;
@@ -107,7 +113,7 @@ void sandbox_loop(bool draw)
 
         collision = collision_test_shapes(
             &asteroid_shape_data[0], &pos1, 0, 1.0f,
-            &asteroid_shape_data[1], &pos2, 0, 1.0f
+            &box_shape_data, &pos2, 0, 1.0f
         );
     }
 
@@ -126,7 +132,7 @@ void sandbox_loop(bool draw)
         }
 
         canvas_draw_line_segments(
-            asteroid_shape_ids[1],
+            box_shape_id,
             pos2,
             0,
             vec_2d_unit
