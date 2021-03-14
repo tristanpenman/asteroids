@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "canvas.h"
+#include "collision.h"
 #include "data.h"
 #include "defines.h"
 #include "entities.h"
@@ -48,7 +49,27 @@ static uint8_t player_frame_2_shape;
 void check_collisions(struct player *p, struct asteroid *aa, unsigned int na,
     unsigned int *asteroids_hit)
 {
-    // TODO
+    float dx, dy;
+    unsigned int i, j;
+
+    p->hit = 0;
+
+    // Check for asteroid collisions
+    for (j = 0; j < na; j++) {
+        if (aa[j].visible == false) {
+            continue;
+        }
+
+        if (p->state == PS_NORMAL) {
+            bool collision = collision_test_shapes(
+                &player_frame_1_shape_data, &p->pos, p->rot, 1.0f,
+                &asteroid_shape_data[aa[j].shape], &aa[j].pos, 0, aa[j].scale);
+
+            if (collision) {
+                p->hit++;
+            }
+        }
+    }
 }
 
 /******************************************************************************
@@ -71,16 +92,16 @@ void level_draw()
 
     canvas_finish_drawing(false);
 
-    // Change character representation positions */
-    nuDebConTextPos(0,12,23);
-    sprintf(conbuf, "pos_x=%7.3f", player.pos.x);
+    // Print score using debug output
+    sprintf(conbuf, "%d", player.score);
+    nuDebConTextPos(0, 3, 3);
     nuDebConCPuts(0, conbuf);
 
-    nuDebConTextPos(0,12,24);
-    sprintf(conbuf, "pos_y=%7.3f", player.pos.y);
+    // Player hit?
+    sprintf(conbuf, "%d", player.hit);
+    nuDebConTextPos(0, 5, 3);
     nuDebConCPuts(0, conbuf);
 
-    // Display characters on the frame buffer
     nuDebConDisp(NU_SC_SWAPBUFFER);
 }
 
