@@ -4,6 +4,7 @@
 // asteroids
 #define ASTEROID_SPEED_MIN 0.05f
 #define ASTEROID_SPEED_MAX 0.11f
+#define MAX_ASTEROIDS 100
 #define NO_ASTEROID_RADIUS 0.19f   /* Asteroids spawn >= distance from ship */
 #define NUM_ASTEROID_SHAPES 4
 

@@ -12,8 +12,6 @@
 #include "shape.h"
 #include "vec.h"
 
-#define NUM_ASTEROIDS 5
-
 // nusys input
 extern NUContData contdata[1];
 extern u8 contPattern;
@@ -29,16 +27,39 @@ static const float max_y =  SCREEN_RATIO / 2.0f + SHIP_RADIUS;
 static const float min_y = -SCREEN_RATIO / 2.0f - SHIP_RADIUS;
 
 // asteroid state
-static struct asteroid asteroids[NUM_ASTEROIDS];
+static struct asteroid asteroids[MAX_ASTEROIDS];
+static unsigned int starting_asteroids;
 
 // player state
-struct player player;
+static struct player player;
 
 // shapes
 static uint8_t asteroid_shapes[NUM_ASTEROID_SHAPES];
-
 static uint8_t player_frame_1_shape;
 static uint8_t player_frame_2_shape;
+
+/******************************************************************************
+ *
+ * Helper functions
+ *
+ *****************************************************************************/
+
+static unsigned int num_asteroids_for_level(int level) {
+    switch (level) {
+        case 1:
+            return 4;
+        case 2:
+            return 6;
+        case 3:
+            return 8;
+        case 4:
+            return 10;
+        default:
+            break;
+    }
+
+    return 11;
+}
 
 /******************************************************************************
  *
@@ -46,27 +67,26 @@ static uint8_t player_frame_2_shape;
  *
  *****************************************************************************/
 
-void check_collisions(struct player *p, struct asteroid *aa, unsigned int na,
-    unsigned int *asteroids_hit)
+void check_collisions(unsigned int *asteroids_hit)
 {
     float dx, dy;
     unsigned int i, j;
 
-    p->hit = 0;
+    player.hit = 0;
 
     // Check for asteroid collisions
-    for (j = 0; j < na; j++) {
-        if (aa[j].visible == false) {
+    for (j = 0; j < MAX_ASTEROIDS; j++) {
+        if (asteroids[j].visible == false) {
             continue;
         }
 
-        if (p->state == PS_NORMAL) {
+        if (player.state == PS_NORMAL) {
             bool collision = collision_test_shapes(
-                &player_frame_1_shape_data, &p->pos, p->rot, 1.0f,
-                &asteroid_shape_data[aa[j].shape], &aa[j].pos, 0, aa[j].scale);
+                &player_frame_1_shape_data, &player.pos, player.rot, 1.0f,
+                &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
 
             if (collision) {
-                p->hit++;
+                player.hit++;
             }
         }
     }
@@ -86,8 +106,10 @@ void level_draw()
     canvas_start_drawing(true);
     canvas_draw_line_segments(player_frame_1_shape, player.pos, player.rot, vec_2d_unit);
 
-    for (i = 0; i < NUM_ASTEROIDS; i++) {
-        canvas_draw_line_segments(asteroid_shapes[asteroids[i].shape], asteroids[i].pos, 0, vec_2d_unit);
+    for (i = 0; i < MAX_ASTEROIDS; i++) {
+        if (asteroids[i].visible) {
+            canvas_draw_line_segments(asteroid_shapes[asteroids[i].shape], asteroids[i].pos, 0, vec_2d_unit);
+        }
     }
 
     canvas_finish_drawing(false);
@@ -148,16 +170,18 @@ void level_update()
         player.pos.x = max_x;
     }
 
-    for (i = 0; i < NUM_ASTEROIDS; i++) {
-        lim.x = 1.f / 2.f + asteroids[i].radius;
-        lim.y = 0.75f / 2.f + asteroids[i].radius;
+    for (i = 0; i < MAX_ASTEROIDS; i++) {
+        if (asteroids[i].visible) {
+            lim.x = 1.f / 2.f + asteroids[i].radius;
+            lim.y = 0.75f / 2.f + asteroids[i].radius;
 
-        asteroid_update(&asteroids[i], 1.f / 60.f, &lim);
+            asteroid_update(&asteroids[i], 1.f / 60.f, &lim);
+        }
     }
 
     {
         unsigned int asteroids_hit = 0;
-        check_collisions(&player, asteroids, NUM_ASTEROIDS, &asteroids_hit);
+        check_collisions(&asteroids_hit);
     }
 }
 
@@ -180,7 +204,9 @@ void level_init(unsigned int level, unsigned int lives, unsigned int score)
         asteroid_shapes[i] = canvas_load_shape(&asteroid_shape_data[i]);
     }
 
-    for (i = 0; i < NUM_ASTEROIDS; i++) {
+    starting_asteroids = num_asteroids_for_level(level);
+    memset(asteroids, 0, sizeof(struct asteroid) * MAX_ASTEROIDS);
+    for (i = 0; i < starting_asteroids; i++) {
         asteroid_init(&asteroids[i]);
     }
 
