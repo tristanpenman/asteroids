@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <nusys.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "canvas.h"
 #include "collision.h"
@@ -30,11 +31,15 @@ static const float min_y = -SCREEN_RATIO / 2.0f - SHIP_RADIUS;
 static struct asteroid asteroids[MAX_ASTEROIDS];
 static unsigned int starting_asteroids;
 
+// bullets
+static struct bullet bullets[MAX_BULLETS];
+
 // player state
 static struct player player;
 
 // shapes
 static uint8_t asteroid_shapes[NUM_ASTEROID_SHAPES];
+static uint8_t bullet_shape;
 static uint8_t player_frame_1_shape;
 static uint8_t player_frame_2_shape;
 
@@ -59,6 +64,49 @@ static unsigned int num_asteroids_for_level(int level) {
     }
 
     return 11;
+}
+
+void check_fire_button(float f)
+{
+    unsigned int i;
+    unsigned int num_player_bullets = 0;
+
+    if (player.reloading == true) {
+        player.reload_delay += f;
+        if (player.reload_delay >= BULLET_DELAY) {
+            player.reload_delay = 0.0f;
+            player.reloading = false;
+        } else {
+            return;
+        }
+    }
+
+    if (player.state != PS_NORMAL) {
+        return;
+    }
+
+    for (i = 0; i < MAX_BULLETS; i++) {
+        if (true == bullets[i].visible) {
+            num_player_bullets++;
+        }
+    }
+
+    if (num_player_bullets >= MAX_BULLETS) {
+        return;
+    }
+
+    if (KS_DOWN == player.keys.fire) {
+        for (i = 0; i < MAX_BULLETS; i++) {
+            if (false == bullets[i].visible) {
+                bullet_init(&bullets[i], &player.pos, player.rot);
+
+                break;
+            }
+        }
+
+        player.reload_delay = 0.0f;
+        player.reloading = true;
+    }
 }
 
 /******************************************************************************
@@ -112,6 +160,12 @@ void level_draw()
         }
     }
 
+    for (i = 0; i < MAX_BULLETS; i++) {
+        if (bullets[i].visible) {
+            canvas_draw_line_segments(bullet_shape, bullets[i].pos, bullets[i].rot, vec_2d_unit);
+        }
+    }
+
     canvas_finish_drawing(false);
 
     // Print score using debug output
@@ -124,13 +178,28 @@ void level_draw()
     nuDebConTextPos(0, 5, 3);
     nuDebConCPuts(0, conbuf);
 
+    {
+        int num_bullets = 0;
+        int i = 0;
+        for (i = 0; i < MAX_BULLETS; i++) {
+            if (bullets[i].visible) {
+                num_bullets++;
+            }
+        }
+
+        // Fire?
+        sprintf(conbuf, "%d", num_bullets);
+        nuDebConTextPos(0, 7, 3);
+        nuDebConCPuts(0, conbuf);
+    }
+
     nuDebConDisp(NU_SC_SWAPBUFFER);
 }
 
 void level_update()
 {
+    float f = 1.f / 60.f;
     int i;
-    struct vec_2d lim;
     static float rot;
 
     // Data reading of controller 1
@@ -149,6 +218,10 @@ void level_update()
     }
 
     rot = player.rot * degrees_to_radians;
+
+    player.keys.fire = contdata[0].button & A_BUTTON ? KS_DOWN : KS_UP;
+
+    check_fire_button(f);
 
     if (contdata[0].button & B_BUTTON) {
         player.vel.x += sinf(rot) * SHIP_ACCELERATION * factor;
@@ -172,10 +245,16 @@ void level_update()
 
     for (i = 0; i < MAX_ASTEROIDS; i++) {
         if (asteroids[i].visible) {
+            struct vec_2d lim;
             lim.x = 1.f / 2.f + asteroids[i].radius;
             lim.y = 0.75f / 2.f + asteroids[i].radius;
+            asteroid_update(&asteroids[i], f, &lim);
+        }
+    }
 
-            asteroid_update(&asteroids[i], 1.f / 60.f, &lim);
+    for (i = 0; i < MAX_BULLETS; i++) {
+        if (bullets[i].visible) {
+            bullet_update(&bullets[i], f);
         }
     }
 
@@ -203,6 +282,8 @@ void level_init(unsigned int level, unsigned int lives, unsigned int score)
     for (i = 0; i < NUM_ASTEROID_SHAPES; i++) {
         asteroid_shapes[i] = canvas_load_shape(&asteroid_shape_data[i]);
     }
+
+    bullet_shape = canvas_load_shape(&bullet_shape_data);
 
     starting_asteroids = num_asteroids_for_level(level);
     memset(asteroids, 0, sizeof(struct asteroid) * MAX_ASTEROIDS);

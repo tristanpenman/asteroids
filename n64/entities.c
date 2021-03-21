@@ -84,3 +84,55 @@ void asteroid_update(struct asteroid *a, float f, const struct vec_2d *lim)
         a->pos_prev.y = a->pos.y;
     }
 }
+
+void bullet_init(struct bullet *b, const struct vec_2d *pos, float rot)
+{
+    b->rot = rot;
+
+    // convert to radians
+    rot = rot / 180.f * M_PI;
+
+    b->visible = true;
+    b->travelled = 0.0f;
+    b->pos.x = pos->x - sinf(rot) * (0 - SHIP_PIVOT);
+    b->pos.y = pos->y + cosf(rot) * (0 - SHIP_PIVOT);
+    b->pos_prev.x = b->pos.x;
+    b->pos_prev.y = b->pos.y;
+
+    b->vel.x = sinf(rot);
+    b->vel.y = 0 - cosf(rot);
+
+    // vec_2d_normalise(&b->vel);
+    vec_2d_scale(&b->vel, BULLET_SPEED);
+}
+
+void bullet_update(struct bullet *b, float f)
+{
+    static struct vec_2d t;
+    t.x = b->vel.x * f;
+    t.y = b->vel.y * f;
+
+    if (b->pos.x + t.x != b->pos.x ||
+        b->pos.y + t.y != b->pos.y) {
+        b->pos_prev.x = b->pos.x;
+        b->pos_prev.y = b->pos.y;
+    }
+
+    b->pos.x += t.x;
+    b->pos.y += t.y;
+    b->travelled += vec_2d_magnitude(&t);
+
+    if (b->travelled > MAX_BULLET_DISTANCE) {
+        // destroy bullets
+        b->visible = false;
+    } else {
+        // wrap bullets
+        struct vec_2d lim;
+        lim.x = 1.f / 2.f + 0.1f;
+        lim.y = 0.75f / 2.f + 0.1f;
+        if (wrap_position(&b->pos, &lim) == true) {
+            b->pos_prev.x = b->pos.x;
+            b->pos_prev.y = b->pos.y;
+        }
+    }
+}

@@ -31,6 +31,7 @@ struct bullet
     struct vec_2d pos_prev;
     struct vec_2d pos;
     struct vec_2d vel;
+    float rot;
     float travelled;
 };
 
@@ -86,5 +87,8 @@ void randomise_asteroid_velocity(struct asteroid *a, float vel_scale);
 
 void asteroid_init(struct asteroid *a);
 void asteroid_update(struct asteroid *a, float f, const struct vec_2d *lim);
+
+void bullet_init(struct bullet *b, const struct vec_2d *pos, float r);
+void bullet_update(struct bullet *b, float f);
 
 #endif

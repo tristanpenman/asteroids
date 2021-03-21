@@ -113,6 +113,28 @@ const struct shape asteroid_shape_data[] = {
 
 // ----------------------------------------------------------------------------
 //
+// Bullet
+//
+
+static const float bullet_vertices[] = {
+    0.0f, 0.0f,
+    0.0f, 0.02f
+};
+
+static const uint8_t bullet_line_segments[] = {
+    0, 1
+};
+
+const struct shape bullet_shape_data = {
+    bullet_vertices,
+    sizeof(bullet_vertices) / sizeof(float) / 2,
+    bullet_line_segments,
+    sizeof(bullet_line_segments) / sizeof(uint8_t) / 2
+};
+
+
+// ----------------------------------------------------------------------------
+//
 // Player
 //
 
