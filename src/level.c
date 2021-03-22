@@ -272,7 +272,7 @@ void check_fire_button(struct player *p, struct bullet *bb, unsigned int n, floa
         }
     }
 
-    if (num_player_bullets >= MAX_PLAYER_BULLETS) {
+    if (num_player_bullets >= MAX_BULLETS) {
         return;
     }
 

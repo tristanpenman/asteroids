@@ -15,4 +15,10 @@
 #define SHIP_RADIUS 0.038f
 #define SHIP_ROTATION_SPEED 4.0f
 
+// bullets
+#define BULLET_DELAY 0.25f
+#define BULLET_SPEED 0.8f
+#define MAX_BULLETS 20
+#define MAX_BULLET_DISTANCE (1.0f / 2.0f - SHIP_PIVOT)
+
 #endif
