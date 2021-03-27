@@ -43,6 +43,8 @@ static uint8_t bullet_shape;
 static uint8_t player_frame_1_shape;
 static uint8_t player_frame_2_shape;
 
+static unsigned int asteroids_hit;
+
 /******************************************************************************
  *
  * Helper functions
@@ -115,10 +117,50 @@ void check_fire_button(float f)
  *
  *****************************************************************************/
 
-void check_collisions(unsigned int *asteroids_hit)
+void explode_asteroid(int i)
+{
+    struct asteroid *a = &asteroids[i];
+    float vel_scale = 1.0f;
+
+    if (a->scale < 0.49f) {
+        a->visible = false;
+        return;
+    } else if (a->scale < 0.99f) {
+        a->scale = 0.25f;
+        vel_scale = 1.5f;
+    } else {
+        a->scale = 0.5f;
+        vel_scale = 1.25f;
+    }
+
+    a->shape = rand() % NUM_ASTEROID_SHAPES;
+    a->radius = calculate_asteroid_radius(a->shape) * a->scale;
+
+    randomise_asteroid_velocity(a, vel_scale);
+    randomise_asteroid_rotation(a);
+
+    for (i = 0; i < MAX_ASTEROIDS; i++) {
+        if (asteroids[i].visible == false) {
+            asteroids[i].visible = true;
+            asteroids[i].pos.x = a->pos.x;
+            asteroids[i].pos.y = a->pos.y;
+            asteroids[i].pos_prev.x = a->pos_prev.x;
+            asteroids[i].pos_prev.y = a->pos_prev.y;
+            asteroids[i].scale = a->scale;
+            asteroids[i].shape = rand() % NUM_ASTEROID_SHAPES;
+            asteroids[i].radius = calculate_asteroid_radius(asteroids[i].shape) * asteroids[i].scale;
+            randomise_asteroid_velocity(&asteroids[i], vel_scale);
+            randomise_asteroid_rotation(&asteroids[i]);
+            break;
+        }
+    }
+}
+
+void check_collisions()
 {
     float dx, dy;
     unsigned int i, j;
+    bool asteroid_hit = false;
 
     player.hit = 0;
 
@@ -129,13 +171,36 @@ void check_collisions(unsigned int *asteroids_hit)
         }
 
         if (player.state == PS_NORMAL) {
-            bool collision = collision_test_shapes(
+            const bool collision = collision_test_shapes(
                 &player_frame_1_shape_data, &player.pos, player.rot, 1.0f,
                 &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
-
             if (collision) {
                 player.hit++;
+
+                // TODO: deal with player-asteroid collisions
             }
+        }
+
+        for (i = 0; i < MAX_BULLETS; i++) {
+            if (bullets[i].visible) {
+              const bool collision = collision_test_shapes(
+                  &bullet_shape_data, &bullets[i].pos, 0, 1.0f,
+                  &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
+
+              if (collision) {
+                  bullets[i].visible = false;
+                  asteroids_hit++;
+
+                  explode_asteroid(j);
+
+                  asteroid_hit = true;
+                  break;
+              }
+            }
+        }
+
+        if (asteroid_hit) {
+            break;
         }
     }
 }
@@ -156,7 +221,11 @@ void level_draw()
 
     for (i = 0; i < MAX_ASTEROIDS; i++) {
         if (asteroids[i].visible) {
-            canvas_draw_line_segments(asteroid_shapes[asteroids[i].shape], asteroids[i].pos, 0, vec_2d_unit);
+            struct vec_2d scale = {
+                asteroids[i].scale,
+                asteroids[i].scale,
+            };
+            canvas_draw_line_segments(asteroid_shapes[asteroids[i].shape], asteroids[i].pos, 0, scale);
         }
     }
 
@@ -192,6 +261,10 @@ void level_draw()
         nuDebConTextPos(0, 7, 3);
         nuDebConCPuts(0, conbuf);
     }
+
+    sprintf(conbuf, "%d", asteroids_hit);
+    nuDebConTextPos(0, 7, 3);
+    nuDebConCPuts(0, conbuf);
 
     nuDebConDisp(NU_SC_SWAPBUFFER);
 }
@@ -258,10 +331,7 @@ void level_update()
         }
     }
 
-    {
-        unsigned int asteroids_hit = 0;
-        check_collisions(&asteroids_hit);
-    }
+    check_collisions(&asteroids_hit);
 }
 
 /******************************************************************************
@@ -296,6 +366,8 @@ void level_init(unsigned int level, unsigned int lives, unsigned int score)
     player.pos.y = 0;
     player.vel.x = 0;
     player.vel.y = 0;
+
+    asteroids_hit = 0;
 }
 
 void level_loop(bool draw)
