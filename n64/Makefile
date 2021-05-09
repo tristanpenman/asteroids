@@ -8,10 +8,10 @@ LIB = $(ROOT)/usr/lib
 LPR = $(LIB)/PR
 INC = $(ROOT)/usr/include
 
-LCDEFS = -DNU_DEBUG -DF3DEX_GBI_2
+LCDEFS = -DNU_DEBUG -DF3DEX_GBI_2 -DN64
 LCINCS = -I. -I$(NUSYSINCDIR) -I$(ROOT)/usr/include/PR
 LCOPTS = -G 0 -O2
-LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnusys_d -lgultra -L$(GCCDIR)/mipse/lib -lkmc
+LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnualsgi_n_d -lgn_audio_d -lnusys_d -lgultra_d -L$(GCCDIR)/mipse/lib -lkmc
 
 OPTIMIZER = -g
 

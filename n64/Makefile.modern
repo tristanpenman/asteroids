@@ -11,7 +11,7 @@ INC = $(ROOT)/usr/include
 LCDEFS = -DNU_DEBUG -DF3DEX_GBI_2 -DN64
 LCINCS = -I. -I$(NUSTDINCDIR) -I$(NUSYSINCDIR) -I$(ROOT)/usr/include/PR
 LCOPTS = -G 0
-LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnusys_d -lultra -L$(N64_LIBGCCDIR) -lgcc -lnustd
+LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnualsgi_n_d -ln_audio_d -lnusys_d -lultra_d -L$(N64_LIBGCCDIR) -lgcc -lnustd
 
 OPTIMIZER = -g
 
