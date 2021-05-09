@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "data.h"
 #include "defines.h"
@@ -135,4 +136,28 @@ void bullet_update(struct bullet *b, float f)
             b->pos_prev.y = b->pos.y;
         }
     }
+}
+
+void player_init(struct player *p)
+{
+    memset(p, 0, sizeof(struct player));
+
+    p->lives = SHIP_LIVES;
+    p->score = 0;
+    p->hit = 0;
+
+    player_reset(p);
+}
+
+void player_reset(struct player *p)
+{
+    p->state = PS_NORMAL;
+    p->death_delay = 0.0f;
+    p->pos.x = 0.0f;
+    p->pos.y = 0.0f;
+    p->reload_delay = 0.0f;
+    p->reloading = false;
+    p->rot = 0.0f;
+    p->vel.x = 0.0f;
+    p->vel.y = 0.0f;
 }

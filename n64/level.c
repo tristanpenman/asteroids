@@ -11,6 +11,7 @@
 #include "gfx.h"
 #include "mathdefs.h"
 #include "shape.h"
+#include "util.h"
 #include "vec.h"
 
 // nusys input
@@ -27,14 +28,17 @@ static const float min_x = -1.0 / 2.0f - SHIP_RADIUS;
 static const float max_y =  SCREEN_RATIO / 2.0f + SHIP_RADIUS;
 static const float min_y = -SCREEN_RATIO / 2.0f - SHIP_RADIUS;
 
-// asteroid state
-static struct asteroid asteroids[MAX_ASTEROIDS];
+// level state
+static unsigned int asteroids_hit;
+static bool gameover;
+static unsigned int level;
+static unsigned int next_beat;
 static unsigned int starting_asteroids;
 
-// bullets
+// entities
+static struct asteroid asteroids[MAX_ASTEROIDS];
 static struct bullet bullets[MAX_BULLETS];
-
-// player state
+static struct explosion explosions[MAX_EXPLOSIONS];
 static struct player player;
 
 // shapes
@@ -42,8 +46,6 @@ static uint8_t asteroid_shapes[NUM_ASTEROID_SHAPES];
 static uint8_t bullet_shape;
 static uint8_t player_frame_1_shape;
 static uint8_t player_frame_2_shape;
-
-static unsigned int asteroids_hit;
 
 /******************************************************************************
  *
@@ -113,9 +115,26 @@ void check_fire_button(float f)
 
 /******************************************************************************
  *
- * Collision helpers
+ * Explosion helpers
  *
  *****************************************************************************/
+
+void explode_player(struct player *p)
+{
+    unsigned int i;
+
+    p->state = PS_EXPLODING;
+
+    for (i = 0; i < SHIP_EXPLOSION_SHARDS; i++) {
+        p->shards[i].angle = ((2 * M_PI) / (float) SHIP_EXPLOSION_SHARDS) * (float) i;
+        p->shards[i].rot = random_float(0 - (float) M_PI, (float) M_PI);
+        if (p->shards[i].rot < 0.0f) {
+            p->shards[i].dir = -1;
+        } else {
+            p->shards[i].dir = 1;
+        }
+    }
+}
 
 void explode_asteroid(int i)
 {
@@ -156,6 +175,12 @@ void explode_asteroid(int i)
     }
 }
 
+/******************************************************************************
+ *
+ * Collision helpers
+ *
+ *****************************************************************************/
+
 void check_collisions()
 {
     float dx, dy;
@@ -174,28 +199,34 @@ void check_collisions()
             const bool collision = collision_test_shapes(
                 &player_frame_1_shape_data, &player.pos, player.rot, 1.0f,
                 &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
+
             if (collision) {
                 player.hit++;
 
                 // TODO: deal with player-asteroid collisions
+
+                explode_asteroid(j);
+
+                asteroid_hit = true;
+                break;
             }
         }
 
         for (i = 0; i < MAX_BULLETS; i++) {
             if (bullets[i].visible) {
-              const bool collision = collision_test_shapes(
-                  &bullet_shape_data, &bullets[i].pos, 0, 1.0f,
-                  &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
+                const bool collision = collision_test_shapes(
+                    &bullet_shape_data, &bullets[i].pos, 0, 1.0f,
+                    &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
 
-              if (collision) {
-                  bullets[i].visible = false;
-                  asteroids_hit++;
+                if (collision) {
+                    bullets[i].visible = false;
+                    asteroids_hit++;
 
-                  explode_asteroid(j);
+                    explode_asteroid(j);
 
-                  asteroid_hit = true;
-                  break;
-              }
+                    asteroid_hit = true;
+                    break;
+                }
             }
         }
 
@@ -340,7 +371,7 @@ void level_update()
  *
  *****************************************************************************/
 
-void level_init(unsigned int level, unsigned int lives, unsigned int score)
+void level_init(unsigned int new_level, unsigned int new_lives, unsigned int new_score)
 {
     int i;
 
@@ -355,17 +386,17 @@ void level_init(unsigned int level, unsigned int lives, unsigned int score)
 
     bullet_shape = canvas_load_shape(&bullet_shape_data);
 
+    // Create some asteroids!
     starting_asteroids = num_asteroids_for_level(level);
     memset(asteroids, 0, sizeof(struct asteroid) * MAX_ASTEROIDS);
     for (i = 0; i < starting_asteroids; i++) {
         asteroid_init(&asteroids[i]);
     }
 
-    player.rot = 0;
-    player.pos.x = 0;
-    player.pos.y = 0;
-    player.vel.x = 0;
-    player.vel.y = 0;
+    player_init(&player);
+
+    player.lives = new_lives;
+    player.score = new_score;
 
     asteroids_hit = 0;
 }

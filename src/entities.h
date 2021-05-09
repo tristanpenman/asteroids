@@ -87,4 +87,7 @@ void randomise_asteroid_velocity(struct asteroid *a, float vel_scale);
 void asteroid_init(struct asteroid *a);
 void asteroid_update(struct asteroid *a, float f);
 
+void player_init(struct player *p);
+void player_reset(struct player *p);
+
 #endif

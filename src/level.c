@@ -33,24 +33,26 @@ extern int explosion_channel;
 extern int phaser_channel;
 extern int thruster_channel;
 
+// level state
+static unsigned int asteroids_hit;
+static bool gameover;
 static unsigned int level;
-static unsigned int starting_asteroids;
 static unsigned int next_beat;
+static unsigned int starting_asteroids;
 
-static struct player player;
+// entities
 static struct asteroid asteroids[MAX_ASTEROIDS];
 static struct bullet bullets[MAX_BULLETS];
 static struct explosion explosions[MAX_EXPLOSIONS];
+static struct player player;
 
 static float beat_delay;
 static float beat_delay_limit;
 static float gameover_countdown;
 static float next_level_countdown;
-static unsigned int asteroids_hit;
 
-static bool gameover;
-
-static int asteroid_shape_ids[NUM_ASTEROID_SHAPES];
+// shapes
+static int asteroid_shapes[NUM_ASTEROID_SHAPES];
 
 /******************************************************************************
  *
@@ -73,28 +75,6 @@ static unsigned int num_asteroids_for_level(int level) {
     }
 
     return 11;
-}
-
-static void reset_player(struct player *p)
-{
-    p->state = PS_NORMAL;
-    p->death_delay = 0.0f;
-    p->pos.x = 0.0f;
-    p->pos.y = 0.0f;
-    p->reload_delay = 0.0f;
-    p->reloading = false;
-    p->rot = 0.0f;
-    p->vel.x = 0.0f;
-    p->vel.y = 0.0f;
-}
-
-static void init_player(struct player* p)
-{
-    memset(p, 0, sizeof(struct player));
-    p->lives = DEFAULT_LIVES;
-    p->score = 0;
-    p->hit = 0;
-    reset_player(p);
 }
 
 void update_player(struct player *p, float factor)
@@ -185,7 +165,7 @@ void update_player(struct player *p, float factor)
         if (p->death_delay >= SHIP_DEATH_DELAY) {
             if (p->lives >= 0) {
                 /* TODO: Make sure that ship won't reappear near asteroids */
-                reset_player(p);
+                player_reset(p);
 #ifndef __EMSCRIPTEN__
             } else if (is_high_score(p->score)) {
                 initials_init(p->score);
@@ -523,51 +503,53 @@ void check_collisions(struct player *p, struct asteroid *aa, unsigned int na,
 
 /******************************************************************************
  *
- * Public interface
+ * Update logic
  *
  *****************************************************************************/
 
-bool level_init(unsigned int new_level, unsigned int new_lives, unsigned int new_score)
+void level_draw()
 {
-    srand(SDL_GetTicks());
+    const float residual = (float)residual_simulation_time() / 1000.f;
 
-    level = new_level;
-    next_beat = 0;
-    beat_delay = 0.0f;
-    beat_delay_limit = 1.2f;
-    next_level_countdown = NEXT_WAVE_DELAY;
-    gameover_countdown = GAMEOVER_COUNTDOWN;
-    gameover = false;
-    asteroids_hit = 0;
+    canvas_start_drawing(true);
 
-    canvas_reset();
-
-    for (int i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
-        asteroid_shape_ids[i] = canvas_load_shape(&asteroid_shape_data[i]);
-        if (asteroid_shape_ids[i] == CANVAS_INVALID_SHAPE) {
-            return false;
+    for (int i = 0; i < MAX_ASTEROIDS; i++) {
+        if (!asteroids[i].visible) {
+            continue;
         }
+
+        const struct vec_2d position = {
+            asteroids[i].pos.x + asteroids[i].vel.x * residual,
+            asteroids[i].pos.y + asteroids[i].vel.y * residual
+        };
+
+        const struct vec_2d scale = {
+            asteroids[i].scale,
+            asteroids[i].scale
+        };
+
+        assert(canvas_draw_line_segments(
+            asteroid_shapes[asteroids[i].shape],
+            position,
+            asteroids[i].rot,
+            scale
+        ));
     }
 
-    // Create some asteroids!
-    starting_asteroids = num_asteroids_for_level(level);
-    memset(asteroids, 0, sizeof(asteroids));
-    for (int i = 0; i < starting_asteroids; i++) {
-        asteroid_init(&asteroids[i]);
+    draw_bullets(bullets, MAX_BULLETS);
+    draw_explosions(explosions, MAX_EXPLOSIONS);
+    if (player.state == PS_NORMAL) {
+        draw_player(&player);
+    } else if (player.state == PS_EXPLODING) {
+        draw_player_exploding(&player);
     }
+    draw_score(player.score);
+    draw_lives(player.lives);
 
-    memset(bullets, 0, sizeof(struct bullet) * MAX_BULLETS);
-    memset(explosions, 0, sizeof(struct explosion) * MAX_EXPLOSIONS);
-
-    init_player(&player);
-
-    player.lives = new_lives;
-    player.score = new_score;
-
-    return true;
+    canvas_finish_drawing(true);
 }
 
-void level_loop(bool draw)
+void level_update()
 {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
@@ -650,47 +632,56 @@ void level_loop(bool draw)
 
         update_explosions(explosions, MAX_EXPLOSIONS, factor);
     }
+}
 
-    if (!draw) {
-        return;
+/******************************************************************************
+ *
+ * Public interface
+ *
+ *****************************************************************************/
+
+bool level_init(unsigned int new_level, unsigned int new_lives, unsigned int new_score)
+{
+    srand(SDL_GetTicks());
+
+    level = new_level;
+    next_beat = 0;
+    beat_delay = 0.0f;
+    beat_delay_limit = 1.2f;
+    next_level_countdown = NEXT_WAVE_DELAY;
+    gameover_countdown = GAMEOVER_COUNTDOWN;
+    gameover = false;
+    asteroids_hit = 0;
+
+    canvas_reset();
+
+    for (int i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
+        asteroid_shapes[i] = canvas_load_shape(&asteroid_shape_data[i]);
     }
 
-    const float residual = (float)residual_simulation_time() / 1000.f;
-
-    canvas_start_drawing(true);
-
-    for (int i = 0; i < MAX_ASTEROIDS; i++) {
-        if (!asteroids[i].visible) {
-            continue;
-        }
-
-        const struct vec_2d position = {
-            asteroids[i].pos.x + asteroids[i].vel.x * residual,
-            asteroids[i].pos.y + asteroids[i].vel.y * residual
-        };
-
-        const struct vec_2d scale = {
-            asteroids[i].scale,
-            asteroids[i].scale
-        };
-
-        assert(canvas_draw_line_segments(
-            asteroid_shape_ids[asteroids[i].shape],
-            position,
-            asteroids[i].rot,
-            scale
-        ));
+    // Create some asteroids!
+    starting_asteroids = num_asteroids_for_level(level);
+    memset(asteroids, 0, sizeof(asteroids));
+    for (int i = 0; i < starting_asteroids; i++) {
+        asteroid_init(&asteroids[i]);
     }
 
-    draw_bullets(bullets, MAX_BULLETS);
-    draw_explosions(explosions, MAX_EXPLOSIONS);
-    if (player.state == PS_NORMAL) {
-        draw_player(&player);
-    } else if (player.state == PS_EXPLODING) {
-        draw_player_exploding(&player);
-    }
-    draw_score(player.score);
-    draw_lives(player.lives);
+    memset(bullets, 0, sizeof(struct bullet) * MAX_BULLETS);
+    memset(explosions, 0, sizeof(struct explosion) * MAX_EXPLOSIONS);
 
-    canvas_finish_drawing(true);
+    player_init(&player);
+
+    player.lives = new_lives;
+    player.score = new_score;
+
+    return true;
+}
+
+void level_loop(bool draw)
+{
+    level_update();
+
+    if (draw) {
+        level_draw();
+    }
 }

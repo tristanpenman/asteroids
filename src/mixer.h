@@ -1,7 +1,7 @@
 #ifndef __MIXER_H
 #define __MIXER_H
 
-#include <stdbool.h>
+#include "types.h"
 
 #define MIXER_DEFAULT -1
 #define MIXER_INVALID_CHANNEL -1

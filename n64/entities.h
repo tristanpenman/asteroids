@@ -91,4 +91,7 @@ void asteroid_update(struct asteroid *a, float f, const struct vec_2d *lim);
 void bullet_init(struct bullet *b, const struct vec_2d *pos, float r);
 void bullet_update(struct bullet *b, float f);
 
+void player_init(struct player *p);
+void player_reset(struct player *p);
+
 #endif
