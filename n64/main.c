@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include <nusys.h>
-#include <nualsgi_n.h>
+#include <nualstl_n.h>
 
 #include "level.h"
 #include "loop.h"
@@ -18,29 +18,29 @@ NUContData contdata[1];
 // Pattern connected to the controller
 u8 contPattern;
 
-void set_audio_data()
+musHandle sndHandle = 0;
+
+void initAudio(void)
 {
-  nuAuSndPlayerBankSet(
-    _sfxbankSegmentRomStart,
-    _sfxbankSegmentRomEnd - _sfxbankSegmentRomStart,
-    _sfxtableSegmentRomStart);
+    nuAuStlInit();
+    nuAuStlPtrBankInit(PBANK_SIZE);
+    nuAuStlPtrBankSet((u8*)PBANK_START, PBANK_SIZE, (u8*)WBANK_START);
+    nuAuStlSndPlayerDataSet((u8*)SFX_START, SFX_SIZE);
 }
 
 void mainproc(void)
 {
-  nuGfxInit();
+    contPattern = nuContInit();
 
-  contPattern = nuContInit();
+    initAudio();
 
-  nuAuInit();
+    nuGfxInit();
 
-  set_audio_data();
+    srand(contdata[0].stick_x);
 
-  srand(contdata[0].stick_x);
+    srand(500);
 
-  srand(500);
-
-  level_init(INITIAL_LEVEL, INITIAL_LIVES, INITIAL_SCORE);
-  set_main_loop(level_loop);
-  run_main_loop();
+    level_init(INITIAL_LEVEL, INITIAL_LIVES, INITIAL_SCORE);
+    set_main_loop(level_loop);
+    run_main_loop();
 }

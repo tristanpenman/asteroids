@@ -1,5 +1,7 @@
-#include <assert.h>
 #include <nusys.h>
+#include <nualstl_n.h>
+
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -46,6 +48,8 @@ static uint8_t asteroid_shapes[NUM_ASTEROID_SHAPES];
 static uint8_t bullet_shape;
 static uint8_t player_frame_1_shape;
 static uint8_t player_frame_2_shape;
+
+extern musHandle sndHandle;
 
 /******************************************************************************
  *
@@ -103,6 +107,14 @@ void check_fire_button(float f)
         for (i = 0; i < MAX_BULLETS; i++) {
             if (false == bullets[i].visible) {
                 bullet_init(&bullets[i], &player.pos, player.rot);
+
+                if (sndHandle != 0) {
+                    // stop currently playing sounds
+                    nuAuStlSndPlayerSndStop(sndHandle, 0);
+                    sndHandle = 0;
+                }
+
+                sndHandle = nuAuStlSndPlayerPlay(0);
 
                 break;
             }
