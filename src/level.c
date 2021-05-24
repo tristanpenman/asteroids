@@ -640,7 +640,7 @@ void level_update()
  *
  *****************************************************************************/
 
-bool level_init(unsigned int new_level, unsigned int new_lives, unsigned int new_score)
+void level_init(unsigned int new_level, unsigned int new_lives, unsigned int new_score)
 {
     srand(SDL_GetTicks());
 
@@ -673,8 +673,6 @@ bool level_init(unsigned int new_level, unsigned int new_lives, unsigned int new
 
     player.lives = new_lives;
     player.score = new_score;
-
-    return true;
 }
 
 void level_loop(bool draw)
