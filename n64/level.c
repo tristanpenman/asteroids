@@ -114,7 +114,8 @@ void check_fire_button(float f)
                     sndHandle = 0;
                 }
 
-                sndHandle = nuAuStlSndPlayerPlay(0);
+                sndHandle = nuAuStlSndPlayerPlay(3);
+                nuAuStlSndPlayerSetSndPitch(sndHandle, 6);
 
                 break;
             }
