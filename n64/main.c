@@ -28,11 +28,21 @@ void initAudio(void)
     nuAuStlSndPlayerDataSet((u8*)SFX_START, SFX_SIZE);
 }
 
+void initFeedback(int controller_number)
+{
+    s32 ret = nuContRmbCheck(controller_number);
+    if (!ret) {
+        nuContRmbModeSet(controller_number, NU_CONT_RMB_MODE_ENABLE);
+        nuContRmbStart(controller_number, 128, 10);
+    }
+}
+
 void mainproc(void)
 {
     contPattern = nuContInit();
 
     initAudio();
+    initFeedback(0);
 
     nuGfxInit();
 

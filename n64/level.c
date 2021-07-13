@@ -126,6 +126,15 @@ void check_fire_button(float f)
     }
 }
 
+void rumble(float time, float intensity)
+{
+    const u16 frequency = 256.0f * intensity;
+    const u16 frame = 60.0f * time;
+
+    nuContRmbModeSet(0, NU_CONT_RMB_MODE_ENABLE);
+    nuContRmbStart(0, frequency, frame);
+}
+
 /******************************************************************************
  *
  * Explosion helpers
@@ -218,6 +227,7 @@ void check_collisions()
 
                 // TODO: deal with player-asteroid collisions
 
+                rumble(0.3, 0.7);
                 explode_asteroid(j);
 
                 asteroid_hit = true;
@@ -235,6 +245,7 @@ void check_collisions()
                     bullets[i].visible = false;
                     asteroids_hit++;
 
+                    rumble(0.3, 0.3);
                     explode_asteroid(j);
 
                     asteroid_hit = true;
