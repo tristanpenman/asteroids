@@ -38,6 +38,6 @@ include $(COMMONRULES)
 $(CODESEGMENT): $(CODEOBJECTS) Makefile
 	$(LD) -o $(CODESEGMENT) -r $(CODEOBJECTS) $(LDFLAGS)
 
-$(TARGETS): $(OBJECTS)
+$(TARGETS): $(OBJECTS) spec
 	$(MAKEROM) spec -I$(NUSYSINCDIR) -r $(TARGETS) -e $(APP)
 	makemask $(TARGETS)

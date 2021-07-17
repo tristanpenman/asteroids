@@ -1,9 +1,11 @@
-#include <nusys.h>
-#include <nualstl_n.h>
-
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <nusys.h>
+#include <nualstl_n.h>
+
+#include "unf_debug.h"
 
 #include "canvas.h"
 #include "collision.h"
@@ -162,6 +164,8 @@ void explode_asteroid(int i)
 {
     struct asteroid *a = &asteroids[i];
     float vel_scale = 1.0f;
+
+    debug_printf("[level] Asteroid go boom\n");
 
     if (a->scale < 0.49f) {
         a->visible = false;
