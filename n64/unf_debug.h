@@ -121,13 +121,11 @@
     // Overwrite library functions with useless macros if debug mode is disabled
     #define debug_initialize()
     #define debug_printf(__VA_ARGS__)
-    #define debug_screenshot(a, b, c)
     #define debug_assert(a)
     #define debug_pollcommands()
     #define debug_addcommand(a, b, c)
     #define debug_parsecommand() NULL
     #define debug_sizecommand() 0
-    #define debug_printcommands()
     #define usb_initialize() 0
     #define usb_getcart() 0
     #define usb_write(a, b, c)

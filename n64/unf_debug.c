@@ -335,52 +335,6 @@ https://github.com/buu342/N64-UNFLoader
 
 
     /*==============================
-        debug_screenshot
-        Sends the currently displayed framebuffer through USB.
-        DOES NOT PAUSE DRAWING THREAD! Using outside the drawing
-        thread may lead to a screenshot with visible tearing
-    ==============================*/
-
-    void debug_screenshot()
-    {
-        usbMesg msg;
-        int data[4];
-
-        // These addresses were obtained from http://en64.shoutwiki.com/wiki/VI_Registers_Detailed
-        void* frame = (void*)(0x80000000|(*(u32*)0xA4400004)); // Same as calling osViGetCurrentFramebuffer() in libultra
-        u32 yscale = (*(u32*)0xA4400034);
-        u32 w = (*(u32*)0xA4400008);
-        u32 h = ((((*(u32*)0xA4400028)&0x3FF)-(((*(u32*)0xA4400028)>>16)&0x3FF))*yscale)/2048;
-        u8 depth = (((*(u32*)0xA4400000)&0x03) == 0x03) ? 4 : 2;
-
-        // Ensure debug mode is initialized
-        if (!debug_initialized) {
-            return;
-        }
-
-        // Create the data header to send
-        data[0] = DATATYPE_SCREENSHOT;
-        data[1] = depth;
-        data[2] = w;
-        data[3] = h;
-
-        // Send the header to the USB thread
-        msg.msgtype = MSG_WRITE;
-        msg.datatype = DATATYPE_HEADER;
-        msg.buff = data;
-        msg.size = sizeof(data);
-        osSendMesg(&usbMessageQ, (OSMesg)&msg, OS_MESG_BLOCK);
-
-        // Send the framebuffer to the USB thread
-        msg.msgtype = MSG_WRITE;
-        msg.datatype = DATATYPE_SCREENSHOT;
-        msg.buff = frame;
-        msg.size = depth*w*h;
-        osSendMesg(&usbMessageQ, (OSMesg)&msg, OS_MESG_BLOCK);
-    }
-
-
-    /*==============================
         _debug_assert
         Halts the program (assumes expression failed)
         @param The expression that was tested

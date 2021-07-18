@@ -19,7 +19,6 @@
     #define DATATYPE_TEXT       0x01
     #define DATATYPE_RAWBINARY  0x02
     #define DATATYPE_HEADER     0x03
-    #define DATATYPE_SCREENSHOT 0x04
 
     extern int usb_datatype;
     extern int usb_datasize;
