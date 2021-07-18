@@ -1,32 +1,6 @@
 #ifndef UNFL_DEBUG_H
 #define UNFL_DEBUG_H
 
-/*********************************
-          Settings macros
-*********************************/
-
-// Settings
-#define DEBUG_MODE        1   // Enable/Disable debug mode
-#define DEBUG_INIT_MSG    0   // Print a message when debug mode has initialized
-#define USE_FAULTTHREAD   1   // Create a fault detection thread
-#define OVERWRITE_OSPRINT 1   // Replaces osSyncPrintf calls with debug_printf
-#define MAX_COMMANDS      25  // The max amount of user defined commands possible
-
-// Fault thread definitions
-#define FAULT_THREAD_ID    13
-#define FAULT_THREAD_PRI   125
-#define FAULT_THREAD_STACK 0x2000
-
-// USB thread definitions
-#define USB_THREAD_ID    14
-#define USB_THREAD_PRI   126
-#define USB_THREAD_STACK 0x2000
-
-
-/*********************************
-          Debug Functions
-*********************************/
-
 #if DEBUG_MODE
 
     /*==============================
@@ -34,8 +8,7 @@
         Initializes the debug and USB library.
     ==============================*/
 
-    extern void debug_initialize();
-
+    void debug_initialize();
 
     /*==============================
         debug_printf
@@ -45,8 +18,7 @@
         @param variadic arguments to print as well
     ==============================*/
 
-    extern void debug_printf(const char* message, ...);
-
+    void debug_printf(const char* message, ...);
 
     /*==============================
         debug_dumpbinary
@@ -55,7 +27,7 @@
         @param The size of the file
     ==============================*/
 
-    extern void debug_dumpbinary(void* file, int size);
+    void debug_dumpbinary(void* file, int size);
 
     /*==============================
         debug_assert
@@ -65,14 +37,12 @@
 
     #define debug_assert(expr) (expr) ? ((void)0) : _debug_assert(#expr, __FILE__, __LINE__)
 
-
     /*==============================
         debug_pollcommands
         Check the USB for incoming commands.
     ==============================*/
 
-    extern void debug_pollcommands();
-
+    void debug_pollcommands();
 
     /*==============================
         debug_addcommand
@@ -82,8 +52,7 @@
         @param The function pointer to execute
     ==============================*/
 
-    extern void debug_addcommand(char* command, char* description, char*(*execute)());
-
+    void debug_addcommand(char* command, char* description, char*(*execute)());
 
     /*==============================
         debug_parsecommand
@@ -95,45 +64,37 @@
 
     extern void debug_parsecommand(void* buffer);
 
-
     /*==============================
         debug_sizecommand
         Returns the size of the data from this part of the command.
         @return The size of the data in bytes, or 0
     ==============================*/
 
-    extern int debug_sizecommand();
-
+    int debug_sizecommand();
 
     /*==============================
         debug_printcommands
         Prints a list of commands to the developer's command prompt.
     ==============================*/
 
-    extern void debug_printcommands();
-
+    void debug_printcommands();
 
     // Ignore this, use the macro instead
-    extern void _debug_assert(const char* expression, const char* file, int line);
+    void _debug_assert(const char* expression, const char* file, int line);
 
 #else
 
     // Overwrite library functions with useless macros if debug mode is disabled
     #define debug_initialize()
-    #define debug_printf(__VA_ARGS__)
     #define debug_assert(a)
     #define debug_pollcommands()
     #define debug_addcommand(a, b, c)
     #define debug_parsecommand() NULL
     #define debug_sizecommand() 0
-    #define usb_initialize() 0
-    #define usb_getcart() 0
-    #define usb_write(a, b, c)
-    #define usb_poll() 0
-    #define usb_read(a, b)
-    #define usb_skip(a)
-    #define usb_rewind(a)
-    #define usb_purge()
+
+    inline void debug_printf(const char* message, ...) {
+      // variadic macros not available before C99
+    }
 
 #endif
 

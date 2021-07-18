@@ -10,6 +10,7 @@ https://github.com/buu342/N64-UNFLoader
 
 #include <string.h>
 
+#ifdef DEBUG_MODE
 
 /*********************************
            Data macros
@@ -24,7 +25,6 @@ https://github.com/buu342/N64-UNFLoader
 // Data header related
 #define USBHEADER_CREATE(type, left) (((type<<24) | (left & 0x00FFFFFF)))
 
-
 /*********************************
      Parallel Interface macros
 *********************************/
@@ -36,7 +36,6 @@ https://github.com/buu342/N64-UNFLoader
 #define N64_PI_READLENGTH  0x08
 #define N64_PI_WRITELENGTH 0x0C
 #define N64_PI_STATUS      0x10
-
 
 /*********************************
           64Drive macros
@@ -86,7 +85,6 @@ https://github.com/buu342/N64-UNFLoader
 #define D64_CI_BUSY  0x10
 #define D64_CI_WRITE 0x20
 
-
 /*********************************
          EverDrive macros
 *********************************/
@@ -116,7 +114,6 @@ https://github.com/buu342/N64-UNFLoader
 
 #define ED3_VERSION 0xED640008
 #define ED7_VERSION 0xED640013
-
 
 /*********************************
        SummerCart64 macros
@@ -151,7 +148,6 @@ https://github.com/buu342/N64-UNFLoader
 #define SC64_USB_DMA_MAX_LEN        (2 * 1024 * 1024)
 #define SC64_USB_FIFO_ITEMS(s)      (((s) >> 3) & 0x7FF)
 
-
 /*********************************
        Function Prototypes
 *********************************/
@@ -168,7 +164,6 @@ static void usb_everdrive_writereg(u64 reg, u32 value);
 static void usb_sc64_write(int datatype, const void* data, int size);
 static u32  usb_sc64_poll();
 static void usb_sc64_read();
-
 
 /*********************************
              Globals
@@ -204,7 +199,6 @@ int usb_readblock = -1;
     #define osPiRawReadIo(a, b) __osPiRawReadIo(a, b)
     #define osPiRawStartDma(a, b, c, d) __osPiRawStartDma(a, b, c, d)
 #endif
-
 
 /*********************************
           USB functions
@@ -255,7 +249,6 @@ char usb_initialize()
 
     return 1;
 }
-
 
 /*==============================
     usb_findcart
@@ -320,7 +313,6 @@ static void usb_findcart()
     }
 }
 
-
 /*==============================
     usb_getcart
     Returns which flashcart is currently connected
@@ -331,7 +323,6 @@ char usb_getcart()
 {
     return usb_cart;
 }
-
 
 /*==============================
     usb_write
@@ -357,7 +348,6 @@ void usb_write(int datatype, const void* data, int size)
     // Call the correct write function
     funcPointer_write(datatype, data, size);
 }
-
 
 /*==============================
     usb_poll
@@ -447,7 +437,6 @@ void usb_read(void* buffer, int nbytes)
     }
 }
 
-
 /*==============================
     usb_skip
     Skips a USB read by the specified amount of bytes
@@ -462,7 +451,6 @@ void usb_skip(int nbytes)
         usb_dataleft = 0;
     }
 }
-
 
 /*==============================
     usb_rewind
@@ -492,7 +480,6 @@ void usb_purge()
     usb_datasize = 0;
     usb_readblock = -1;
 }
-
 
 /*********************************
         64Drive functions
@@ -529,7 +516,6 @@ static s8 usb_64drive_wait()
     return 0;
 }
 
-
 /*==============================
     usb_64drive_setwritable
     Set the write mode on the 64Drive
@@ -546,7 +532,6 @@ static void usb_64drive_setwritable(u8 enable)
     #endif
     usb_64drive_wait();
 }
-
 
 /*==============================
     usb_64drive_waitidle
@@ -573,7 +558,6 @@ static int usb_64drive_waitidle()
     return 1;
 }
 
-
 /*==============================
     usb_64drive_armstatus
     Checks if the 64Drive is armed
@@ -590,7 +574,6 @@ static u32 usb_64drive_armstatus()
     #endif
     return status & 0xf;
 }
-
 
 /*==============================
     usb_64drive_waitdisarmed
@@ -609,7 +592,6 @@ static void usb_64drive_waitdisarmed()
         status &= 0x0F;
     } while (status != D64_USB_IDLEUNARMED);
 }
-
 
 /*==============================
     usb_64drive_write
@@ -693,7 +675,6 @@ static void usb_64drive_write(int datatype, const void* data, int size)
     usb_64drive_setwritable(FALSE);
 }
 
-
 /*==============================
     usb_64drive_arm
     Arms the 64Drive's USB
@@ -722,7 +703,6 @@ static void usb_64drive_arm(u32 offset, u32 size)
     }
 }
 
-
 /*==============================
     usb_64drive_disarm
     Disarms the 64Drive's USB
@@ -738,7 +718,6 @@ static void usb_64drive_disarm()
     #endif
     usb_64drive_waitdisarmed();
 }
-
 
 /*==============================
     usb_64drive_poll
@@ -788,7 +767,6 @@ static u32 usb_64drive_poll()
     return 0;
 }
 
-
 /*==============================
     usb_64drive_read
     Reads bytes from the 64Drive ROM into the global buffer with the block offset
@@ -810,7 +788,6 @@ static void usb_64drive_read()
     #endif
 }
 
-
 /*********************************
        EverDrive functions
 *********************************/
@@ -828,7 +805,6 @@ static void usb_everdrive_wait_pidma()
         status &= (PI_STATUS_DMA_BUSY | PI_STATUS_IO_BUSY);
     } while (status);
 }
-
 
 /*==============================
     usb_everdrive_readdata
@@ -857,7 +833,6 @@ static void usb_everdrive_readdata(void* buff, u32 pi_address, u32 len)
     #endif
 }
 
-
 /*==============================
     usb_everdrive_readreg
     Reads data from a specific register on the EverDrive
@@ -869,7 +844,6 @@ static void usb_everdrive_readreg(u32 reg, u32* result)
 {
     usb_everdrive_readdata(result, ED_GET_REGADD(reg), sizeof(u32));
 }
-
 
 /*==============================
     usb_everdrive_writedata
@@ -898,7 +872,6 @@ static void usb_everdrive_writedata(void* buff, u32 pi_address, u32 len)
     #endif
 }
 
-
 /*==============================
     usb_everdrive_writereg
     Writes data to a specific register on the EverDrive
@@ -910,7 +883,6 @@ static void usb_everdrive_writereg(u64 reg, u32 value)
 {
     usb_everdrive_writedata(&value, ED_GET_REGADD(reg), sizeof(u32));
 }
-
 
 /*==============================
     usb_everdrive_usbbusy
@@ -924,7 +896,6 @@ static void usb_everdrive_usbbusy()
         usb_everdrive_readreg(ED_REG_USBCFG, &val);
     } while ((val & ED_USBSTAT_ACT) != 0);
 }
-
 
 /*==============================
     usb_everdrive_canread
@@ -942,7 +913,6 @@ static u8 usb_everdrive_canread()
     status = val & (ED_USBSTAT_POWER | ED_USBSTAT_RXF);
     return status == ED_USBSTAT_POWER;
 }
-
 
 /*==============================
     usb_everdrive_readusb
@@ -974,7 +944,6 @@ static void usb_everdrive_readusb(void* buffer, int size)
         size -= block;
     }
 }
-
 
 /*==============================
     usb_everdrive_write
@@ -1042,7 +1011,6 @@ static void usb_everdrive_write(int datatype, const void* data, int size)
         offset = 0;
     }
 }
-
 
 /*==============================
     usb_everdrive_poll
@@ -1113,7 +1081,6 @@ static u32 usb_everdrive_poll()
     return USBHEADER_CREATE(usb_datatype, usb_datasize);
 }
 
-
 /*==============================
     usb_everdrive_read
     Reads bytes from the EverDrive ROM into the global buffer with the block offset
@@ -1134,7 +1101,6 @@ static void usb_everdrive_read()
         (void)osRecvMesg(&dmaMessageQ, NULL, OS_MESG_BLOCK);
     #endif
 }
-
 
 /*********************************
        SummerCart64 functions
@@ -1159,7 +1125,6 @@ static u32 usb_sc64_read_usb_scr(void)
     return usb_scr;
 }
 
-
 /*==============================
     usb_sc64_read_usb_fifo
     Loads one element from USB FIFO
@@ -1178,7 +1143,6 @@ static u32 usb_sc64_read_usb_fifo(void)
 
     return data;
 }
-
 
 /*==============================
     usb_sc64_waitidle
@@ -1201,7 +1165,6 @@ static s8 usb_sc64_waitidle(void)
 
     return 0;
 }
-
 
 /*==============================
     usb_sc64_waitdata
@@ -1229,7 +1192,6 @@ static s32 usb_sc64_waitdata(u32 length)
     return (s32) bytes;
 }
 
-
 /*==============================
     usb_sc64_setwritable
     Enable ROM (SDRAM) writes in SummerCart64
@@ -1248,7 +1210,6 @@ static void usb_sc64_setwritable(u8 enable)
         osPiWriteIo(SC64_REG_SCR, enable ? (scr | SC64_SCR_SDRAM_WRITE_EN) : (scr & (~SC64_SCR_SDRAM_WRITE_EN)));
     #endif
 }
-
 
 /*==============================
     usb_sc64_write
@@ -1366,7 +1327,6 @@ static void usb_sc64_write(int datatype, const void* data, int size)
     }
 }
 
-
 /*==============================
     usb_sc64_poll
     Returns the header of data being received via USB on the SummerCart64
@@ -1457,7 +1417,6 @@ static u32 usb_sc64_poll(void)
     return 0;
 }
 
-
 /*==============================
     usb_sc64_read
     Reads bytes from the SummerCart64 ROM into the global buffer with the block offset
@@ -1479,3 +1438,5 @@ static void usb_sc64_read(void)
     // Invalidate cache
     osInvalDCache(usb_buffer, BUFFER_SIZE);
 }
+
+#endif

@@ -1,43 +1,39 @@
 #ifndef UNFL_USB_H
 #define UNFL_USB_H
 
-    /*********************************
-             DataType macros
-    *********************************/
+/*********************************
+          DataType macros
+*********************************/
 
-    // Settings
-    #define USE_OSRAW          0                // Use if you're doing USB operations without the PI Manager
-    #define DEBUG_ADDRESS_SIZE 8 * 1024 * 1024  // Max size of USB I/O. The bigger this value, the more ROM you lose!
+// Settings
+#define USE_OSRAW          0                // Use if you're doing USB operations without the PI Manager
+#define DEBUG_ADDRESS_SIZE 8 * 1024 * 1024  // Max size of USB I/O. The bigger this value, the more ROM you lose!
 
-    // Cart definitions
-    #define CART_NONE      0
-    #define CART_64DRIVE   1
-    #define CART_EVERDRIVE 2
-    #define CART_SC64      3
+// Cart definitions
+#define CART_NONE      0
+#define CART_64DRIVE   1
+#define CART_EVERDRIVE 2
+#define CART_SC64      3
 
-    // Data types defintions
-    #define DATATYPE_TEXT       0x01
-    #define DATATYPE_RAWBINARY  0x02
-    #define DATATYPE_HEADER     0x03
+// Data types defintions
+#define DATATYPE_TEXT       0x01
+#define DATATYPE_RAWBINARY  0x02
+#define DATATYPE_HEADER     0x03
 
-    extern int usb_datatype;
-    extern int usb_datasize;
-    extern int usb_dataleft;
-    extern int usb_readblock;
+extern int usb_datatype;
+extern int usb_datasize;
+extern int usb_dataleft;
+extern int usb_readblock;
 
+/*********************************
+        Convenience macros
+*********************************/
 
-    /*********************************
-            Convenience macros
-    *********************************/
+// Use these to conveniently read the header from usb_poll()
+#define USBHEADER_GETTYPE(header) ((header & 0xFF000000) >> 24)
+#define USBHEADER_GETSIZE(header) ((header & 0x00FFFFFF))
 
-    // Use these to conveniently read the header from usb_poll()
-    #define USBHEADER_GETTYPE(header) ((header & 0xFF000000) >> 24)
-    #define USBHEADER_GETSIZE(header) ((header & 0x00FFFFFF))
-
-
-    /*********************************
-              USB Functions
-    *********************************/
+#if DEBUG_MODE
 
     /*==============================
         usb_initialize
@@ -45,8 +41,7 @@
         @return 1 if the USB initialization was successful, 0 if not
     ==============================*/
 
-    extern char usb_initialize();
-
+    char usb_initialize();
 
     /*==============================
         usb_getcart
@@ -54,8 +49,7 @@
         @return The CART macro that corresponds to the identified flashcart
     ==============================*/
 
-    extern char usb_getcart();
-
+    char usb_getcart();
 
     /*==============================
         usb_write
@@ -66,8 +60,7 @@
         @param The size of the data being sent
     ==============================*/
 
-    extern void usb_write(int datatype, const void* data, int size);
-
+    void usb_write(int datatype, const void* data, int size);
 
     /*==============================
         usb_poll
@@ -76,8 +69,7 @@
         @return The data header, or 0
     ==============================*/
 
-    extern unsigned long usb_poll();
-
+    unsigned long usb_poll();
 
     /*==============================
         usb_read
@@ -86,8 +78,7 @@
         @param The number of bytes to read
     ==============================*/
 
-    extern void usb_read(void* buffer, int size);
-
+    void usb_read(void* buffer, int size);
 
     /*==============================
         usb_skip
@@ -95,8 +86,7 @@
         @param The number of bytes to skip
     ==============================*/
 
-    extern void usb_skip(int nbytes);
-
+    void usb_skip(int nbytes);
 
     /*==============================
         usb_rewind
@@ -104,14 +94,26 @@
         @param The number of bytes to rewind
     ==============================*/
 
-    extern void usb_rewind(int nbytes);
-
+    void usb_rewind(int nbytes);
 
     /*==============================
         usb_purge
         Purges the incoming USB data
     ==============================*/
 
-    extern void usb_purge();
+    void usb_purge();
+
+#else
+
+    #define usb_initialize() 0
+    #define usb_getcart() 0
+    #define usb_write(a, b, c)
+    #define usb_poll() 0
+    #define usb_read(a, b)
+    #define usb_skip(a)
+    #define usb_rewind(a)
+    #define usb_purge()
+
+#endif
 
 #endif

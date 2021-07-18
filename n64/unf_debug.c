@@ -15,6 +15,21 @@ https://github.com/buu342/N64-UNFLoader
 
 #if DEBUG_MODE
 
+    #define DEBUG_INIT_MSG    0   // Print a message when debug mode has initialized
+    #define USE_FAULTTHREAD   1   // Create a fault detection thread
+    #define OVERWRITE_OSPRINT 1   // Replaces osSyncPrintf calls with debug_printf
+    #define MAX_COMMANDS      25  // The max amount of user defined commands possible
+
+    // Fault thread definitions
+    #define FAULT_THREAD_ID    13
+    #define FAULT_THREAD_PRI   125
+    #define FAULT_THREAD_STACK 0x2000
+
+    // USB thread definitions
+    #define USB_THREAD_ID    14
+    #define USB_THREAD_PRI   126
+    #define USB_THREAD_STACK 0x2000
+
     /*********************************
                Definitions
     *********************************/
@@ -63,7 +78,6 @@ https://github.com/buu342/N64-UNFLoader
         void* next;
     } debugCommand;
 
-
     /*********************************
             Function Prototypes
     *********************************/
@@ -78,7 +92,6 @@ https://github.com/buu342/N64-UNFLoader
     #if OVERWRITE_OSPRINT
         static void* debug_osSyncPrintf_implementation(void *unused, const char *str, size_t len);
     #endif
-
 
     /*********************************
                  Globals
@@ -261,7 +274,6 @@ https://github.com/buu342/N64-UNFLoader
         #endif
     }
 
-
     /*==============================
         printf_handler
         Handles printf memory copying
@@ -275,7 +287,6 @@ https://github.com/buu342/N64-UNFLoader
     {
         return ((char *) memcpy(buf, str, len) + len);
     }
-
 
     /*==============================
         debug_printf
@@ -313,7 +324,6 @@ https://github.com/buu342/N64-UNFLoader
         osSendMesg(&usbMessageQ, (OSMesg)&msg, OS_MESG_BLOCK);
     }
 
-
     /*==============================
         debug_dumpbinary
         Dumps a binary file through USB
@@ -333,7 +343,6 @@ https://github.com/buu342/N64-UNFLoader
         osSendMesg(&usbMessageQ, (OSMesg)&msg, OS_MESG_BLOCK);
     }
 
-
     /*==============================
         _debug_assert
         Halts the program (assumes expression failed)
@@ -352,7 +361,6 @@ https://github.com/buu342/N64-UNFLoader
         // Intentionally cause a null pointer exception
         *((char*)(NULL)) = 0;
     }
-
 
     /*==============================
         debug_addcommand
@@ -395,7 +403,6 @@ https://github.com/buu342/N64-UNFLoader
         debug_commands_count++;
     }
 
-
     /*==============================
         debug_pollcommands
         Check the USB for incoming commands
@@ -415,7 +422,6 @@ https://github.com/buu342/N64-UNFLoader
         osSendMesg(&usbMessageQ, (OSMesg)&msg, OS_MESG_BLOCK);
     }
 
-
     /*==============================
         debug_sizecommand
         Returns the size of the data from this part of the command
@@ -432,7 +438,6 @@ https://github.com/buu342/N64-UNFLoader
         // Otherwise, return the amount of data to read
         return debug_command_incoming_size[debug_command_current];
     }
-
 
     /*==============================
         debug_parsecommand
@@ -464,7 +469,6 @@ https://github.com/buu342/N64-UNFLoader
         debug_command_current++;
     }
 
-
     /*==============================
         debug_commands_setup
         Reads the entire incoming string and breaks it into parts for
@@ -483,8 +487,7 @@ https://github.com/buu342/N64-UNFLoader
         memset(debug_command_incoming_start, -1, COMMAND_TOKENS*sizeof(int));
 
         // Read data from USB in blocks
-        while (dataleft > 0)
-        {
+        while (dataleft > 0) {
             int readsize = BUFFER_SIZE;
             if (readsize > dataleft) {
                 readsize = dataleft;
@@ -495,7 +498,7 @@ https://github.com/buu342/N64-UNFLoader
             usb_read(debug_buffer, readsize);
 
             // Parse the block
-            for (i=0; i<readsize && dataleft > 0; i++) {
+            for (i = 0; i < readsize && dataleft > 0; i++) {
                 // If we're not reading a file
                 int offset = datasize-dataleft;
                 u8 tok = debug_command_totaltokens;
@@ -556,7 +559,6 @@ https://github.com/buu342/N64-UNFLoader
         usb_rewind(datasize);
     }
 
-
     /*==============================
         debug_thread_usb
         Handles the USB thread
@@ -572,20 +574,17 @@ https://github.com/buu342/N64-UNFLoader
         osCreateMesgQueue(&usbMessageQ, &usbMessageBuf, 1);
 
         // Thread loop
-        while (1)
-        {
+        while (1) {
             // Wait for a USB message to arrive
             osRecvMesg(&usbMessageQ, (OSMesg *)&threadMsg, OS_MESG_BLOCK);
 
             // Ensure there's no data in the USB (which handles MSG_READ)
-            while (usb_poll() != 0)
-            {
+            while (usb_poll() != 0) {
                 int header = usb_poll();
                 debugCommand* entry;
 
                 // Ensure we're receiving a text command
-                if (USBHEADER_GETTYPE(header) != DATATYPE_TEXT)
-                {
+                if (USBHEADER_GETTYPE(header) != DATATYPE_TEXT) {
                     errortype = USBERROR_NOTTEXT;
                     usb_purge();
                     break;
@@ -599,8 +598,7 @@ https://github.com/buu342/N64-UNFLoader
                 debug_commands_setup();
 
                 // Ensure we don't read past our buffer
-                if (debug_sizecommand() > BUFFER_SIZE)
-                {
+                if (debug_sizecommand() > BUFFER_SIZE) {
                     errortype = USBERROR_TOOMUCH;
                     usb_purge();
                     break;
@@ -680,7 +678,7 @@ https://github.com/buu342/N64-UNFLoader
 
             // Clear the debug buffer and copy the formatted string to it
             memset(debug_buffer, 0, len+1);
-            ret =  ((char *) memcpy(debug_buffer, str, len) + len);
+            ret = ((char *) memcpy(debug_buffer, str, len) + len);
 
             // Send the printf to the usb thread
             msg.msgtype = MSG_WRITE;
@@ -718,7 +716,6 @@ https://github.com/buu342/N64-UNFLoader
             }
             debug_printf(">\n");
         }
-
 
         /*==============================
             debug_thread_fault
