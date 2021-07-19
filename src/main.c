@@ -8,6 +8,7 @@
 
 #include <SDL.h>
 
+#include "debug.h"
 #include "game.h"
 #include "mixer.h"
 #include "options.h"
@@ -20,7 +21,7 @@
 
 void cleanup(void)
 {
-    printf("cleanup...\n");
+    debug_printf("cleanup...\n");
     game_cleanup();
     mixer_cleanup();
     video_cleanup();
@@ -42,6 +43,8 @@ int main(int argc, char **argv)
     bool fullscreen = false;
     bool sandbox = false;
     bool silent = false;
+
+    debug_init();
 
     if (argc > 1) {
         for (int i = 1; i < argc; ++i) {
@@ -67,24 +70,24 @@ int main(int argc, char **argv)
     SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
 #endif
 
-    fprintf(stdout, "video_init...\n");
+    debug_printf("video_init...\n");
     if (false == video_init(LOGICAL_WIDTH_PX, LOGICAL_HEIGHT_PX, "Asteroids", fullscreen)) {
         exit(1);
     }
 
     if (!silent) {
-        fprintf(stdout, "mixer_init...\n");
+        debug_printf("mixer_init...\n");
         if (false == mixer_init(MIXER_DEFAULT)) {
             exit(1);
         }
     }
 
-    fprintf(stdout, "game_init...\n");
+    debug_printf("game_init...\n");
     if (false == game_init(silent)) {
         exit(1);
     }
 
-    fprintf(stdout, "game_play...\n");
+    debug_printf("game_play...\n");
     game_play(sandbox);
 
     return 0;

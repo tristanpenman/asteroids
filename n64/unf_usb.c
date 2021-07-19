@@ -10,10 +10,8 @@ https://github.com/buu342/N64-UNFLoader
 
 #include <string.h>
 
-#ifdef DEBUG_MODE
-
 /*********************************
-           Data macros
+          Data macros
 *********************************/
 
 // Input/Output buffer size. Always keep it at 512
@@ -26,7 +24,7 @@ https://github.com/buu342/N64-UNFLoader
 #define USBHEADER_CREATE(type, left) (((type<<24) | (left & 0x00FFFFFF)))
 
 /*********************************
-     Parallel Interface macros
+    Parallel Interface macros
 *********************************/
 
 #define N64_PI_ADDRESS    0xA4600000
@@ -86,7 +84,7 @@ https://github.com/buu342/N64-UNFLoader
 #define D64_CI_WRITE 0x20
 
 /*********************************
-         EverDrive macros
+        EverDrive macros
 *********************************/
 
 #define ED_BASE           0x10000000
@@ -116,7 +114,7 @@ https://github.com/buu342/N64-UNFLoader
 #define ED7_VERSION 0xED640013
 
 /*********************************
-       SummerCart64 macros
+      SummerCart64 macros
 *********************************/
 
 #define SC64_SDRAM_BASE             0x10000000
@@ -149,7 +147,7 @@ https://github.com/buu342/N64-UNFLoader
 #define SC64_USB_FIFO_ITEMS(s)      (((s) >> 3) & 0x7FF)
 
 /*********************************
-       Function Prototypes
+      Function Prototypes
 *********************************/
 
 static void usb_findcart();
@@ -166,7 +164,7 @@ static u32  usb_sc64_poll();
 static void usb_sc64_read();
 
 /*********************************
-             Globals
+            Globals
 *********************************/
 
 // Function pointers
@@ -789,7 +787,7 @@ static void usb_64drive_read()
 }
 
 /*********************************
-       EverDrive functions
+      EverDrive functions
 *********************************/
 
 /*==============================
@@ -1103,7 +1101,7 @@ static void usb_everdrive_read()
 }
 
 /*********************************
-       SummerCart64 functions
+      SummerCart64 functions
 *********************************/
 
 /*==============================
@@ -1438,5 +1436,3 @@ static void usb_sc64_read(void)
     // Invalidate cache
     osInvalDCache(usb_buffer, BUFFER_SIZE);
 }
-
-#endif

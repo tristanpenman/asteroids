@@ -1,5 +1,5 @@
-#ifndef UNFL_USB_H
-#define UNFL_USB_H
+#ifndef __UNFL_USB_H
+#define __UNFL_USB_H
 
 /*********************************
           DataType macros
@@ -33,87 +33,72 @@ extern int usb_readblock;
 #define USBHEADER_GETTYPE(header) ((header & 0xFF000000) >> 24)
 #define USBHEADER_GETSIZE(header) ((header & 0x00FFFFFF))
 
-#if DEBUG_MODE
+/*==============================
+    usb_initialize
+    Initializes the USB buffers and pointers
+    @return 1 if the USB initialization was successful, 0 if not
+==============================*/
 
-    /*==============================
-        usb_initialize
-        Initializes the USB buffers and pointers
-        @return 1 if the USB initialization was successful, 0 if not
-    ==============================*/
+char usb_initialize();
 
-    char usb_initialize();
+/*==============================
+    usb_getcart
+    Returns which flashcart is currently connected
+    @return The CART macro that corresponds to the identified flashcart
+==============================*/
 
-    /*==============================
-        usb_getcart
-        Returns which flashcart is currently connected
-        @return The CART macro that corresponds to the identified flashcart
-    ==============================*/
+char usb_getcart();
 
-    char usb_getcart();
+/*==============================
+    usb_write
+    Writes data to the USB.
+    Will not write if there is data to read from USB
+    @param The DATATYPE that is being sent
+    @param A buffer with the data to send
+    @param The size of the data being sent
+==============================*/
 
-    /*==============================
-        usb_write
-        Writes data to the USB.
-        Will not write if there is data to read from USB
-        @param The DATATYPE that is being sent
-        @param A buffer with the data to send
-        @param The size of the data being sent
-    ==============================*/
+void usb_write(int datatype, const void* data, int size);
 
-    void usb_write(int datatype, const void* data, int size);
+/*==============================
+    usb_poll
+    Returns the header of data being received via USB
+    The first byte contains the data type, the next 3 the number of bytes left to read
+    @return The data header, or 0
+==============================*/
 
-    /*==============================
-        usb_poll
-        Returns the header of data being received via USB
-        The first byte contains the data type, the next 3 the number of bytes left to read
-        @return The data header, or 0
-    ==============================*/
+unsigned long usb_poll();
 
-    unsigned long usb_poll();
+/*==============================
+    usb_read
+    Reads bytes from USB into the provided buffer
+    @param The buffer to put the read data in
+    @param The number of bytes to read
+==============================*/
 
-    /*==============================
-        usb_read
-        Reads bytes from USB into the provided buffer
-        @param The buffer to put the read data in
-        @param The number of bytes to read
-    ==============================*/
+void usb_read(void* buffer, int size);
 
-    void usb_read(void* buffer, int size);
+/*==============================
+    usb_skip
+    Skips a USB read by the specified amount of bytes
+    @param The number of bytes to skip
+==============================*/
 
-    /*==============================
-        usb_skip
-        Skips a USB read by the specified amount of bytes
-        @param The number of bytes to skip
-    ==============================*/
+void usb_skip(int nbytes);
 
-    void usb_skip(int nbytes);
+/*==============================
+    usb_rewind
+    Rewinds a USB read by the specified amount of bytes
+    @param The number of bytes to rewind
+==============================*/
 
-    /*==============================
-        usb_rewind
-        Rewinds a USB read by the specified amount of bytes
-        @param The number of bytes to rewind
-    ==============================*/
+void usb_rewind(int nbytes);
 
-    void usb_rewind(int nbytes);
+/*==============================
+    usb_purge
+    Purges the incoming USB data
+==============================*/
 
-    /*==============================
-        usb_purge
-        Purges the incoming USB data
-    ==============================*/
-
-    void usb_purge();
-
-#else
-
-    #define usb_initialize() 0
-    #define usb_getcart() 0
-    #define usb_write(a, b, c)
-    #define usb_poll() 0
-    #define usb_read(a, b)
-    #define usb_skip(a)
-    #define usb_rewind(a)
-    #define usb_purge()
-
-#endif
+void usb_purge();
 
 #endif

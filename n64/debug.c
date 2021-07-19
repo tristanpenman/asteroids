@@ -10,13 +10,13 @@ https://github.com/buu342/N64-UNFLoader
 #include <ultra64.h>
 #include <PR/os_internal.h> // Needed for Crash's Linux toolchain
 
-#include "unf_debug.h"
 #include "unf_usb.h"
 
-#if DEBUG_MODE
+#include "debug.h"
 
-    #define DEBUG_INIT_MSG    0   // Print a message when debug mode has initialized
-    #define USE_FAULTTHREAD   1   // Create a fault detection thread
+#if DEBUG
+
+    #define USE_FAULTTHREAD   0   // Create a fault detection thread
     #define OVERWRITE_OSPRINT 1   // Replaces osSyncPrintf calls with debug_printf
     #define MAX_COMMANDS      25  // The max amount of user defined commands possible
 
@@ -241,7 +241,7 @@ https://github.com/buu342/N64-UNFLoader
         Initializes the debug library
     ==============================*/
 
-    void debug_initialize()
+    void debug_init()
     {
         // Initialize the USB functions
         if (!usb_initialize()) {
@@ -269,9 +269,7 @@ https://github.com/buu342/N64-UNFLoader
 
         // Mark the debug mode as initialized
         debug_initialized = 1;
-        #if DEBUG_INIT_MSG
-            debug_printf("Debug mode initialized!\n\n");
-        #endif
+        debug_printf("debug_init...\n");
     }
 
     /*==============================

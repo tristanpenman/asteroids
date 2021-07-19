@@ -3,8 +3,7 @@
 #include <nusys.h>
 #include <nualstl_n.h>
 
-#include "unf_debug.h"
-
+#include "debug.h"
 #include "level.h"
 #include "loop.h"
 #include "segment.h"
@@ -27,7 +26,7 @@ musHandle sndHandle = 0;
 static OSMesg PiMessages[NUM_PI_MSGS];
 static OSMesgQueue PiMessageQ;
 
-void initAudio(void)
+void audio_init(void)
 {
     nuAuStlInit();
     nuAuStlPtrBankInit(PBANK_SIZE);
@@ -35,35 +34,26 @@ void initAudio(void)
     nuAuStlSndPlayerDataSet((u8*)SFX_START, SFX_SIZE);
 }
 
-void initController(int controller_number)
+void controller_init(int controller_number)
 {
     s32 ret = nuContRmbCheck(controller_number);
     if (ret) {
-        debug_printf("[main] Rumble Pak: Fail (%d)\n", ret);
+        debug_printf("Rumble Pak: Fail (%d)\n", ret);
     } else {
-        debug_printf("[main] Rumble Pak: OK\n");
+        debug_printf("Rumble Pak: OK\n");
         nuContRmbModeSet(controller_number, NU_CONT_RMB_MODE_ENABLE);
         nuContRmbStart(controller_number, 128, 10);
     }
 }
 
-void initUsb()
-{
-    osCreatePiManager((OSPri)OS_PRIORITY_PIMGR, &PiMessageQ, PiMessages, NUM_PI_MSGS);
-
-    debug_initialize();
-}
-
 void mainproc(void)
 {
-    initUsb();
     nuGfxInit();
-
-    debug_printf("[main] Starting...\n\n");
-
+    debug_init();
+    debug_printf("Starting...\n");
     contPattern = nuContInit();
-    initController(0);
-    initAudio();
+    controller_init(0);
+    audio_init();
 
     srand(contdata[0].stick_x);
 

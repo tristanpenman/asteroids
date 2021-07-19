@@ -10,6 +10,7 @@
 #include <SDL.h>
 
 #include "collision.h"
+#include "debug.h"
 #include "draw.h"
 #include "loop.h"
 #include "mixer.h"
@@ -74,12 +75,12 @@ static void mixer_channel_complete(int channel)
 bool game_init(bool silent)
 {
 #ifndef __EMSCRIPTEN__
-    fprintf(stdout, "load_highscores...\n");
+    debug_printf("load_highscores...\n");
     load_highscores();
 #endif
     if (!silent) {
         mixer_set_channel_completion_handler(mixer_channel_complete);
-        fprintf(stdout, "load_samples...\n");
+        debug_printf("load_samples...\n");
         if (!load_samples()) {
             return false;
         }

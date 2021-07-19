@@ -11,6 +11,7 @@
 #define EM_TARGET "canvas"
 #endif
 
+#include "debug.h"
 #include "video.h"
 
 // Pointer to window created by a call to SDL_CreateWindow
@@ -79,10 +80,8 @@ static EM_BOOL resize_callback(int eventType, const EmscriptenUiEvent *uiEvent, 
     }
 
     if (new_width != canvas_width || new_height != canvas_height) {
-#ifdef DEBUG
-        printf("resizing canvas from (%d, %d) to (%d, %d)\n", canvas_width, canvas_height,
+        debug_printf"resizing canvas from (%d, %d) to (%d, %d)\n", canvas_width, canvas_height,
             new_width, new_height);
-#endif
         SDL_SetWindowSize(sdl_window, new_width, new_height);
         canvas_width = new_width;
         canvas_height = new_height;
@@ -161,9 +160,7 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
     const int inner_height = rect.h;
 #endif
 
-#ifdef DEBUG
-    printf("client area = (%d, %d)\n", inner_width, inner_height);
-#endif
+    debug_printf("client area = (%d, %d)\n", inner_width, inner_height);
 
     while (new_width * 2 < inner_width && new_height * 2 < inner_height) {
         new_width *= 2;
@@ -251,10 +248,8 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
     SDL_SetEventFilter(event_filter, NULL);
 #endif
 
-#ifdef DEBUG
-    printf("initial drawable size = (%d, %d)\n", canvas_width, canvas_height);
-    printf("initial pixel density = %f\n", pixel_density);
-#endif
+    debug_printf("initial drawable size = (%d, %d)\n", canvas_width, canvas_height);
+    debug_printf("initial pixel density = %f\n", pixel_density);
 
     // Scale viewport and line width according to device pixel ratio
     glViewport(0, 0, canvas_width, canvas_height);
@@ -291,11 +286,10 @@ void video_clear()
     // appear to correctly handle changes in device pixel ratio (at least,
     // this was the case when I was testing in Safari).
     if (reset_window_metrics()) {
-#ifdef DEBUG
-        printf("canvas width = %d\n", canvas_width);
-        printf("canvas height = %d\n", canvas_height);
-        printf("pixel density = %f\n", pixel_density);
-#endif
+        debug_printf("canvas width = %d\n", canvas_width);
+        debug_printf("canvas height = %d\n", canvas_height);
+        debug_printf("pixel density = %f\n", pixel_density);
+
         glLineWidth(1.5f * pixel_density);
     }
 

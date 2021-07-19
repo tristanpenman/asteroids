@@ -5,6 +5,8 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR)
     message(FATAL_ERROR "You must set your binary directory different from your source")
 endif()
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEBUG")
+
 if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     if(CMAKE_C_FLAGS MATCHES "/W[0-4]")
@@ -46,6 +48,7 @@ set(SRCS
     src/canvas.c
     src/collision.c
     src/data.c
+    src/debug.c
     src/draw.c
     src/entities.c
     src/game.c
