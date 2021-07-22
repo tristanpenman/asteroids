@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <nusys.h>
 
+#include "debug.h"
 #include "loop.h"
 
 static main_loop_fn_t main_loop = NULL;
@@ -14,6 +15,8 @@ static void exit_loop(bool draw)
 
 static void nusys_loop(int pendingGfx)
 {
+    debug_pollcommands();
+
     main_loop(pendingGfx < 1);
 }
 

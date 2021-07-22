@@ -24,6 +24,11 @@ int canvas_load_shape(const struct shape *);
 void canvas_start_drawing(bool clear);
 
 /**
+ * Change the colour that will be used when drawing lines
+ */
+void canvas_set_colour(float r, float g, float b);
+
+/**
  * Draw the lines segments defined by a shape
  */
 bool canvas_draw_line_segments(int shape, struct vec_2d position, float rotation, struct vec_2d scale);

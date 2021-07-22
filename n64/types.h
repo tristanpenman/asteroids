@@ -7,6 +7,7 @@
 #define false 0
 typedef int bool;
 typedef unsigned char uint8_t;
+typedef unsigned int uint32_t;
 
 #else
 

@@ -113,6 +113,25 @@ const struct shape asteroid_shape_data[] = {
 
 // ----------------------------------------------------------------------------
 //
+// Box (debug shape)
+//
+
+static const float box_vertices[] = {
+    -.04f, -.04f,
+     .04f, -.04f,
+     .04f,  .04f,
+    -.04f,  .04f
+};
+
+const struct shape box_shape_data = {
+    box_vertices,
+    sizeof(box_vertices) / sizeof(float) / 2,
+    NULL,
+    0
+};
+
+// ----------------------------------------------------------------------------
+//
 // Bullet
 //
 

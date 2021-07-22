@@ -6,6 +6,7 @@
 #include "debug.h"
 #include "level.h"
 #include "loop.h"
+#include "sandbox.h"
 #include "segment.h"
 #include "vec.h"
 
@@ -46,11 +47,22 @@ void controller_init(int controller_number)
     }
 }
 
+char* sandbox()
+{
+    sandbox_init();
+    set_main_loop(sandbox_loop);
+
+    return "sandbox";
+}
+
 void mainproc(void)
 {
     nuGfxInit();
+
     debug_init();
+    debug_addcommand("sandbox", "Switch to sandbox mode", sandbox);
     debug_printf("Starting...\n");
+
     contPattern = nuContInit();
     controller_init(0);
     audio_init();

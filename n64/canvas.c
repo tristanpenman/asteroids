@@ -103,6 +103,11 @@ void canvas_start_drawing(bool clear)
     gDPSetCycleType(glistp++, G_CYC_1CYCLE);
 }
 
+void canvas_set_colour(float r, float g, float b)
+{
+    // TODO: figure out if it's possible to make this dynamic
+}
+
 bool canvas_draw_line_segments(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
 {
     Dynamic *transform = &transforms[num_transforms++];

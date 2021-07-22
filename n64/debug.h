@@ -19,8 +19,6 @@
 
     int debug_sizecommand();
 
-    void debug_printcommands();
-
     // Ignore this, use the macro instead
     void _debug_assert(const char* expression, const char* file, int line);
 
