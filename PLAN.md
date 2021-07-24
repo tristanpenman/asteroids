@@ -21,13 +21,12 @@ Much of the inspiration for this project comes from the (massively) cross-platfo
   + ~~Engine boilerplate~~
   + ~~Basic graphics and audio~~
   + ~~Integrate UNFLoader debug interface~~
-  + Port physics sandbox (in progress)
-  + Implement UNFLoader command interface (in progress)
+  + ~~Port physics sandbox~~
+  + ~~Figure out how to get UNFLoader fault handler working~~
+  + UNFLoader command interface (in progress)
   + Packer template for dev environment (in progress)
   + Basic menu system
   + Scripts for pre-processing audio files
-  + Figure out how to get UNFLoader fault handler working
-    + GDB stub (?)
   + Asteroids font for main screen
   + Mixer interface
   + High score screens
