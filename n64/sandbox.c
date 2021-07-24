@@ -1,3 +1,5 @@
+#include <nusys.h>
+
 #include "canvas.h"
 #include "collision.h"
 #include "data.h"
@@ -8,8 +10,11 @@
 #define NUM_ASTEROID_SHAPES 4
 #define TIME_STEP_MILLIS 10
 
+extern NUContData contdata[1];
+
 static int asteroid_shape_ids[NUM_ASTEROID_SHAPES];
 static int box_shape_id;
+static int box_shape_active_id;
 
 static struct vec_2d pos1;
 static struct vec_2d pos2;
@@ -34,8 +39,15 @@ bool sandbox_init()
         }
     }
 
+    // white box when there is no collision detected
     box_shape_id = canvas_load_shape(&box_shape_data);
     if (box_shape_id == CANVAS_INVALID_SHAPE) {
+        return false;
+    }
+
+    // red box when collision is detected
+    box_shape_active_id = canvas_load_shape_with_color(&box_shape_data, 0xff, 0, 0);
+    if (box_shape_active_id == CANVAS_INVALID_SHAPE) {
         return false;
     }
 
@@ -57,13 +69,29 @@ bool sandbox_init()
 
 void sandbox_loop(bool draw)
 {
-    // TODO: reimplement input handling
+    nuContDataGetEx(contdata, 0);
+
+    move_left = false;
+    move_right = false;
+
+    if (contdata[0].stick_x < -20) {
+        move_left = true;
+    } else if (contdata[0].stick_x > 20) {
+        move_right = true;
+    }
+
+    move_up = false;
+    move_down = false;
+
+    if (contdata[0].stick_y < -20) {
+        move_down = true;
+    } else if (contdata[0].stick_y > 20) {
+        move_up = true;
+    }
 
     // Update and consume unused simulation time
     produce_simulation_time();
     while (maybe_consume_simulation_time(TIME_STEP_MILLIS)) {
-        // TODO
-
         if (move_left) {
             pos1.x -= 0.001f;
         }
@@ -96,12 +124,8 @@ void sandbox_loop(bool draw)
             vec_2d_unit
         );
 
-        if (collision) {
-            canvas_set_colour(1.0f, 0.0f, 0.0f);
-        }
-
         canvas_draw_line_segments(
-            box_shape_id,
+            collision ? box_shape_active_id : box_shape_id,
             pos2,
             0,
             vec_2d_unit

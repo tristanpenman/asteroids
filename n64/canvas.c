@@ -42,6 +42,11 @@ void canvas_reset()
 
 int canvas_load_shape(const struct shape *shape)
 {
+    return canvas_load_shape_with_color(shape, 0xff, 0xff, 0xff);
+}
+
+int canvas_load_shape_with_color(const struct shape *shape, int r, int g, int b)
+{
     int i;
 
     if (num_shapes == MAX_SHAPES) {
@@ -61,9 +66,9 @@ int canvas_load_shape(const struct shape *shape)
         vertex->v.ob[1] = shape->vertices[i * 2 + 1] * (float)SCREEN_WD;
         vertex->v.ob[2] = -5;
 
-        vertex->v.cn[0] = 0xFF;
-        vertex->v.cn[1] = 0xFF;
-        vertex->v.cn[2] = 0xFF;
+        vertex->v.cn[0] = r;
+        vertex->v.cn[1] = g;
+        vertex->v.cn[2] = b;
         vertex->v.cn[3] = 0xFF;
     }
 

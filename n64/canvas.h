@@ -15,8 +15,17 @@ void canvas_reset();
 
 /**
  * Load a shape so that it can be drawn using \c canvas_draw_lines or \c canvas_draw_triangles
+ *
+ * Shapes will be white by default.
  */
 int canvas_load_shape(const struct shape *);
+
+/**
+ * Load a shape so that it can be drawn using \c canvas_draw_lines or \c canvas_draw_triangles
+ *
+ * Shapes will be drawn using the specified color.
+ */
+int canvas_load_shape_with_color(const struct shape *, int r, int g, int b);
 
 /**
  * Start drawing shapes onto the canvas
