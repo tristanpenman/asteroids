@@ -248,6 +248,10 @@ https://github.com/buu342/N64-UNFLoader
 
     void debug_init()
     {
+        if (IO_READ(DPC_CLOCK_REG) == 0) {
+            return;
+        }
+
         // Initialize the USB functions
         if (!usb_initialize()) {
             return;
