@@ -101,3 +101,8 @@ bool input_active(int handle)
 {
     return active[handle];
 }
+
+void input_read_joystick(int8_t* x, int8_t* y)
+{
+    // TODO: not implemented
+}

@@ -12,6 +12,7 @@
 #include "defines.h"
 #include "entities.h"
 #include "gfx.h"
+#include "input.h"
 #include "mathdefs.h"
 #include "shape.h"
 #include "util.h"
@@ -20,10 +21,6 @@
 // nusys input
 extern NUContData contdata[1];
 extern u8 contPattern;
-
-// useful constants
-static const float factor = 1.0f / 60.0f;
-static const float degrees_to_radians = M_PI / 180.0f;
 
 // ship wrapping constants
 static const float max_x =  1.0 / 2.0f + SHIP_RADIUS;
@@ -50,6 +47,13 @@ static uint8_t bullet_shape;
 static uint8_t player_frame_1_shape;
 static uint8_t player_frame_2_shape;
 
+// inputs
+static int input_fire;
+static int input_left;
+static int input_pause;
+static int input_right;
+static int input_thruster;
+
 extern musHandle sndHandle;
 
 /******************************************************************************
@@ -75,13 +79,13 @@ static unsigned int num_asteroids_for_level(int level) {
     return 11;
 }
 
-void check_fire_button(float f)
+void check_fire_button(float factor)
 {
     unsigned int i;
     unsigned int num_player_bullets = 0;
 
     if (player.reloading == true) {
-        player.reload_delay += f;
+        player.reload_delay += factor;
         if (player.reload_delay >= BULLET_DELAY) {
             player.reload_delay = 0.0f;
             player.reloading = false;
@@ -329,32 +333,36 @@ void level_draw()
 
 void level_update()
 {
-    float f = 1.f / 60.f;
+    // useful constants
+    static const float factor = 1.0f / 60.0f;
+    static const float degrees_to_radians = M_PI / 180.0f;
+
     int i;
-    static float rot;
+    float rot;
+    int8_t joystick_x;
 
-    // Data reading of controller 1
-    nuContDataGetEx(contdata, 0);
+    input_update();
+    input_read_joystick(&joystick_x, NULL);
 
-    if (contdata[0].stick_x < -20) {
+    if (joystick_x < -20 || input_active(input_left)) {
         player.rot -= SHIP_ROTATION_SPEED;
-    } else if (contdata[0].stick_x > 20) {
+        if (player.rot < 0.0) {
+            player.rot += 360.0;
+        }
+    } else if (joystick_x > 20 || input_active(input_right)) {
         player.rot += SHIP_ROTATION_SPEED;
-    }
-
-    if (player.rot > 360.0) {
-        player.rot -= 360.0;
-    } else if (player.rot < 0.0) {
-        player.rot += 360.0;
+        if (player.rot > 360.0) {
+            player.rot -= 360.0;
+        }
     }
 
     rot = player.rot * degrees_to_radians;
 
-    player.keys.fire = contdata[0].button & A_BUTTON ? KS_DOWN : KS_UP;
+    player.keys.fire = input_active(input_fire) ? KS_DOWN : KS_UP;
 
-    check_fire_button(f);
+    check_fire_button(factor);
 
-    if (contdata[0].button & B_BUTTON) {
+    if (input_active(input_thruster)) {
         player.vel.x += sinf(rot) * SHIP_ACCELERATION * factor;
         player.vel.y -= cosf(rot) * SHIP_ACCELERATION * factor;
     }
@@ -379,13 +387,13 @@ void level_update()
             struct vec_2d lim;
             lim.x = 1.f / 2.f + asteroids[i].radius;
             lim.y = 0.75f / 2.f + asteroids[i].radius;
-            asteroid_update(&asteroids[i], f, &lim);
+            asteroid_update(&asteroids[i], factor, &lim);
         }
     }
 
     for (i = 0; i < MAX_BULLETS; i++) {
         if (bullets[i].visible) {
-            bullet_update(&bullets[i], f);
+            bullet_update(&bullets[i], factor);
         }
     }
 
@@ -401,6 +409,28 @@ void level_update()
 void level_init(unsigned int new_level, unsigned int new_lives, unsigned int new_score)
 {
     int i;
+
+    input_reset();
+
+    input_left = input_register();
+    input_map(input_left, INPUT_DPAD_LEFT);
+    input_map(input_left, INPUT_KEY_LEFT);
+    input_map(input_left, INPUT_JOYSTICK_LEFT);
+
+    input_right = input_register();
+    input_map(input_right, INPUT_DPAD_RIGHT);
+    input_map(input_right, INPUT_KEY_RIGHT);
+    input_map(input_right, INPUT_JOYSTICK_RIGHT);
+
+    input_thruster = input_register();
+    input_map(input_thruster, INPUT_BUTTON_A);
+
+    input_fire = input_register();
+    input_map(input_fire, INPUT_BUTTON_B);
+    input_map(input_fire, INPUT_BUTTON_Z);
+
+    input_pause = input_register();
+    input_map(input_pause, INPUT_BUTTON_START);
 
     canvas_reset();
 

@@ -23,7 +23,7 @@ enum input
     INPUT_KEY_RIGHT,
     INPUT_KEY_UP,
 
-    // controllers
+    // controller buttons
     INPUT_BUTTON_START,
     INPUT_BUTTON_A,
     INPUT_BUTTON_B,

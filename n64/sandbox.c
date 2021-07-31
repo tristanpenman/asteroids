@@ -3,6 +3,7 @@
 #include "canvas.h"
 #include "collision.h"
 #include "data.h"
+#include "input.h"
 #include "sandbox.h"
 #include "timing.h"
 #include "vec.h"
@@ -26,9 +27,36 @@ static bool move_up;
 
 static bool collision;
 
+static int input_down;
+static int input_left;
+static int input_right;
+static int input_up;
+
 bool sandbox_init()
 {
     unsigned int i;
+
+    input_reset();
+
+    input_down = input_register();
+    input_map(input_down, INPUT_DPAD_DOWN);
+    input_map(input_down, INPUT_KEY_DOWN);
+    input_map(input_down, INPUT_JOYSTICK_DOWN);
+
+    input_left = input_register();
+    input_map(input_left, INPUT_DPAD_LEFT);
+    input_map(input_left, INPUT_KEY_LEFT);
+    input_map(input_left, INPUT_JOYSTICK_LEFT);
+
+    input_right = input_register();
+    input_map(input_right, INPUT_DPAD_RIGHT);
+    input_map(input_right, INPUT_KEY_RIGHT);
+    input_map(input_right, INPUT_JOYSTICK_RIGHT);
+
+    input_up = input_register();
+    input_map(input_up, INPUT_DPAD_UP);
+    input_map(input_up, INPUT_KEY_UP);
+    input_map(input_up, INPUT_JOYSTICK_UP);
 
     canvas_reset();
 
@@ -69,23 +97,28 @@ bool sandbox_init()
 
 void sandbox_loop(bool draw)
 {
-    nuContDataGetEx(contdata, 0);
+    int8_t x;
+    int8_t y;
+
+    input_update();
+
+    input_read_joystick(&x, &y);
 
     move_left = false;
     move_right = false;
 
-    if (contdata[0].stick_x < -20) {
+    if (x < -20 || input_active(input_left)) {
         move_left = true;
-    } else if (contdata[0].stick_x > 20) {
+    } else if (x > 20 || input_active(input_right)) {
         move_right = true;
     }
 
     move_up = false;
     move_down = false;
 
-    if (contdata[0].stick_y < -20) {
+    if (y < -20 || input_active(input_down)) {
         move_down = true;
-    } else if (contdata[0].stick_y > 20) {
+    } else if (y > 20 || input_active(input_up)) {
         move_up = true;
     }
 

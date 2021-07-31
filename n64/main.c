@@ -4,6 +4,7 @@
 #include <nualstl_n.h>
 
 #include "debug.h"
+#include "input.h"
 #include "level.h"
 #include "loop.h"
 #include "sandbox.h"
@@ -15,10 +16,6 @@
 #define INITIAL_LEVEL 1
 #define INITIAL_LIVES 3
 #define INITIAL_SCORE 0
-
-// Controller
-NUContData contdata[1];
-u8 contPattern;
 
 // Audio
 musHandle sndHandle = 0;
@@ -63,11 +60,9 @@ void mainproc(void)
     debug_addcommand("sandbox", "Switch to sandbox mode", sandbox);
     debug_printf("Starting...\n");
 
-    contPattern = nuContInit();
+    input_init();
     controller_init(0);
     audio_init();
-
-    srand(contdata[0].stick_x);
 
     level_init(INITIAL_LEVEL, INITIAL_LIVES, INITIAL_SCORE);
     set_main_loop(level_loop);
