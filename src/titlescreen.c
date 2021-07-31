@@ -9,6 +9,7 @@
 #include "draw.h"
 #include "entities.h"
 #include "highscores.h"
+#include "input.h"
 #include "level.h"
 #include "loop.h"
 #include "mathdefs.h"
@@ -30,6 +31,10 @@ static struct asteroid asteroids[NUM_ASTEROIDS];
 
 static int asteroid_shape_ids[NUM_ASTEROID_SHAPES];
 
+static int input_highscores;
+static int input_start;
+static int input_quit;
+
 /******************************************************************************
  *
  * Public interface
@@ -40,6 +45,33 @@ bool titlescreen_init()
 {
     unsigned int i;
 
+    input_reset();
+
+    // high scores action
+    input_highscores = input_register();
+    assert(input_highscores != INPUT_INVALID_HANDLE);
+#ifndef __EMSCRIPTEN__
+    assert(input_map(input_highscores, INPUT_KEY_H));
+#endif
+
+    // start action
+    input_start = input_register();
+    assert(input_start != INPUT_INVALID_HANDLE);
+    assert(input_map(input_start, INPUT_KEY_ENTER));
+    assert(input_map(input_start, INPUT_KEY_RETURN));
+    assert(input_map(input_start, INPUT_BUTTON_START));
+
+    // quit aciton
+    input_quit = input_register();
+    assert(input_quit != INPUT_INVALID_HANDLE);
+#ifndef __EMSCRIPTEN__
+    assert(input_map(input_quit, INPUT_KEY_ESCAPE));
+#endif
+
+    // reset button states
+    enter_down = false;
+    h_down = false;
+
     canvas_reset();
 
     for (i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
@@ -49,8 +81,6 @@ bool titlescreen_init()
         }
     }
 
-    enter_down = false;
-    h_down = false;
     for (i = 0; i < NUM_ASTEROIDS; ++i) {
         asteroid_init(&asteroids[i]);
     }
@@ -60,38 +90,29 @@ bool titlescreen_init()
 
 void titlescreen_loop(bool draw)
 {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        switch (event.type) {
-        case SDL_KEYDOWN:
-            if (event.key.keysym.sym == SDLK_KP_ENTER ||
-                event.key.keysym.sym == SDLK_RETURN) {
-                enter_down = true;
-            } else if (event.key.keysym.sym == SDLK_h) {
-                h_down = true;
-            }
-            break;
-        case SDL_KEYUP:
-            if (enter_down == true && (
-                event.key.keysym.sym == SDLK_KP_ENTER ||
-                event.key.keysym.sym == SDLK_RETURN)) {
-                enter_down = false;
-                transition_init(1, 3, 0);
-                set_main_loop(transition_loop);
-                return;
-#ifndef __EMSCRIPTEN__
-            } else if (h_down == true && event.key.keysym.sym == SDLK_h) {
-                set_main_loop(highscores_loop);
-                return;
-            } else if (event.key.keysym.sym == SDLK_ESCAPE) {
-                cancel_main_loop(EXIT_SUCCESS);
-                return;
-#endif
-            }
-            break;
-        case SDL_QUIT:
-            exit(EXIT_SUCCESS);
-        }
+    input_update();
+
+    if (input_active(input_highscores)) {
+        h_down = true;
+    } else if (h_down) {
+        set_main_loop(highscores_loop);
+        return;
+    } else {
+        h_down = false;
+    }
+
+    if (input_active(input_start)) {
+        enter_down = true;
+    } else if (enter_down) {
+        transition_init(1, 3, 0);
+        set_main_loop(transition_loop);
+        return;
+    } else {
+        enter_down = false;
+    }
+
+    if (input_active(input_quit)) {
+        exit(EXIT_SUCCESS);
     }
 
     // Update and consume unused simulation time

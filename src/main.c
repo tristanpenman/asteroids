@@ -10,6 +10,7 @@
 
 #include "debug.h"
 #include "game.h"
+#include "input.h"
 #include "mixer.h"
 #include "options.h"
 #include "video.h"
@@ -81,6 +82,8 @@ int main(int argc, char **argv)
             exit(1);
         }
     }
+
+    input_init();
 
     debug_printf("game_init...\n");
     if (false == game_init(silent)) {
