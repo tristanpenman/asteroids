@@ -1,9 +1,8 @@
 #include <stdlib.h>
 
-#include <SDL.h>
-
 #include "canvas.h"
 #include "draw.h"
+#include "input.h"
 #include "level.h"
 #include "loop.h"
 #include "options.h"
@@ -32,13 +31,7 @@ void transition_init(unsigned int next_level, unsigned int next_lives, unsigned 
 
 void transition_loop(bool draw)
 {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        switch (event.type) {
-        case SDL_QUIT:
-            exit(EXIT_SUCCESS);
-        }
-    }
+    input_update();
 
     produce_simulation_time();
     const uint32_t residual = residual_simulation_time();

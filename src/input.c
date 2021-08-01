@@ -13,16 +13,25 @@ static int mappings[__INPUT__COUNT];
 // Active state of registered input handles
 static bool active[INPUT_MAX_HANDLES];
 
+// Previous active states of registered input handles
+static bool last_active[INPUT_MAX_HANDLES];
+
 void input_handle_key(int key, bool down)
 {
-    if (mappings[key] != INPUT_INVALID_HANDLE) {
-        active[mappings[key]] = down;
+    int handle = mappings[key];
+
+    if (handle != INPUT_INVALID_HANDLE) {
+        last_active[handle] = active[handle];
+        active[handle] = down;
     }
 }
 
 void input_handle_event(int sym, bool down)
 {
     switch (sym) {
+    case SDLK_BACKSPACE:
+        input_handle_key(INPUT_KEY_BACKSPACE, down);
+        break;
     case SDLK_ESCAPE:
         input_handle_key(INPUT_KEY_ESCAPE, down);
         break;
@@ -44,10 +53,10 @@ void input_handle_event(int sym, bool down)
     case SDLK_UP:
         input_handle_key(INPUT_KEY_UP, down);
         break;
-    case SDLK_h:
-        input_handle_key(INPUT_KEY_H, down);
-        break;
     default:
+        if (sym >= SDLK_a && sym <= SDLK_z) {
+            input_handle_key(INPUT_KEY_A + sym - SDLK_a, down);
+        }
         break;
     }
 }
@@ -94,6 +103,14 @@ bool input_map(int handle, enum input inp)
 
 void input_update()
 {
+    int i = 0;
+
+    for (i = 0; i < num_handles; i++) {
+        if (!last_active[i] && active[i]) {
+            last_active[i] = true;
+        }
+    }
+
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
@@ -112,6 +129,11 @@ void input_update()
 bool input_active(int handle)
 {
     return active[handle];
+}
+
+bool input_triggered(int handle)
+{
+    return active[handle] && !last_active[handle];
 }
 
 void input_read_joystick(int8_t* x, int8_t* y)

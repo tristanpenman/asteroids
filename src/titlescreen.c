@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <SDL.h>
-
 #include "canvas.h"
 #include "data.h"
 #include "draw.h"
