@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <SDL.h>
-
 #include "canvas.h"
 #include "collision.h"
 #include "data.h"
@@ -592,8 +590,6 @@ void level_update()
 
 void level_init(unsigned int new_level, unsigned int new_lives, unsigned int new_score)
 {
-    srand(SDL_GetTicks());
-
     level = new_level;
     next_beat = 0;
     beat_delay = 0.0f;

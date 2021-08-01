@@ -3,11 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <SDL.h>
-
 #include "canvas.h"
 #include "draw.h"
 #include "highscores.h"
+#include "input.h"
 #include "loop.h"
 #include "options.h"
 #include "titlescreen.h"
@@ -16,6 +15,8 @@
 #define HIGHSCORES_BUFFER_SIZE 100
 
 static struct highscores scores;
+
+static int input_return;
 
 void load_highscores()
 {
@@ -103,33 +104,6 @@ bool is_high_score(unsigned int score)
     return false;
 }
 
-void highscores_loop(bool draw)
-{
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        switch (event.type) {
-        case SDL_KEYUP:
-            if (event.key.keysym.sym == SDLK_KP_ENTER ||
-                event.key.keysym.sym == SDLK_RETURN) {
-                titlescreen_init();
-                set_main_loop(titlescreen_loop);
-                return;
-            }
-            break;
-        case SDL_QUIT:
-            exit(EXIT_SUCCESS);
-        }
-    }
-
-    if (!draw) {
-        return;
-    }
-
-    canvas_start_drawing(true);
-    draw_highscores(&scores);
-    canvas_finish_drawing(true);
-}
-
 void insert_new_high_score(unsigned int score, const char initials[4])
 {
     int i, j;
@@ -147,3 +121,34 @@ void insert_new_high_score(unsigned int score, const char initials[4])
     }
 }
 
+void highscores_init()
+{
+    input_reset();
+
+    input_return = input_register();
+    input_map(input_return, INPUT_BUTTON_A);
+    input_map(input_return, INPUT_BUTTON_B);
+    input_map(input_return, INPUT_BUTTON_START);
+    input_map(input_return, INPUT_KEY_ENTER);
+    input_map(input_return, INPUT_KEY_ESCAPE);
+    input_map(input_return, INPUT_KEY_RETURN);
+}
+
+void highscores_loop(bool draw)
+{
+    input_update();
+
+    if (input_active(input_return)) {
+        titlescreen_init();
+        set_main_loop(titlescreen_loop);
+        return;
+    }
+
+    if (!draw) {
+        return;
+    }
+
+    canvas_start_drawing(true);
+    draw_highscores(&scores);
+    canvas_finish_drawing(true);
+}

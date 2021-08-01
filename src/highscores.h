@@ -20,8 +20,10 @@ void dump_highscores();
 
 bool is_high_score(unsigned int score);
 
-void highscores_loop(bool draw);
-
 void insert_new_high_score(unsigned int score, const char initials[4]);
+
+void highscores_init();
+
+void highscores_loop(bool draw);
 
 #endif

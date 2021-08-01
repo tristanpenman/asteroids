@@ -67,6 +67,8 @@ int main(int argc, char **argv)
 
     SDL_Init(0);
 
+    srand(SDL_GetTicks());
+
 #ifdef __EMSCRIPTEN__
     SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
 #endif

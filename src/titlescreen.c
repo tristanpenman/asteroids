@@ -95,6 +95,7 @@ void titlescreen_loop(bool draw)
     if (input_active(input_highscores)) {
         h_down = true;
     } else if (h_down) {
+        highscores_init();
         set_main_loop(highscores_loop);
         return;
     } else {
