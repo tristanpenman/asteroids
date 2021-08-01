@@ -132,6 +132,10 @@ void check_fire_button(float factor)
 
         player.reload_delay = 0.0f;
         player.reloading = true;
+
+    } else {
+        player.reload_delay = 0.0f;
+        player.reloading = false;
     }
 }
 

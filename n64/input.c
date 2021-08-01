@@ -22,6 +22,9 @@ static int mappings[__INPUT__COUNT];
 // Active state of registered input handles
 static bool active[INPUT_MAX_HANDLES];
 
+// Triggered state of registered input handles
+static bool triggered[INPUT_MAX_HANDLES];
+
 // Compacted list of mappings, that will be checked on each update
 static struct check checklist[__INPUT__COUNT];
 
@@ -44,6 +47,7 @@ void input_check_button(enum input inp, int bitmask)
     // button activation
     if (cont_data[0].trigger & bitmask) {
         active[handle] = true;
+        triggered[handle] = true;
         return;
     }
 
@@ -61,6 +65,8 @@ void input_check_button(enum input inp, int bitmask)
 
 void input_init()
 {
+    input_reset();
+
     cont_pattern = nuContInit();
 
     memset(bitmasks, 0, sizeof(int) * __INPUT__COUNT);
@@ -78,8 +84,12 @@ void input_reset()
     num_handles = 0;
     num_mappings = 0;
 
-    for (i = 0; i < __INPUT__COUNT; i++) {
+    for (i = 0; i < INPUT_MAX_HANDLES; i++) {
         active[i] = false;
+        triggered[i] = false;
+    }
+
+    for (i = 0; i < __INPUT__COUNT; i++) {
         mappings[i] = INPUT_INVALID_HANDLE;
     }
 }
@@ -87,6 +97,10 @@ void input_reset()
 void input_update()
 {
     int i = 0;
+
+    for (i = 0; i < num_handles; i++) {
+        triggered[i] = false;
+    }
 
     nuContDataGetEx(cont_data, 0);
 
@@ -124,6 +138,11 @@ bool input_map(int handle, enum input inp)
 bool input_active(int handle)
 {
     return active[handle];
+}
+
+bool input_triggered(int handle)
+{
+    return triggered[handle];
 }
 
 void input_read_joystick(int8_t* x, int8_t* y)

@@ -9,8 +9,33 @@
 
 enum input
 {
-    // alphabetical
+    // alphabet
+    INPUT_KEY_A,
+    INPUT_KEY_B,
+    INPUT_KEY_C,
+    INPUT_KEY_D,
+    INPUT_KEY_E,
+    INPUT_KEY_F,
+    INPUT_KEY_G,
     INPUT_KEY_H,
+    INPUT_KEY_I,
+    INPUT_KEY_J,
+    INPUT_KEY_K,
+    INPUT_KEY_L,
+    INPUT_KEY_M,
+    INPUT_KEY_N,
+    INPUT_KEY_O,
+    INPUT_KEY_P,
+    INPUT_KEY_Q,
+    INPUT_KEY_R,
+    INPUT_KEY_S,
+    INPUT_KEY_T,
+    INPUT_KEY_U,
+    INPUT_KEY_V,
+    INPUT_KEY_W,
+    INPUT_KEY_X,
+    INPUT_KEY_Y,
+    INPUT_KEY_Z,
 
     // meta
     INPUT_KEY_ESCAPE,
