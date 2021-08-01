@@ -14,16 +14,13 @@
 #include "gfx.h"
 #include "input.h"
 #include "mathdefs.h"
+#include "rumble.h"
 #include "shape.h"
 #include "timing.h"
 #include "util.h"
 #include "vec.h"
 
 #define TIME_STEP_MILLIS 10
-
-// nusys input
-extern NUContData contdata[1];
-extern u8 contPattern;
 
 // ship wrapping constants
 static const float max_x =  1.0 / 2.0f + SHIP_RADIUS;
@@ -139,15 +136,6 @@ void check_fire_button(float factor)
     }
 }
 
-void rumble(float time, float intensity)
-{
-    const u16 frequency = 256.0f * intensity;
-    const u16 frame = 60.0f * time;
-
-    nuContRmbModeSet(0, NU_CONT_RMB_MODE_ENABLE);
-    nuContRmbStart(0, frequency, frame);
-}
-
 /******************************************************************************
  *
  * Explosion helpers
@@ -242,7 +230,7 @@ void check_collisions()
 
                 // TODO: deal with player-asteroid collisions
 
-                rumble(0.3, 0.7);
+                rumble_start(0.3, 0.7);
                 explode_asteroid(j);
 
                 asteroid_hit = true;
@@ -260,7 +248,7 @@ void check_collisions()
                     bullets[i].visible = false;
                     asteroids_hit++;
 
-                    rumble(0.3, 0.3);
+                    rumble_start(0.3, 0.3);
                     explode_asteroid(j);
 
                     asteroid_hit = true;

@@ -7,6 +7,7 @@
 #include "input.h"
 #include "level.h"
 #include "loop.h"
+#include "rumble.h"
 #include "sandbox.h"
 #include "segment.h"
 #include "vec.h"
@@ -24,24 +25,12 @@ musHandle sndHandle = 0;
 static OSMesg PiMessages[NUM_PI_MSGS];
 static OSMesgQueue PiMessageQ;
 
-void audio_init(void)
+void audio_init()
 {
     nuAuStlInit();
     nuAuStlPtrBankInit(PBANK_SIZE);
     nuAuStlPtrBankSet((u8*)PBANK_START, PBANK_SIZE, (u8*)WBANK_START);
     nuAuStlSndPlayerDataSet((u8*)SFX_START, SFX_SIZE);
-}
-
-void controller_init(int controller_number)
-{
-    s32 ret = nuContRmbCheck(controller_number);
-    if (ret) {
-        debug_printf("Rumble Pak: Fail (%d)\n", ret);
-    } else {
-        debug_printf("Rumble Pak: OK\n");
-        nuContRmbModeSet(controller_number, NU_CONT_RMB_MODE_ENABLE);
-        nuContRmbStart(controller_number, 128, 10);
-    }
 }
 
 char* sandbox()
@@ -52,7 +41,7 @@ char* sandbox()
     return "sandbox";
 }
 
-void mainproc(void)
+void mainproc()
 {
     nuGfxInit();
 
@@ -61,7 +50,7 @@ void mainproc(void)
     debug_printf("Starting...\n");
 
     input_init();
-    controller_init(0);
+    rumble_init();
     audio_init();
 
     level_init(INITIAL_LEVEL, INITIAL_LIVES, INITIAL_SCORE);
