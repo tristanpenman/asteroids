@@ -37,8 +37,7 @@ struct bullet
 enum keystate
 {
     KS_UP = 0,
-    KS_DOWN = 1,
-    KS_ACTIVE = 2
+    KS_DOWN = 1
 };
 
 struct player_keys

@@ -26,11 +26,23 @@ void input_handle_event(int sym, bool down)
     case SDLK_ESCAPE:
         input_handle_key(INPUT_KEY_ESCAPE, down);
         break;
+    case SDLK_LEFT:
+        input_handle_key(INPUT_KEY_LEFT, down);
+        break;
     case SDLK_KP_ENTER:
         input_handle_key(INPUT_KEY_ENTER, down);
         break;
     case SDLK_RETURN:
         input_handle_key(INPUT_KEY_RETURN, down);
+        break;
+    case SDLK_RIGHT:
+        input_handle_key(INPUT_KEY_RIGHT, down);
+        break;
+    case SDLK_SPACE:
+        input_handle_key(INPUT_KEY_SPACE, down);
+        break;
+    case SDLK_UP:
+        input_handle_key(INPUT_KEY_UP, down);
         break;
     case SDLK_h:
         input_handle_key(INPUT_KEY_H, down);

@@ -10,6 +10,7 @@
 #include "defines.h"
 #include "draw.h"
 #include "entities.h"
+#include "input.h"
 #include "loop.h"
 #include "mathdefs.h"
 #include "mixer.h"
@@ -46,13 +47,22 @@ static struct bullet bullets[MAX_BULLETS];
 static struct explosion explosions[MAX_EXPLOSIONS];
 static struct player player;
 
+// shapes
+static int asteroid_shapes[NUM_ASTEROID_SHAPES];
+
+// inputs
+static int input_escape;
+static int input_fire;
+static int input_left;
+static int input_pause;
+static int input_right;
+static int input_thruster;
+
+// misc state
 static float beat_delay;
 static float beat_delay_limit;
 static float gameover_countdown;
 static float next_level_countdown;
-
-// shapes
-static int asteroid_shapes[NUM_ASTEROID_SHAPES];
 
 /******************************************************************************
  *
@@ -86,20 +96,23 @@ void update_player(struct player *p, float factor)
     int spin = 0;
 
     if (p->state == PS_NORMAL) {
-        if (KS_ACTIVE == p->keys.left) {
+        if (KS_DOWN == p->keys.left) {
             spin = -1;
-        } else if (KS_ACTIVE == p->keys.right) {
+        } else if (KS_DOWN == p->keys.right) {
             spin = 1;
         }
 
         p->rot = wrap_angle(p->rot + SHIP_ROTATION_SPEED * factor * spin);
 
-        if (KS_ACTIVE == p->keys.up) {
+        if (KS_DOWN == p->keys.up) {
             vel->x += sinf(rot) * SHIP_ACCELERATION * factor;
             vel->y -= cosf(rot) * SHIP_ACCELERATION * factor;
             if (thruster_channel == -1) {
                 thruster_channel = mixer_play_sample(SOUND_THRUSTER);
             }
+        } else if (thruster_channel != -1) {
+            mixer_stop_playing_on_channel(thruster_channel);
+            thruster_channel = MIXER_INVALID_CHANNEL;
         }
     }
 
@@ -143,15 +156,13 @@ void update_player(struct player *p, float factor)
             }
         }
 
-        if (ENABLE_AUTO_FIRE) {
-            if (p->reloading == true) {
-                p->reload_delay += factor;
-            }
+        if (p->reloading == true) {
+            p->reload_delay += factor;
+        }
 
-            if (p->reload_delay >= BULLET_DELAY) {
-                p->reload_delay = 0.0f;
-                p->reloading = false;
-            }
+        if (p->reload_delay >= BULLET_DELAY) {
+            p->reload_delay = 0.0f;
+            p->reloading = false;
         }
 
     } else if (p->state == PS_EXPLODING) {
@@ -179,68 +190,16 @@ void update_player(struct player *p, float factor)
     }
 }
 
-static void update_player_keystate(struct player* p, const SDL_Event* event)
-{
-    if (SDL_KEYDOWN == event->type) {
-        switch (event->key.keysym.sym) {
-        case SDLK_LEFT:
-            p->keys.left = KS_ACTIVE;
-            p->keys.right = (KS_ACTIVE == p->keys.right) ? KS_DOWN : p->keys.right;
-            break;
-
-        case SDLK_RIGHT:
-            p->keys.right = KS_ACTIVE;
-            p->keys.left = (KS_ACTIVE == p->keys.left) ? KS_DOWN : p->keys.left;
-            break;
-
-        case SDLK_UP:
-            p->keys.up = KS_ACTIVE;
-            break;
-
-        case SDLK_SPACE:
-            p->keys.fire = KS_ACTIVE;
-            break;
-
-
-        default:
-            break;
-        }
-
-    } else if (SDL_KEYUP == event->type) {
-        switch (event->key.keysym.sym) {
-        case SDLK_LEFT:
-            p->keys.left = KS_UP;
-            p->keys.right = (KS_DOWN == p->keys.right) ? KS_ACTIVE : p->keys.right;
-            break;
-
-        case SDLK_RIGHT:
-            p->keys.right = KS_UP;
-            p->keys.left = (KS_DOWN == p->keys.left) ? KS_ACTIVE : p->keys.left;
-            break;
-
-        case SDLK_UP:
-            p->keys.up = KS_UP;
-            if (thruster_channel > -1) {
-                mixer_stop_playing_on_channel(thruster_channel);
-            }
-            break;
-
-        case SDLK_SPACE:
-            p->keys.fire = KS_UP;
-            p->reload_delay = 0.0f;
-            p->reloading = false;
-            break;
-
-        default:
-            break;
-        }
-    }
-}
-
 void check_fire_button(struct player *p, struct bullet *bb, unsigned int n, float f)
 {
     unsigned int i;
     unsigned int num_player_bullets = 0;
+
+    if (KS_UP == p->keys.fire) {
+        p->reload_delay = 0.0f;
+        p->reloading = false;
+        return;
+    }
 
     if (p->state != PS_NORMAL || p->reloading == true) {
         return;
@@ -256,41 +215,32 @@ void check_fire_button(struct player *p, struct bullet *bb, unsigned int n, floa
         return;
     }
 
-    if (ENABLE_AUTO_FIRE) {
-        if (p->keys.fire == KS_DOWN) {
-            p->keys.fire = KS_ACTIVE;
-        }
-    }
+    for (i = 0; i < n; i++, bb++) {
+        if (false == bb->visible) {
+            bb->visible = true;
+            bb->travelled = 0.0f;
+            bb->pos.x = p->pos.x - sinf(p->rot) * (0 - SHIP_PIVOT);
+            bb->pos.y = p->pos.y + cosf(p->rot) * (0 - SHIP_PIVOT);
+            bb->pos_prev.x = bb->pos.x;
+            bb->pos_prev.y = bb->pos.y;
 
-    if (KS_ACTIVE == p->keys.fire) {
-        p->keys.fire = KS_DOWN;
-        for (i = 0; i < n; i++, bb++) {
-            if (false == bb->visible) {
-                bb->visible = true;
-                bb->travelled = 0.0f;
-                bb->pos.x = p->pos.x - sinf(p->rot) * (0 - SHIP_PIVOT);
-                bb->pos.y = p->pos.y + cosf(p->rot) * (0 - SHIP_PIVOT);
-                bb->pos_prev.x = bb->pos.x;
-                bb->pos_prev.y = bb->pos.y;
+            bb->vel.x = sinf(p->rot);
+            bb->vel.y = 0 - cosf(p->rot);
 
-                bb->vel.x = sinf(p->rot);
-                bb->vel.y = 0 - cosf(p->rot);
+            vec_2d_normalise(&bb->vel);
+            vec_2d_scale(&bb->vel, BULLET_SPEED);
 
-                vec_2d_normalise(&bb->vel);
-                vec_2d_scale(&bb->vel, BULLET_SPEED);
-
-                if (phaser_channel > -1) {
-                    mixer_stop_playing_on_channel(phaser_channel);
-                }
-
-                phaser_channel = mixer_play_sample(SOUND_PHASER);
-                break;
+            if (phaser_channel > -1) {
+                mixer_stop_playing_on_channel(phaser_channel);
             }
-        }
 
-        p->reload_delay = 0.0f;
-        p->reloading = true;
+            phaser_channel = mixer_play_sample(SOUND_PHASER);
+            break;
+        }
     }
+
+    p->reload_delay = 0.0f;
+    p->reloading = true;
 }
 
 void update_bullets(struct bullet *bb, unsigned int n, float f)
@@ -551,42 +501,41 @@ void level_draw()
 
 void level_update()
 {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        switch (event.type) {
-        case SDL_KEYUP:
-            if (event.key.keysym.sym == SDLK_ESCAPE) {
-                titlescreen_init();
-                set_main_loop(titlescreen_loop);
-                return;
-            }
-            /* Fall through */
-        case SDL_KEYDOWN:
-            update_player_keystate(&player, &event);
-            break;
-        case SDL_QUIT:
-            exit(EXIT_SUCCESS);
-        }
+    int8_t joystick_x;
+
+    input_update();
+    input_read_joystick(&joystick_x, NULL);
+
+    if (input_active(input_escape)) {
+        titlescreen_init();
+        set_main_loop(titlescreen_loop);
+        return;
     }
 
     produce_simulation_time();
     while (maybe_consume_simulation_time(TIME_STEP_MILLIS)) {
         const float factor = (float)(TIME_STEP_MILLIS) / 1000.f;
+
         update_player(&player, factor);
 
         if (player.state == PS_NORMAL) {
-            /* Check for object creation or destruction triggers */
+            if (input_active(input_left)) {
+                player.keys.left = KS_DOWN;
+                player.keys.right = KS_UP;
+            } else if (input_active(input_right)) {
+                player.keys.right = KS_DOWN;
+                player.keys.left = KS_UP;
+            } else {
+                player.keys.left = KS_UP;
+                player.keys.right = KS_UP;
+            }
+
+            player.keys.up = input_active(input_thruster) ? KS_DOWN : KS_UP;
+            player.keys.fire = input_active(input_fire) ? KS_DOWN : KS_UP;
+
+            // Check for object creation or destruction triggers
             check_fire_button(&player, bullets, MAX_BULLETS, factor);
         }
-
-        // Calculate new position for projectiles
-        // TODO: Make this better by updating collision detection
-        // routine to take velocity and acceleration * timestep
-        // into account. So instead of asking, do these objects
-        // overlap at this point in time, we're asking 'do these
-        // objects pass through one another during this time
-        // interval?''
-        update_bullets(bullets, MAX_BULLETS, factor);
 
         // Calculate new positions for asteroids
         for (int i = 0; i < MAX_ASTEROIDS; i++) {
@@ -595,6 +544,7 @@ void level_update()
             }
         }
 
+        update_bullets(bullets, MAX_BULLETS, factor);
 
         check_collisions(&player, asteroids, MAX_ASTEROIDS,
             bullets, MAX_BULLETS, explosions, MAX_EXPLOSIONS,
@@ -653,11 +603,43 @@ void level_init(unsigned int new_level, unsigned int new_lives, unsigned int new
     gameover = false;
     asteroids_hit = 0;
 
+    input_reset();
+
+    input_escape = input_register();
+    input_map(input_escape, INPUT_KEY_ESCAPE);
+
+    input_left = input_register();
+    input_map(input_left, INPUT_DPAD_LEFT);
+    input_map(input_left, INPUT_KEY_LEFT);
+    input_map(input_left, INPUT_JOYSTICK_LEFT);
+
+    input_right = input_register();
+    input_map(input_right, INPUT_DPAD_RIGHT);
+    input_map(input_right, INPUT_KEY_RIGHT);
+    input_map(input_right, INPUT_JOYSTICK_RIGHT);
+
+    input_thruster = input_register();
+    input_map(input_thruster, INPUT_BUTTON_A);
+    input_map(input_thruster, INPUT_KEY_UP);
+
+    input_fire = input_register();
+    input_map(input_fire, INPUT_BUTTON_B);
+    input_map(input_fire, INPUT_BUTTON_Z);
+    input_map(input_fire, INPUT_KEY_SPACE);
+
+    input_pause = input_register();
+    input_map(input_pause, INPUT_BUTTON_START);
+
     canvas_reset();
+
+    // player_frame_1_shape = canvas_load_shape(&player_frame_1_shape_data);
+    // player_frame_2_shape = canvas_load_shape(&player_frame_2_shape_data);
 
     for (int i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
         asteroid_shapes[i] = canvas_load_shape(&asteroid_shape_data[i]);
     }
+
+    // bullet_shape = canvas_load_shape(&bullet_shape_data);
 
     // Create some asteroids!
     starting_asteroids = num_asteroids_for_level(level);

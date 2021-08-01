@@ -296,7 +296,7 @@ void draw_player(const struct player *p)
     glPushMatrix();
     glTranslatef((GLfloat)(origin.x + p->pos.x), (GLfloat)(origin.y + p->pos.y), 0.f);
     glRotatef((GLfloat)(p->rot * RAD_TO_DEG), 0.f, 0.f, 1.f);
-    draw_ship(p->keys.up == KS_ACTIVE && p->phase > SHIP_THRUSTER_BLINK ? true : false, 1.f);
+    draw_ship(p->keys.up == KS_DOWN && p->phase > SHIP_THRUSTER_BLINK ? true : false, 1.f);
     glPopMatrix();
 }
 
