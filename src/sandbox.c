@@ -1,8 +1,7 @@
-#include <SDL.h>
-
 #include "canvas.h"
 #include "collision.h"
 #include "data.h"
+#include "input.h"
 #include "options.h"
 #include "sandbox.h"
 #include "timing.h"
@@ -24,9 +23,36 @@ static bool move_up;
 
 static bool collision;
 
+static int input_down;
+static int input_left;
+static int input_right;
+static int input_up;
+
 bool sandbox_init()
 {
     unsigned int i;
+
+    input_reset();
+
+    input_down = input_register();
+    input_map(input_down, INPUT_DPAD_DOWN);
+    input_map(input_down, INPUT_KEY_DOWN);
+    input_map(input_down, INPUT_JOYSTICK_DOWN);
+
+    input_left = input_register();
+    input_map(input_left, INPUT_DPAD_LEFT);
+    input_map(input_left, INPUT_KEY_LEFT);
+    input_map(input_left, INPUT_JOYSTICK_LEFT);
+
+    input_right = input_register();
+    input_map(input_right, INPUT_DPAD_RIGHT);
+    input_map(input_right, INPUT_KEY_RIGHT);
+    input_map(input_right, INPUT_JOYSTICK_RIGHT);
+
+    input_up = input_register();
+    input_map(input_up, INPUT_DPAD_UP);
+    input_map(input_up, INPUT_KEY_UP);
+    input_map(input_up, INPUT_JOYSTICK_UP);
 
     canvas_reset();
 
@@ -60,41 +86,34 @@ bool sandbox_init()
 
 void sandbox_loop(bool draw)
 {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        switch (event.type) {
-        case SDL_KEYDOWN:
-            if (event.key.keysym.sym == SDLK_LEFT) {
-                move_left = true;
-            } else if (event.key.keysym.sym == SDLK_RIGHT) {
-                move_right = true;
-            } else if (event.key.keysym.sym == SDLK_UP) {
-                move_up = true;
-            } else if (event.key.keysym.sym == SDLK_DOWN) {
-                move_down = true;
-            }
-            break;
-        case SDL_KEYUP:
-            if (event.key.keysym.sym == SDLK_LEFT) {
-                move_left = false;
-            } else if (event.key.keysym.sym == SDLK_RIGHT) {
-                move_right = false;
-            } else if (event.key.keysym.sym == SDLK_UP) {
-                move_up = false;
-            } else if (event.key.keysym.sym == SDLK_DOWN) {
-                move_down = false;
-            }
-            break;
-        case SDL_QUIT:
-            exit(EXIT_SUCCESS);
-        }
+    int8_t x;
+    int8_t y;
+
+    input_update();
+
+    input_read_joystick(&x, &y);
+
+    move_left = false;
+    move_right = false;
+
+    if (x < -20 || input_active(input_left)) {
+        move_left = true;
+    } else if (x > 20 || input_active(input_right)) {
+        move_right = true;
+    }
+
+    move_up = false;
+    move_down = false;
+
+    if (y < -20 || input_active(input_down)) {
+        move_down = true;
+    } else if (y > 20 || input_active(input_up)) {
+        move_up = true;
     }
 
     // Update and consume unused simulation time
     produce_simulation_time();
     while (maybe_consume_simulation_time(TIME_STEP_MILLIS)) {
-        // TODO
-
         if (move_left) {
             pos1.x -= 0.001f;
         }

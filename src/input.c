@@ -32,6 +32,9 @@ void input_handle_event(int sym, bool down)
     case SDLK_BACKSPACE:
         input_handle_key(INPUT_KEY_BACKSPACE, down);
         break;
+    case SDLK_DOWN:
+        input_handle_key(INPUT_KEY_DOWN, down);
+        break;
     case SDLK_ESCAPE:
         input_handle_key(INPUT_KEY_ESCAPE, down);
         break;
