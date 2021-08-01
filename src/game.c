@@ -3,15 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#endif
-
-#include <SDL.h>
-
 #include "collision.h"
 #include "debug.h"
 #include "draw.h"
+#include "highscores.h"
 #include "loop.h"
 #include "mixer.h"
 #include "options.h"
@@ -20,10 +15,6 @@
 #include "util.h"
 #include "vec.h"
 #include "video.h"
-
-#ifndef __EMSCRIPTEN__
-#include "highscores.h"
-#endif
 
 #define MAX_SAMPLES 20
 

@@ -1,5 +1,3 @@
-#include <nusys.h>
-
 #include "canvas.h"
 #include "collision.h"
 #include "data.h"
@@ -10,8 +8,6 @@
 
 #define NUM_ASTEROID_SHAPES 4
 #define TIME_STEP_MILLIS 10
-
-extern NUContData contdata[1];
 
 static int asteroid_shape_ids[NUM_ASTEROID_SHAPES];
 static int box_shape_id;

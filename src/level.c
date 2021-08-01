@@ -8,6 +8,8 @@
 #include "defines.h"
 #include "draw.h"
 #include "entities.h"
+#include "highscores.h"
+#include "initials.h"
 #include "input.h"
 #include "loop.h"
 #include "mathdefs.h"
@@ -20,11 +22,6 @@
 #include "util.h"
 #include "vec.h"
 #include "video.h"
-
-#ifndef __EMSCRIPTEN__
-#include "highscores.h"
-#include "initials.h"
-#endif
 
 #define TIME_STEP_MILLIS 5
 
