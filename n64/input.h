@@ -16,6 +16,7 @@ enum input
     INPUT_KEY_ESCAPE,
     INPUT_KEY_ENTER,
     INPUT_KEY_RETURN,
+    INPUT_KEY_SPACE,
 
     // arrow keys
     INPUT_KEY_DOWN,

@@ -24,7 +24,6 @@ struct asteroid
     int shape;
 };
 
-
 struct bullet
 {
     bool visible;

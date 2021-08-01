@@ -15,8 +15,11 @@
 #include "input.h"
 #include "mathdefs.h"
 #include "shape.h"
+#include "timing.h"
 #include "util.h"
 #include "vec.h"
+
+#define TIME_STEP_MILLIS 10
 
 // nusys input
 extern NUContData contdata[1];
@@ -48,6 +51,7 @@ static uint8_t player_frame_1_shape;
 static uint8_t player_frame_2_shape;
 
 // inputs
+static int input_escape;
 static int input_fire;
 static int input_left;
 static int input_pause;
@@ -334,7 +338,6 @@ void level_draw()
 void level_update()
 {
     // useful constants
-    static const float factor = 1.0f / 60.0f;
     static const float degrees_to_radians = M_PI / 180.0f;
 
     int i;
@@ -344,60 +347,105 @@ void level_update()
     input_update();
     input_read_joystick(&joystick_x, NULL);
 
-    if (joystick_x < -20 || input_active(input_left)) {
-        player.rot -= SHIP_ROTATION_SPEED;
-        if (player.rot < 0.0) {
-            player.rot += 360.0;
+    // if (input_active(input_escape)) {
+    //     titlescreen_init();
+    //     set_main_loop(titlescreen_loop);
+    //     return;
+    // }
+
+    produce_simulation_time();
+    while (maybe_consume_simulation_time(TIME_STEP_MILLIS)) {
+        const float factor = (float)(TIME_STEP_MILLIS) / 1000.f;
+
+        if (joystick_x < -20 || input_active(input_left)) {
+            player.rot -= SHIP_ROTATION_SPEED;
+            if (player.rot < 0.0) {
+                player.rot += 360.0;
+            }
+        } else if (joystick_x > 20 || input_active(input_right)) {
+            player.rot += SHIP_ROTATION_SPEED;
+            if (player.rot > 360.0) {
+                player.rot -= 360.0;
+            }
         }
-    } else if (joystick_x > 20 || input_active(input_right)) {
-        player.rot += SHIP_ROTATION_SPEED;
-        if (player.rot > 360.0) {
-            player.rot -= 360.0;
+
+        rot = player.rot * degrees_to_radians;
+
+        player.keys.fire = input_active(input_fire) ? KS_DOWN : KS_UP;
+
+        if (player.state == PS_NORMAL) {
+            check_fire_button(factor);
         }
-    }
 
-    rot = player.rot * degrees_to_radians;
-
-    player.keys.fire = input_active(input_fire) ? KS_DOWN : KS_UP;
-
-    check_fire_button(factor);
-
-    if (input_active(input_thruster)) {
-        player.vel.x += sinf(rot) * SHIP_ACCELERATION * factor;
-        player.vel.y -= cosf(rot) * SHIP_ACCELERATION * factor;
-    }
-
-    player.pos.x += player.vel.x * factor;
-    player.pos.y += player.vel.y * factor;
-
-    if (player.pos.y > max_y) {
-        player.pos.y = min_y;
-    } else if (player.pos.y < min_y) {
-        player.pos.y = max_y;
-    }
-
-    if (player.pos.x > max_x) {
-        player.pos.x = min_x;
-    } else if (player.pos.x < min_x) {
-        player.pos.x = max_x;
-    }
-
-    for (i = 0; i < MAX_ASTEROIDS; i++) {
-        if (asteroids[i].visible) {
-            struct vec_2d lim;
-            lim.x = 1.f / 2.f + asteroids[i].radius;
-            lim.y = 0.75f / 2.f + asteroids[i].radius;
-            asteroid_update(&asteroids[i], factor, &lim);
+        if (input_active(input_thruster)) {
+            player.vel.x += sinf(rot) * SHIP_ACCELERATION * factor;
+            player.vel.y -= cosf(rot) * SHIP_ACCELERATION * factor;
         }
-    }
 
-    for (i = 0; i < MAX_BULLETS; i++) {
-        if (bullets[i].visible) {
-            bullet_update(&bullets[i], factor);
+        player.pos.x += player.vel.x * factor;
+        player.pos.y += player.vel.y * factor;
+
+        if (player.pos.y > max_y) {
+            player.pos.y = min_y;
+        } else if (player.pos.y < min_y) {
+            player.pos.y = max_y;
         }
-    }
 
-    check_collisions(&asteroids_hit);
+        if (player.pos.x > max_x) {
+            player.pos.x = min_x;
+        } else if (player.pos.x < min_x) {
+            player.pos.x = max_x;
+        }
+
+        for (i = 0; i < MAX_ASTEROIDS; i++) {
+            if (asteroids[i].visible) {
+                struct vec_2d lim;
+                lim.x = 1.f / 2.f + asteroids[i].radius;
+                lim.y = 0.75f / 2.f + asteroids[i].radius;
+                asteroid_update(&asteroids[i], factor, &lim);
+            }
+        }
+
+        for (i = 0; i < MAX_BULLETS; i++) {
+            if (bullets[i].visible) {
+                bullet_update(&bullets[i], factor);
+            }
+        }
+
+        check_collisions();
+
+        // unsigned int num_asteroids = 0;
+        // for (int i = 0; i < MAX_ASTEROIDS; ++i) {
+        //     if (true == asteroids[i].visible) {
+        //         num_asteroids++;
+        //     }
+        // }
+
+        // if (0 == num_asteroids) {
+        //     next_level_countdown -= factor;
+        // } else {
+        //     beat_delay += factor;
+        //     beat_delay_limit = 1.2f - 0.6f * ((float)asteroids_hit / (float)(starting_asteroids * 5.f));
+
+        //     if (beat_delay >= beat_delay_limit) {
+        //         if (next_beat == 0) {
+        //             mixer_play_sample(SOUND_BEAT1);
+        //             next_beat = 1;
+        //         } else {
+        //             mixer_play_sample(SOUND_BEAT2);
+        //             next_beat = 0;
+        //         }
+        //         beat_delay = 0.0f;
+        //     }
+        // }
+
+        // if (next_level_countdown <= 0.f) {
+        //     transition_init(level + 1, player.lives, player.score);
+        //     set_main_loop(transition_loop);
+        // }
+
+        // update_explosions(explosions, MAX_EXPLOSIONS, factor);
+    }
 }
 
 /******************************************************************************
@@ -410,7 +458,12 @@ void level_init(unsigned int new_level, unsigned int new_lives, unsigned int new
 {
     int i;
 
+    asteroids_hit = 0;
+
     input_reset();
+
+    input_escape = input_register();
+    input_map(input_escape, INPUT_KEY_ESCAPE);
 
     input_left = input_register();
     input_map(input_left, INPUT_DPAD_LEFT);
@@ -424,10 +477,12 @@ void level_init(unsigned int new_level, unsigned int new_lives, unsigned int new
 
     input_thruster = input_register();
     input_map(input_thruster, INPUT_BUTTON_A);
+    input_map(input_thruster, INPUT_KEY_UP);
 
     input_fire = input_register();
     input_map(input_fire, INPUT_BUTTON_B);
     input_map(input_fire, INPUT_BUTTON_Z);
+    input_map(input_fire, INPUT_KEY_SPACE);
 
     input_pause = input_register();
     input_map(input_pause, INPUT_BUTTON_START);
@@ -450,12 +505,13 @@ void level_init(unsigned int new_level, unsigned int new_lives, unsigned int new
         asteroid_init(&asteroids[i]);
     }
 
+    memset(bullets, 0, sizeof(struct bullet) * MAX_BULLETS);
+    memset(explosions, 0, sizeof(struct explosion) * MAX_EXPLOSIONS);
+
     player_init(&player);
 
     player.lives = new_lives;
     player.score = new_score;
-
-    asteroids_hit = 0;
 }
 
 void level_loop(bool draw)
