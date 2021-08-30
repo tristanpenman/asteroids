@@ -21,10 +21,6 @@
 // Audio
 musHandle sndHandle = 0;
 
-// Parallel interface
-static OSMesg PiMessages[NUM_PI_MSGS];
-static OSMesgQueue PiMessageQ;
-
 void audio_init()
 {
     nuAuStlInit();
