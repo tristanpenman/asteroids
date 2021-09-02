@@ -838,6 +838,10 @@ static void usb_everdrive_readdata(void* buff, u32 pi_address, u32 len)
     @param A pointer to write the read value to
 ==============================*/
 
+// Disabling inlining of usb_everdrive_readreg fixes system crashes when compiled with
+// optimisations (-O2) enabled, but it is not clear why inlining causes these issues. It is
+// possible that inlining the function allows other problematic optimisations to be applied.
+__attribute__((noinline))
 static void usb_everdrive_readreg(u32 reg, u32* result)
 {
     usb_everdrive_readdata(result, ED_GET_REGADD(reg), sizeof(u32));
