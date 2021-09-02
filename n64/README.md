@@ -12,9 +12,7 @@ This code has been written to compile using the original Nintendo 64 SDK on Wind
 
 To compile on Windows or Wine, you can run `compile.bat`. A script for running via wine has also been included in `build.sh`.
 
-To compile on Linux using the Modern SDK, run:
-
-    make -f Makefile.modern
+To compile on Linux using the Modern SDK, simply run `make`.
 
 ## Emulator Support
 
