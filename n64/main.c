@@ -34,7 +34,7 @@ char* sandbox()
     sandbox_init();
     set_main_loop(sandbox_loop);
 
-    return "sandbox";
+    return "ok";
 }
 
 char* level()
@@ -42,7 +42,7 @@ char* level()
     level_init(INITIAL_LEVEL, INITIAL_LIVES, INITIAL_SCORE);
     set_main_loop(level_loop);
 
-    return "level";
+    return "ok";
 }
 
 void mainproc()

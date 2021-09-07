@@ -4,17 +4,16 @@ flashcarts.
 https://github.com/buu342/N64-UNFLoader
 ***************************************************************/
 
-#include <stdarg.h>
-#include <string.h>
-
-#include <ultra64.h>
-#include <PR/os_internal.h> // Needed for Crash's Linux toolchain
-
-#include "unf_usb.h"
-
-#include "debug.h"
-
 #if DEBUG
+
+    #include <stdarg.h>
+    #include <string.h>
+
+    #include <ultra64.h>
+    #include <PR/os_internal.h>  // Needed for Crash's Linux toolchain
+
+    #include "debug.h"
+    #include "usb.h"
 
     #define USE_FAULTTHREAD   1  // Create a fault detection thread
     #define MAX_COMMANDS     25  // The max amount of user defined commands possible
