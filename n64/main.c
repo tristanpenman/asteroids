@@ -37,12 +37,21 @@ char* sandbox()
     return "sandbox";
 }
 
+char* level()
+{
+    level_init(INITIAL_LEVEL, INITIAL_LIVES, INITIAL_SCORE);
+    set_main_loop(level_loop);
+
+    return "level";
+}
+
 void mainproc()
 {
     nuGfxInit();
 
     debug_init();
     debug_addcommand("sandbox", "Switch to sandbox mode", sandbox);
+    debug_addcommand("level", "Switch to level mode", level);
     debug_printf("Starting...\n");
 
     input_init();
