@@ -80,7 +80,7 @@ static EM_BOOL resize_callback(int eventType, const EmscriptenUiEvent *uiEvent, 
     }
 
     if (new_width != canvas_width || new_height != canvas_height) {
-        debug_printf"resizing canvas from (%d, %d) to (%d, %d)\n", canvas_width, canvas_height,
+        debug_printf("resizing canvas from (%d, %d) to (%d, %d)\n", canvas_width, canvas_height,
             new_width, new_height);
         SDL_SetWindowSize(sdl_window, new_width, new_height);
         canvas_width = new_width;
