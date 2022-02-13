@@ -32,7 +32,7 @@
     #define debug_parsecommand() NULL
     #define debug_sizecommand() 0
 
-    inline void debug_printf(const char* message, ...) {
+    static inline void debug_printf(const char* message, ...) {
       // variadic macros not available before C99
     }
 

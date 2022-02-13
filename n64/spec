@@ -22,19 +22,19 @@ endseg
 beginseg
   name "audiopbank"
   flags RAW
-  include "audio.ptr"
+  include "assets/audio.ptr"
 endseg
 
 beginseg
   name "audiowbank"
   flags RAW
-  include "audio.wbk"
+  include "assets/audio.wbk"
 endseg
 
 beginseg
   name "audiosfx"
   flags RAW
-  include "audio.bfx"
+  include "assets/audio.bfx"
 endseg
 
 beginwave
