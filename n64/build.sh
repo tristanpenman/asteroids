@@ -1,6 +1,5 @@
 #!/bin/bash
 set -eu
-rm -f *.o
-rm -f *.out
-rm -f *.n64
+rm -rf build
+mkdir -p build/src
 wine cmd /c compile.bat

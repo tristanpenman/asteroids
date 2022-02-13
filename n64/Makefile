@@ -15,25 +15,31 @@ LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -ln_gmus_d -lnualstl_n_d -ln_gau
 
 OPTIMIZER = -g
 
-APP = asteroids.out
+BUILD_DIR = build
+APP = $(BUILD_DIR)/asteroids.out
+TARGETS = $(BUILD_DIR)/asteroids.n64
 
-TARGETS = asteroids.n64
+CODEFILES = $(wildcard src/*.c)
 
-CODEFILES = $(wildcard *.c)
-
-CODEOBJECTS = $(CODEFILES:.c=.o) $(NUSYSLIBDIR)/nusys.o
+CODEOBJECTS = $(foreach file,$(CODEFILES),$(BUILD_DIR)/$(file:.c=.o)) \
+	$(NUSYSLIBDIR)/nusys.o
 
 DATAFILES =
 
-DATAOBJECTS = $(DATAFILES:.c=.o)
+DATAOBJECTS = \
+	$(foreach file,$(DATAFILES),$(BUILD_DIR)/$(file:.c=.o))
 
-CODESEGMENT = codesegment.o
+CODESEGMENT = $(BUILD_DIR)/codesegment.o
 
 OBJECTS = $(CODESEGMENT) $(DATAOBJECTS)
 
 default: $(TARGETS)
 
 include $(COMMONRULES)
+
+# Compile C code
+$(BUILD_DIR)/%.o: %.c
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 $(CODESEGMENT): $(CODEOBJECTS) Makefile
 	$(LD) -o $(CODESEGMENT) -r $(CODEOBJECTS) $(LDFLAGS)

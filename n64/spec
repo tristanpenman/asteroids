@@ -6,7 +6,7 @@ beginseg
   entry   nuBoot
   address NU_SPEC_BOOT_ADDR
   stack   NU_SPEC_BOOT_STACK
-  include "codesegment.o"
+  include "build/codesegment.o"
   include "$(ROOT)/usr/lib/PR/rspboot.o"
 
   include "$(ROOT)/usr/lib/PR/gspF3DEX2.fifo.o"

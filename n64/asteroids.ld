@@ -54,7 +54,7 @@ SECTIONS
       /* text */
       BUILD_DIR/asm/entry.o(.start);
       /usr/lib/n64/nusys/nusys_rom.o(.text);
-      BUILD_DIR*.o(.text);
+      BUILD_DIR/src*.o(.text);
 
       */libultra_rom.a:*.o(.text);
       */libnustd.a:*.o(.text);
@@ -80,7 +80,7 @@ SECTIONS
 
       /* data */
       /usr/lib/n64/nusys/nusys_rom.o(.data*);
-      BUILD_DIR*.o(.data*);
+      BUILD_DIR/src*.o(.data*);
 
       */libultra_rom.a:*.o(.data*);
       */libnustd.a:*.o(.data*);
@@ -105,7 +105,7 @@ SECTIONS
 
       /* rodata */
       /usr/lib/n64/nusys/nusys_rom.o(.*rodata*);
-      BUILD_DIR*.o(.*rodata*);
+      BUILD_DIR/src*.o(.*rodata*);
 
       */libultra_rom.a:*.o(.*rodata*);
       */libnustd.a:*.o(*.rodata*);
@@ -126,7 +126,7 @@ SECTIONS
       /usr/lib/n64/nusys/nusys_rom.o(COMMON);
       /usr/lib/n64/nusys/nusys_rom.o(.scommon);
       /usr/lib/n64/nusys/nusys_rom.o(.*bss*);
-      BUILD_DIR*.o(.*bss*);
+      BUILD_DIR/src*.o(.*bss*);
 
       */libultra_rom.a:*.o(COMMON);
       */libultra_rom.a:*.o(.scommon);
