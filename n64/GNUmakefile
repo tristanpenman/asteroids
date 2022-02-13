@@ -66,7 +66,15 @@ AR        := mips-n64-ar
 OBJDUMP   := mips-n64-objdump
 OBJCOPY   := mips-n64-objcopy
 
-INCLUDE_DIRS += /usr/include/n64 /usr/include/n64/PR /usr/include/n64/nustd /usr/include/n64/nusys include $(BUILD_DIR) $(BUILD_DIR)/include src .
+INCLUDE_DIRS += . \
+	/usr/include/n64 \
+	/usr/include/n64/PR \
+	/usr/include/n64/nustd \
+	/usr/include/n64/nusys \
+	include \
+	$(BUILD_DIR) \
+	$(BUILD_DIR)/include \
+	src
 
 C_DEFINES := $(foreach d,$(DEFINES),-D$(d))
 DEF_INC_CFLAGS := $(foreach i,$(INCLUDE_DIRS),-I$(i)) $(C_DEFINES)

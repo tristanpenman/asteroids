@@ -155,7 +155,7 @@ SECTIONS
       */libmus.a:*.o(.scommon);
       */libmus.a:*.o(.*bss*);
 #endif
-}
+   }
    END_NOLOAD(code)
 
    BEGIN_SEG(rawdata, __romPos)
