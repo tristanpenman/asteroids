@@ -1,13 +1,5 @@
 # Plan
 
-This project has two main goals at the moment. First is to implement a very light-weight set of interfaces for writing simple games in C, that can also be built and deployed using Emscripten. Second is to show that this can be applied to a more esoteric platform, such as the Nintendo 64.
-
-Some interesting platform-related issues include supporting both fixed and variable timesteps, as well as radically different graphics and audio architectures. Handling different kinds of input is also a challenge.
-
-Much of the inspiration for this project comes from the (massively) cross-platform Retro City Rampage.
-
-## TODO
-
 - Improve original code
   + ~~Factor out basic canvas and shape API~~
   + ~~Backport logging API from N64 version~~
@@ -31,8 +23,14 @@ Much of the inspiration for this project comes from the (massively) cross-platfo
   + Mixer interface
   + High score screens
     + Store high scores on controller pak
+- Dreamcast version
+  + Basic app structure
+  + Port current N64 functionality
+  + Allow highscores to be saved to VMU
 - General improvements
   + Alien ship
+  + Attract mode
   + Improve emscripten wrapper
   + Framerate counter
   + Draw-call counter and other metrics
+  + Automated testing
