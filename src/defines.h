@@ -9,6 +9,7 @@
 #define NUM_ASTEROID_SHAPES 4
 
 // player
+#define NUM_PLAYER_FRAMES 2
 #define SHIP_ACCELERATION 0.45f
 #define SHIP_DEATH_DELAY 1.7f
 #define SHIP_EXPLOSION_LENGTH 0.3f

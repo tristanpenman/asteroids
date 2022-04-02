@@ -127,7 +127,7 @@ void titlescreen_loop(bool draw)
     }
 
     // Unused simulation time, used to smooth animation
-    const float residual = residual_simulation_time() / 1000.f;
+    const float residual = (float) residual_simulation_time() / 1000.f;
     if (residual < 0.f) {
         printf("%f\n", residual);
     }
@@ -136,19 +136,16 @@ void titlescreen_loop(bool draw)
 
     for (int i = 0; i < NUM_ASTEROIDS; i++) {
         const struct vec_2d position = {
-          asteroids[i].pos.x + asteroids[i].vel.x * residual,
-          asteroids[i].pos.y + asteroids[i].vel.y * residual
+            asteroids[i].pos.x + asteroids[i].vel.x * residual,
+            asteroids[i].pos.y + asteroids[i].vel.y * residual
         };
 
-        assert(canvas_draw_line_segments(
+        canvas_draw_shape(
             asteroid_shape_ids[asteroids[i].shape],
             position,
             asteroids[i].rot,
-            vec_2d_unit
-        ));
+            vec_2d_unit);
     }
-
-    // draw_asteroids(asteroids, NUM_ASTEROIDS, true, residual);
 
     draw_title();
     draw_instructions();

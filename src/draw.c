@@ -18,7 +18,7 @@
 
 extern float pixel_density;
 extern struct shape asteroid_shapes[];
-extern GLfloat *_font[];
+extern GLfloat *font[];
 
 const struct vec_2d origin = {1.0f / 2.0f,
     ((GLfloat)LOGICAL_HEIGHT_PX / (GLfloat)LOGICAL_WIDTH_PX) / 2.0f};
@@ -51,7 +51,7 @@ static void draw_colon()
     glEnd();
 }
 
-static void draw_ship(bool thruster, float c)
+static void draw_ship(float c)
 {
     glColor3f((GLfloat) c, (GLfloat) c, (GLfloat) c);
 
@@ -69,14 +69,6 @@ static void draw_ship(bool thruster, float c)
     glVertex_2f(-0.0105f,  0.0325f);
     glVertex_2f( 0.0105f,  0.0325f);
     glEnd();
-
-    if (true == thruster) {
-        glBegin(GL_LINE_STRIP);
-        glVertex_2f(-0.006f, 0.0325f);
-        glVertex_2f( 0.000f, 0.0400f);
-        glVertex_2f( 0.006f, 0.0325f);
-        glEnd();
-    }
 
     glPopMatrix();
 }
@@ -130,10 +122,10 @@ static void draw_text_ex(const char *s, GLfloat size, GLfloat x, GLfloat y, floa
         if (*s == ':') {
             draw_colon();
         } else {
-            g = _font[(int) *s];  /* First element of each glyph is vertex count */
+            g = font[(int) *s];  // First element of each glyph is vertex count
             if (NULL != g) {
                 glVertexPointer(2, GL_FLOAT, 0, g + 1);
-                glDrawArrays(GL_LINE_STRIP, 0, (unsigned int) g[0]);
+                glDrawArrays(GL_LINE_STRIP, 0, (GLsizei) g[0]);
             }
         }
 
@@ -215,11 +207,6 @@ void draw_explosions(const struct explosion *ee, unsigned int n)
     }
 }
 
-void draw_gameover_text()
-{
-    draw_text_centered("GAME OVER", 0.39f, 0.12f);
-}
-
 void draw_highscores(const struct highscores *scores)
 {
     int i;
@@ -267,7 +254,7 @@ void draw_lives(int lives)
     glTranslatef(0.05f, 0.11f, 0.0f);
     for (i = 0; i < lives; i++) {
         glTranslatef(0.04f, 0.0f, 0.0f);
-        draw_ship(false, 1.0f);
+        draw_ship(1.0f);
     }
 
     glPopMatrix();
@@ -290,16 +277,6 @@ void draw_new_high_score_enter_to_continue()
     draw_text_centered("OR BACKSPACE TO MAKE CHANGES", 0.25f, 0.535f);
 }
 
-void draw_player(const struct player *p)
-{
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glTranslatef((GLfloat)(origin.x + p->pos.x), (GLfloat)(origin.y + p->pos.y), 0.f);
-    glRotatef((GLfloat)(p->rot * RAD_TO_DEG), 0.f, 0.f, 1.f);
-    draw_ship(p->keys.up == KS_DOWN && p->phase > SHIP_THRUSTER_BLINK ? true : false, 1.f);
-    glPopMatrix();
-}
-
 void draw_player_exploding(const struct player *p)
 {
     const float c = 1.0f - (p->death_delay / SHIP_EXPLOSION_LENGTH);
@@ -307,7 +284,7 @@ void draw_player_exploding(const struct player *p)
     glPushMatrix();
     glTranslatef((GLfloat)(origin.x + p->pos.x), (GLfloat)(origin.y + p->pos.y), 0.f);
     glRotatef((GLfloat)(p->rot * RAD_TO_DEG), 0.f, 0.f, 1.f);
-    draw_ship(false, c > 1.f ? 1.f : c);
+    draw_ship(c > 1.f ? 1.f : c);
     draw_ship_explosion(p);
     glPopMatrix();
 }

@@ -1,6 +1,5 @@
 #include <stdlib.h>
 
-#include "options.h"
 #include "shape.h"
 
 // ----------------------------------------------------------------------------
@@ -151,6 +150,47 @@ const struct shape bullet_shape_data = {
     sizeof(bullet_line_segments) / sizeof(uint8_t) / 2
 };
 
+// ----------------------------------------------------------------------------
+//
+// Player
+//
+
+static const float player_vertices[] = {
+    0.000f, -0.020f,
+   -0.016f,  0.018f,
+    0.016f,  0.018f,
+    0.014f,  0.0125f,
+   -0.014f,  0.0125f,
+    0.000f,  0.02f
+};
+
+static const uint8_t player_frame_1_line_segments[] = {
+    0, 1,
+    0, 2,
+    3, 4
+};
+
+static const uint8_t player_frame_2_line_segments[] = {
+    0, 1,
+    0, 2,
+    3, 4,
+    3, 5,
+    4, 5
+};
+
+const struct shape player_shape_data[] = {
+    {
+        player_vertices,
+        sizeof(player_vertices) / sizeof(float) / 2,
+        player_frame_1_line_segments,
+        sizeof(player_frame_1_line_segments) / sizeof(uint8_t) / 2
+    }, {
+        player_vertices,
+        sizeof(player_vertices) / sizeof(float) / 2,
+        player_frame_2_line_segments,
+        sizeof(player_frame_2_line_segments) / sizeof(uint8_t) / 2
+    }
+};
 
 // ----------------------------------------------------------------------------
 //
@@ -198,7 +238,7 @@ const float
 
     _minus[] = { 2.0f, .00f, .03f, .03f, .03f};
 
-const float *_font[256] = {
+const float *font[256] = {
 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   /* 00 - 0F */
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   /* 10 - 1F */

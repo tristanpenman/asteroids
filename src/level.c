@@ -5,6 +5,7 @@
 #include "canvas.h"
 #include "collision.h"
 #include "data.h"
+#include "debug.h"
 #include "defines.h"
 #include "draw.h"
 #include "entities.h"
@@ -45,6 +46,7 @@ static struct player player;
 // shapes
 static int asteroid_shapes[NUM_ASTEROID_SHAPES];
 static int bullet_shape;
+static int player_shapes[NUM_PLAYER_FRAMES];
 
 // inputs
 static int input_escape;
@@ -322,7 +324,9 @@ void explode_asteroid(struct asteroid *a,
     if (a->scale < 0.49f) {
         a->visible = false;
         return;
-    } else if (a->scale < 0.99f) {
+    }
+
+    if (a->scale < 0.99f) {
         a->scale = 0.25f;
         vel_scale = 1.5f;
     } else {
@@ -392,7 +396,10 @@ void check_collisions()
                 }
 
                 // Player bullet, test against asteroids
-                const bool collision = test_asteroid_bullet_collision(&bullets[i], &asteroids[j]);
+                //const bool collision = test_asteroid_bullet_collision(&bullets[i], &asteroids[j]);
+                const bool collision = collision_test_shapes(
+                    &bullet_shape_data, &bullets[i].pos, 0, 1.0f,
+                    &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
 
                 if (collision) {
                     // Bullets can only hit one asteroid
@@ -404,9 +411,12 @@ void check_collisions()
         }
 
         if (player.state == PS_NORMAL && asteroid_hit == false) {
-            const bool collision = test_asteroid_ship_collision(&player, &asteroids[j]);
+            const bool collision = collision_test_shapes(
+                &player_shape_data[0], &player.pos, player.rot, 1.0f,
+                &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
 
             if (collision) {
+                debug_printf("collision between ship and asteroid %d\n", j);
                 explode_player();
                 asteroid_hit = true;
                 player.lives--;
@@ -447,8 +457,20 @@ void level_draw()
 
     canvas_start_drawing(true);
 
+    // draw player ship
+    if (player.state == PS_NORMAL) {
+        canvas_draw_shape(
+                player.keys.up == KS_DOWN && player.phase > SHIP_THRUSTER_BLINK ? player_shapes[1] : player_shapes[0],
+                player.pos,
+                player.rot,
+                vec_2d_unit);
+    } else if (player.state == PS_EXPLODING) {
+        draw_player_exploding(&player);
+    }
+
+    // draw asteroids
     for (int i = 0; i < MAX_ASTEROIDS; i++) {
-        if (!asteroids[i].visible) {
+        if (asteroids[i].visible == false) {
             continue;
         }
 
@@ -462,21 +484,15 @@ void level_draw()
             asteroids[i].scale
         };
 
-        assert(canvas_draw_line_segments(
-            asteroid_shapes[asteroids[i].shape],
-            position,
-            asteroids[i].rot,
-            scale
-        ));
+        canvas_draw_shape(
+                asteroid_shapes[asteroids[i].shape],
+                position,
+                asteroids[i].rot,
+                scale);
     }
 
     draw_bullets(bullets, MAX_BULLETS);
     draw_explosions(explosions, MAX_EXPLOSIONS);
-    if (player.state == PS_NORMAL) {
-        draw_player(&player);
-    } else if (player.state == PS_EXPLODING) {
-        draw_player_exploding(&player);
-    }
     draw_score(player.score);
     draw_lives(player.lives);
 
@@ -612,8 +628,9 @@ void level_init(unsigned int new_level, unsigned int new_lives, unsigned int new
 
     canvas_reset();
 
-    // player_frame_1_shape = canvas_load_shape(&player_frame_1_shape_data);
-    // player_frame_2_shape = canvas_load_shape(&player_frame_2_shape_data);
+    for (int i = 0; i < NUM_PLAYER_FRAMES; i++) {
+        player_shapes[i] = canvas_load_shape(&player_shape_data[i]);
+    }
 
     for (int i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
         asteroid_shapes[i] = canvas_load_shape(&asteroid_shape_data[i]);

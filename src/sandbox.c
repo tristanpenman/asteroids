@@ -139,22 +139,22 @@ void sandbox_loop(bool draw)
     if (draw) {
         canvas_start_drawing(true);
 
-        canvas_draw_line_segments(
-            asteroid_shape_ids[0],
-            pos1,
-            0,
-            vec_2d_unit
+        canvas_draw_shape(
+                asteroid_shape_ids[0],
+                pos1,
+                0,
+                vec_2d_unit
         );
 
         if (collision) {
             canvas_set_colour(1.0f, 0.0f, 0.0f);
         }
 
-        canvas_draw_line_segments(
-            box_shape_id,
-            pos2,
-            0,
-            vec_2d_unit
+        canvas_draw_shape(
+                box_shape_id,
+                pos2,
+                0,
+                vec_2d_unit
         );
 
         canvas_finish_drawing(true);

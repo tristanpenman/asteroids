@@ -12,7 +12,7 @@
 
 #define MAX_SHAPES 64
 
-#define RAD_TO_DEG (180.0 / M_PI)
+#define RAD_TO_DEG (180.0f / (float) M_PI)
 
 extern struct vec_2d origin;
 
@@ -49,7 +49,7 @@ void canvas_set_colour(float r, float g, float b)
     glColor3f(r, g, b);
 }
 
-bool canvas_draw_line_segments(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
+bool canvas_draw_shape(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
 {
     if (shape + 1 > num_shapes || shape < 0) {
         return false;
@@ -65,7 +65,11 @@ bool canvas_draw_line_segments(int shape, struct vec_2d position, float rotation
     glScalef((GLfloat) scale.x, (GLfloat) scale.y, 1.0f);
 
     glVertexPointer(2, GL_FLOAT, 0, shapes[shape]->vertices);
-    glDrawArrays(GL_LINE_LOOP, 0, shapes[shape]->num_vertices);
+    if (shapes[shape]->line_segments) {
+        glDrawElements(GL_LINES, shapes[shape]->num_line_segments * 2, GL_UNSIGNED_BYTE, shapes[shape]->line_segments);
+    } else {
+        glDrawArrays(GL_LINE_LOOP, 0, shapes[shape]->num_vertices);
+    }
 
     glPopMatrix();
 
