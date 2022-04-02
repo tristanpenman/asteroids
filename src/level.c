@@ -44,6 +44,7 @@ static struct player player;
 
 // shapes
 static int asteroid_shapes[NUM_ASTEROID_SHAPES];
+static int bullet_shape;
 
 // inputs
 static int input_escape;
@@ -286,32 +287,32 @@ void init_explosion(struct explosion *e, const struct vec_2d *pos)
     e->visible = true;
 }
 
-void explode_player(struct player *p)
+void explode_player()
 {
     unsigned int i;
 
-    p->state = PS_EXPLODING;
+    player.state = PS_EXPLODING;
 
     for (i = 0; i < SHIP_EXPLOSION_SHARDS; i++) {
-        p->shards[i].angle = ((2 * M_PI) / (float) SHIP_EXPLOSION_SHARDS) * (float) i;
-        p->shards[i].rot = random_float(0 - (float) M_PI, (float) M_PI);
-        if (p->shards[i].rot < 0.0f) {
-            p->shards[i].dir = -1;
+        player.shards[i].angle = ((2 * M_PI) / (float) SHIP_EXPLOSION_SHARDS) * (float) i;
+        player.shards[i].rot = random_float(0 - (float) M_PI, (float) M_PI);
+        if (player.shards[i].rot < 0.0f) {
+            player.shards[i].dir = -1;
         } else {
-            p->shards[i].dir = 1;
+            player.shards[i].dir = 1;
         }
     }
 }
 
 void explode_asteroid(struct asteroid *a,
-    struct asteroid *aa, unsigned int na,
-    struct explosion *ea, unsigned int ne)
+    struct asteroid *aa,
+    struct explosion *ea)
 {
     float vel_scale = 1.0f;
 
     unsigned int i;
 
-    for (i = 0; i < ne; i++, ea++) {
+    for (i = 0; i < MAX_EXPLOSIONS; i++, ea++) {
         if (ea->visible == false) {
             init_explosion(ea, &a->pos);
             break;
@@ -335,7 +336,7 @@ void explode_asteroid(struct asteroid *a,
     randomise_asteroid_velocity(a, vel_scale);
     randomise_asteroid_rotation(a);
 
-    for (i = 0; i < na; i++) {
+    for (i = 0; i < MAX_ASTEROIDS; i++) {
         if (aa[i].visible == false) {
             aa[i].visible = true;
             aa[i].pos.x = a->pos.x;
@@ -372,76 +373,64 @@ void update_explosions(struct explosion *ee, unsigned int n, float f)
  *
  *****************************************************************************/
 
-void check_collisions(struct player *p, struct asteroid *aa, unsigned int na,
-    struct bullet *ba, unsigned int nb, struct explosion *ea, unsigned ne,
-    unsigned int *asteroids_hit)
+void check_collisions()
 {
-    float dx, dy;
     unsigned int i, j;
     bool asteroid_hit = false;
-    float ascale;
 
     // Check for asteroid collisions
-    for (j = 0; j < na; j++) {
-        if (aa[j].visible == false) {
+    for (j = 0; j < MAX_ASTEROIDS; j++) {
+        if (asteroids[j].visible == false) {
             continue;
         }
 
-        ascale = aa[j].scale;
-
         if (asteroid_hit == false) {
-            /* Check for bullet collisions */
-            for (i = 0; i < nb; i++) {
-                if (ba[i].visible == false) {
+            // Check for bullet collisions
+            for (i = 0; i < MAX_BULLETS; i++) {
+                if (bullets[i].visible == false) {
                     continue;
                 }
 
-                /* Player bullet, test against asteroids */
+                // Player bullet, test against asteroids
+                const bool collision = test_asteroid_bullet_collision(&bullets[i], &asteroids[j]);
 
-                dx = ba[i].pos.x - aa[j].pos.x;
-                dy = ba[i].pos.y - aa[j].pos.y;
-                if (sqrt (dx * dx + dy * dy) <= aa[j].radius) {
-                    if (test_asteroid_bullet_collision(&ba[i], &aa[j]) == true) {
-                        ba[i].visible = false;
-                        asteroid_hit = true;
-                        // TODO: Should this be 'continue'?
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (p->state == PS_NORMAL && asteroid_hit == false) {
-            dx = p->pos.x - aa[j].pos.x;
-            dy = p->pos.y - aa[j].pos.y;
-            if (sqrt (dx * dx + dy * dy) <= SHIP_RADIUS + aa[j].radius) {
-                if (test_asteroid_ship_collision(p, &aa[j]) == true) {
-                    explode_player(p);
+                if (collision) {
+                    // Bullets can only hit one asteroid
+                    bullets[i].visible = false;
                     asteroid_hit = true;
-                    p->lives--;
+                    break;
                 }
             }
         }
 
-        if (asteroid_hit == true) {
+        if (player.state == PS_NORMAL && asteroid_hit == false) {
+            const bool collision = test_asteroid_ship_collision(&player, &asteroids[j]);
+
+            if (collision) {
+                explode_player();
+                asteroid_hit = true;
+                player.lives--;
+            }
+        }
+
+        if (asteroid_hit) {
             asteroid_hit = false;
-            (*asteroids_hit)++;
-            explode_asteroid(&aa[j], aa, na, ea, ne);
+            asteroids_hit++;
+            explode_asteroid(&asteroids[j], asteroids, explosions);
 
             if (explosion_channel > -1) {
                 mixer_stop_playing_on_channel(explosion_channel);
             }
             explosion_channel = mixer_play_sample(SOUND_EXPLOSION);
-
+            
+            const float ascale = asteroids[j].scale;
             if (ascale < 0.49f) {
-                update_score(p, 100);
+                update_score(&player, 100);
             } else if (ascale < 0.99f) {
-                update_score(p, 50);
+                update_score(&player, 50);
             } else {
-                update_score(p, 20);
+                update_score(&player, 20);
             }
-
-            p->hit++;
         }
     }
 }
@@ -541,9 +530,7 @@ void level_update()
 
         update_bullets(bullets, MAX_BULLETS, factor);
 
-        check_collisions(&player, asteroids, MAX_ASTEROIDS,
-            bullets, MAX_BULLETS, explosions, MAX_EXPLOSIONS,
-            &asteroids_hit);
+        check_collisions();
 
         unsigned int num_asteroids = 0;
         for (int i = 0; i < MAX_ASTEROIDS; ++i) {
@@ -632,7 +619,7 @@ void level_init(unsigned int new_level, unsigned int new_lives, unsigned int new
         asteroid_shapes[i] = canvas_load_shape(&asteroid_shape_data[i]);
     }
 
-    // bullet_shape = canvas_load_shape(&bullet_shape_data);
+    bullet_shape = canvas_load_shape(&bullet_shape_data);
 
     // Create some asteroids!
     starting_asteroids = num_asteroids_for_level(level);

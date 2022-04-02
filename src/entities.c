@@ -97,7 +97,6 @@ void player_init(struct player *p)
 
     p->lives = SHIP_LIVES;
     p->score = 0;
-    p->hit = 0;
 
     player_reset(p);
 }

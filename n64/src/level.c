@@ -142,19 +142,19 @@ void check_fire_button(float factor)
  *
  *****************************************************************************/
 
-void explode_player(struct player *p)
+void explode_player()
 {
     unsigned int i;
 
-    p->state = PS_EXPLODING;
+    player.state = PS_EXPLODING;
 
     for (i = 0; i < SHIP_EXPLOSION_SHARDS; i++) {
-        p->shards[i].angle = ((2 * M_PI) / (float) SHIP_EXPLOSION_SHARDS) * (float) i;
-        p->shards[i].rot = random_float(0 - (float) M_PI, (float) M_PI);
-        if (p->shards[i].rot < 0.0f) {
-            p->shards[i].dir = -1;
+        player.shards[i].angle = ((2 * M_PI) / (float) SHIP_EXPLOSION_SHARDS) * (float) i;
+        player.shards[i].rot = random_float(0 - (float) M_PI, (float) M_PI);
+        if (player.shards[i].rot < 0.0f) {
+            player.shards[i].dir = -1;
         } else {
-            p->shards[i].dir = 1;
+            player.shards[i].dir = 1;
         }
     }
 }
@@ -208,11 +208,8 @@ void explode_asteroid(int i)
 
 void check_collisions()
 {
-    float dx, dy;
     unsigned int i, j;
     bool asteroid_hit = false;
-
-    player.hit = 0;
 
     // Check for asteroid collisions
     for (j = 0; j < MAX_ASTEROIDS; j++) {
@@ -220,45 +217,49 @@ void check_collisions()
             continue;
         }
 
-        if (player.state == PS_NORMAL) {
-            const bool collision = collision_test_shapes(
-                &player_frame_1_shape_data, &player.pos, player.rot, 1.0f,
-                &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
+        if (asteroid_hit == false) {
+            // Check for bullet collisions
+            for (i = 0; i < MAX_BULLETS; i++) {
+                if (bullets[i].visible == false) {
+                    continue;
+                }
 
-            if (collision) {
-                player.hit++;
-
-                // TODO: deal with player-asteroid collisions
-
-                rumble_start(0.3, 0.7);
-                explode_asteroid(j);
-
-                asteroid_hit = true;
-                break;
-            }
-        }
-
-        for (i = 0; i < MAX_BULLETS; i++) {
-            if (bullets[i].visible) {
+                // Player bullet, test against asteroids
                 const bool collision = collision_test_shapes(
                     &bullet_shape_data, &bullets[i].pos, 0, 1.0f,
                     &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
 
                 if (collision) {
+                    // Bullets can only hit one asteroid
                     bullets[i].visible = false;
-                    asteroids_hit++;
-
-                    rumble_start(0.3, 0.3);
-                    explode_asteroid(j);
-
                     asteroid_hit = true;
                     break;
                 }
             }
         }
 
+        // deal with player-asteroid collisions
+        if (player.state == PS_NORMAL && asteroid_hit == false) {
+            const bool collision = collision_test_shapes(
+                &player_frame_1_shape_data, &player.pos, player.rot, 1.0f,
+                &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
+
+            if (collision) {
+                explode_player();
+                asteroid_hit = true;
+                player.lives--;
+            }
+        }
+
         if (asteroid_hit) {
-            break;
+            asteroid_hit = false;
+            asteroids_hit++;
+            explode_asteroid(j);
+
+            // TODO: score logic
+
+            // feedback
+            rumble_start(0.3, 0.3);
         }
     }
 }

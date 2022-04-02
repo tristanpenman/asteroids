@@ -5,8 +5,6 @@
 
 #define INPUT_INVALID_HANDLE -1
 
-#define INPUT_MAX_HANDLES 32
-
 enum input
 {
     // alphabet

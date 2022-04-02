@@ -79,8 +79,9 @@ void input_reset()
 {
     num_handles = 0;
 
+    memset(active, 0, sizeof(bool) * INPUT_MAX_HANDLES);
+
     for (int i = 0; i < __INPUT__COUNT; i++) {
-        active[i] = false;
         mappings[i] = INPUT_INVALID_HANDLE;
     }
 }

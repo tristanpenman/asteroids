@@ -24,7 +24,6 @@ struct asteroid
     int shape;
 };
 
-
 struct bullet
 {
     bool visible;
@@ -66,7 +65,6 @@ struct player
     bool reloading;
     enum player_state state;
     unsigned int score;
-    unsigned int hit;
     int lives;
     float phase;
     float reload_delay;

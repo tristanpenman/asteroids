@@ -5,6 +5,8 @@
 
 #include "input.h"
 
+#define INPUT_MAX_HANDLES 32
+
 struct check {
     enum input inp;
     int bitmask;
@@ -84,10 +86,8 @@ void input_reset()
     num_handles = 0;
     num_mappings = 0;
 
-    for (i = 0; i < INPUT_MAX_HANDLES; i++) {
-        active[i] = false;
-        triggered[i] = false;
-    }
+    memset(active, 0, sizeof(bool) * INPUT_MAX_HANDLES);
+    memset(triggered, 0, sizeof(bool) * INPUT_MAX_HANDLES);
 
     for (i = 0; i < __INPUT__COUNT; i++) {
         mappings[i] = INPUT_INVALID_HANDLE;

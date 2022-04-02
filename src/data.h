@@ -5,5 +5,6 @@
 
 extern const struct shape asteroid_shape_data[];
 extern const struct shape box_shape_data;
+extern const struct shape bullet_shape_data;
 
 #endif
