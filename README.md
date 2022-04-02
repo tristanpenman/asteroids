@@ -2,11 +2,13 @@
 
 Be thrilled by this high fidelity reproduction of Atari's 1979 classic, Asteroids!
 
-## Background
-
 This is a tidied up version of an Asteroids clone that I wrote over the course of several weekends, as a way to procrastinate while studying for exams. The aim was to get the game running quickly, taking a 'less-is-more' approach. Graphics were implemented using legacy OpenGL, while window management, audio and input were all handled by SDL.
 
-This project has been ported a couple of times as well. First to the web using Emscripten, which I wrote about in [this blog post](https://tristanpenman.com/blog/posts/2018/01/08/porting-an-asteroids-clone-to-javascript/). And later to the venerable Nintendo 64, the details for which can be found [here](./n64).
+![Asteroids Title Screen](./doc/titlescreen.png)
+
+## Ports
+
+This project has also been ported to the web using Emscripten, which I wrote about in [this blog post](https://tristanpenman.com/blog/posts/2018/01/08/porting-an-asteroids-clone-to-javascript/), and later to the venerable Nintendo 64. The code for the N64 version can be found under [n64](./n64).
 
 ## Demo
 
