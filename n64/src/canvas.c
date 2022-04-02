@@ -24,6 +24,12 @@ struct geometry {
     uint8_t num_line_segments;
 };
 
+struct color {
+    float r;
+    float g;
+    float b;
+};
+
 static Vtx vertices[MAX_VERTICES];
 static struct geometry shapes[MAX_SHAPES];
 
@@ -34,10 +40,16 @@ static Dynamic transforms[MAX_TRANSFORMS];
 
 static int num_transforms = 0;
 
+static struct color primitive_color;
+
 void canvas_reset()
 {
     num_shapes = 0;
     num_vertices = 0;
+
+    primitive_color.r = 255.0f;
+    primitive_color.g = 255.0f;
+    primitive_color.b = 255.0f;
 }
 
 int canvas_load_shape(const struct shape *shape)
@@ -110,7 +122,9 @@ void canvas_start_drawing(bool clear)
 
 void canvas_set_colour(float r, float g, float b)
 {
-    // TODO: figure out if it's possible to make this dynamic
+    primitive_color.r = r;
+    primitive_color.g = g;
+    primitive_color.b = b;
 }
 
 bool canvas_draw_line_segments(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
@@ -147,6 +161,10 @@ bool canvas_draw_line_segments(int shape, struct vec_2d position, float rotation
 
     // support anti-aliased, translucent lines
     gDPSetRenderMode(glistp++, G_RM_AA_XLU_LINE, G_RM_AA_XLU_LINE2);
+
+    // set line color
+    gDPSetCombineMode(glistp++, G_CC_PRIMITIVE, G_CC_PRIMITIVE);
+    gDPSetPrimColor(glistp++, 0, 0, primitive_color.r, primitive_color.g, primitive_color.b, 255);
 
     gSPClearGeometryMode(glistp++, 0xFFFFFFFF);
     gSPSetGeometryMode(glistp++, G_SHADE | G_SHADING_SMOOTH);
