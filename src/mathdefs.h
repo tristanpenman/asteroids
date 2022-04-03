@@ -3,16 +3,12 @@
 
 #include <math.h>
 
-#ifndef sinf
+#ifdef N64
+
 #define sinf sin
-#endif
-
-#ifndef cosf
 #define cosf cos
-#endif
-
-#ifndef sqrtf
 #define sqrtf sqrt
+
 #endif
 
 #ifndef M_PI

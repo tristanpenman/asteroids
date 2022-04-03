@@ -396,7 +396,6 @@ void check_collisions()
                 }
 
                 // Player bullet, test against asteroids
-                //const bool collision = test_asteroid_bullet_collision(&bullets[i], &asteroids[j]);
                 const bool collision = collision_test_shapes(
                     &bullet_shape_data, &bullets[i].pos, 0, 1.0f,
                     &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
