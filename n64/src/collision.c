@@ -127,12 +127,9 @@ bool collision_test_shapes_full(
     const struct shape *b, const struct vec_2d *b_pos, float b_rot, float b_scale,
     struct vec_2d *intersection, float *t)
 {
-    // TODO: perform low granularity test using bounding sphere
-
-    const float sinr = sinf(a_rot);
-    const float cosr = cosf(a_rot);
-
     int i;
+    float sinr = sinf(a_rot);
+    float cosr = cosf(a_rot);
 
     if (a->num_line_segments > 0) {
         for (i = 0; i < a->num_line_segments * 2; i += 2) {

@@ -18,9 +18,6 @@
 #define INITIAL_LIVES 3
 #define INITIAL_SCORE 0
 
-// Audio
-musHandle sndHandle = 0;
-
 void audio_init()
 {
     nuAuStlInit();

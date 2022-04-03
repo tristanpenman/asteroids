@@ -20,6 +20,10 @@
 #include "util.h"
 #include "vec.h"
 
+// how close objects need to be before performing collision detection
+#define COLLISION_THRESHOLD 0.5f
+
+// number of milliseconds that should be simulated in each timestep
 #define TIME_STEP_MILLIS 10
 
 // ship wrapping constants
@@ -55,7 +59,7 @@ static int input_pause;
 static int input_right;
 static int input_thruster;
 
-extern musHandle sndHandle;
+static musHandle snd_handle;
 
 /******************************************************************************
  *
@@ -80,7 +84,7 @@ static unsigned int num_asteroids_for_level(int level) {
     return 11;
 }
 
-void check_fire_button(float factor)
+static void check_fire_button(float factor)
 {
     unsigned int i;
     unsigned int num_player_bullets = 0;
@@ -114,14 +118,14 @@ void check_fire_button(float factor)
             if (false == bullets[i].visible) {
                 bullet_init(&bullets[i], &player.pos, player.rot);
 
-                if (sndHandle != 0) {
+                if (snd_handle != 0) {
                     // stop currently playing sounds
-                    nuAuStlSndPlayerSndStop(sndHandle, 0);
-                    sndHandle = 0;
+                    nuAuStlSndPlayerSndStop(snd_handle, 0);
+                    snd_handle = 0;
                 }
 
-                sndHandle = nuAuStlSndPlayerPlay(3);
-                nuAuStlSndPlayerSetSndPitch(sndHandle, 6);
+                snd_handle = nuAuStlSndPlayerPlay(3);
+                nuAuStlSndPlayerSetSndPitch(snd_handle, 6);
 
                 break;
             }
@@ -142,7 +146,7 @@ void check_fire_button(float factor)
  *
  *****************************************************************************/
 
-void explode_player()
+static void explode_player()
 {
     unsigned int i;
 
@@ -159,7 +163,7 @@ void explode_player()
     }
 }
 
-void explode_asteroid(int i)
+static void explode_asteroid(int i)
 {
     struct asteroid *a = &asteroids[i];
     float vel_scale = 1.0f;
@@ -206,10 +210,22 @@ void explode_asteroid(int i)
  *
  *****************************************************************************/
 
-void check_collisions()
+static bool should_test_collisions(const struct vec_2d *a, const struct vec_2d *b)
+{
+    const float dx = a->x - b->x;
+    const float dy = a->y - b->y;
+    const float dist_sq = dx * dx + dy + dy;
+    const float threshold = COLLISION_THRESHOLD;
+    const float threshold_sq = threshold * threshold;
+
+    return dist_sq < threshold;
+}
+
+static void check_collisions()
 {
     unsigned int i, j;
     bool asteroid_hit = false;
+    bool collision = false;
 
     // Check for asteroid collisions
     for (j = 0; j < MAX_ASTEROIDS; j++) {
@@ -224,8 +240,12 @@ void check_collisions()
                     continue;
                 }
 
+                if (!should_test_collisions(&bullets[i].pos, &asteroids[j].pos)) {
+                    continue;
+                }
+
                 // Player bullet, test against asteroids
-                const bool collision = collision_test_shapes(
+                collision = collision_test_shapes(
                     &bullet_shape_data, &bullets[i].pos, 0, 1.0f,
                     &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
 
@@ -240,7 +260,7 @@ void check_collisions()
 
         // deal with player-asteroid collisions
         if (player.state == PS_NORMAL && asteroid_hit == false) {
-            const bool collision = collision_test_shapes(
+            collision = collision_test_shapes(
                 &player_frame_1_shape_data, &player.pos, player.rot, 1.0f,
                 &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
 
@@ -270,24 +290,34 @@ void check_collisions()
  *
  *****************************************************************************/
 
-void level_draw()
+static void level_draw()
 {
     int i;
     char conbuf[20];
+    struct vec_2d scale;
 
     canvas_start_drawing(true);
+
+    // draw player ship
     canvas_draw_line_segments(player_frame_1_shape, player.pos, player.rot, vec_2d_unit);
 
+    // draw asteroids
     for (i = 0; i < MAX_ASTEROIDS; i++) {
-        if (asteroids[i].visible) {
-            struct vec_2d scale = {
-                asteroids[i].scale,
-                asteroids[i].scale,
-            };
-            canvas_draw_line_segments(asteroid_shapes[asteroids[i].shape], asteroids[i].pos, 0, scale);
+        if (asteroids[i].visible == false) {
+            continue;
         }
+
+        scale.x = asteroids[i].scale;
+        scale.y = asteroids[i].scale;
+
+        canvas_draw_line_segments(
+            asteroid_shapes[asteroids[i].shape],
+            asteroids[i].pos,
+            asteroids[i].rot,
+            scale);
     }
 
+    // draw bullets
     for (i = 0; i < MAX_BULLETS; i++) {
         if (bullets[i].visible) {
             canvas_draw_line_segments(bullet_shape, bullets[i].pos, bullets[i].rot, vec_2d_unit);
@@ -328,7 +358,7 @@ void level_draw()
     nuDebConDisp(NU_SC_SWAPBUFFER);
 }
 
-void level_update()
+static void level_update()
 {
     // useful constants
     static const float degrees_to_radians = M_PI / 180.0f;
