@@ -153,6 +153,12 @@ void sandbox_loop(bool draw)
             vec_2d_unit
         );
 
+        if (collision) {
+            canvas_set_colour(255.f, 0.f, 0.f);
+        } else {
+            canvas_set_colour(255.f, 255.f, 255.f);
+        }
+
         canvas_draw_line_segments(
             collision ? box_shape_active_id : box_shape_id,
             pos2,
