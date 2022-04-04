@@ -24,7 +24,11 @@
 #include "vec.h"
 #include "video.h"
 
-#define TIME_STEP_MILLIS 5
+// how close objects need to be before performing collision detection
+#define COLLISION_THRESHOLD 0.5f
+
+// number of milliseconds that should be simulated in each timestep
+#define TIME_STEP_MILLIS 10
 
 extern int explosion_channel;
 extern int phaser_channel;
@@ -85,7 +89,7 @@ static unsigned int num_asteroids_for_level(int level) {
     return 11;
 }
 
-void update_player(struct player *p, float factor)
+static void update_player(struct player *p, float factor)
 {
     unsigned int i;
     float s, d, rot = p->rot;
@@ -188,7 +192,7 @@ void update_player(struct player *p, float factor)
     }
 }
 
-void check_fire_button(struct player *p, struct bullet *bb, unsigned int n, float f)
+static void check_fire_button(struct player *p, struct bullet *bb, unsigned int n, float f)
 {
     unsigned int i;
     unsigned int num_player_bullets = 0;
@@ -241,7 +245,7 @@ void check_fire_button(struct player *p, struct bullet *bb, unsigned int n, floa
     p->reloading = true;
 }
 
-void update_bullets(struct bullet *bb, unsigned int n, float f)
+static void update_bullets(struct bullet *bb, unsigned int n, float f)
 {
     static struct vec_2d t;
     unsigned int i;
@@ -268,7 +272,7 @@ void update_bullets(struct bullet *bb, unsigned int n, float f)
     }
 }
 
-void update_score(struct player *p, int amount)
+static void update_score(struct player *p, int amount)
 {
     const int lives_given = p->score / 10000;
     p->score += amount;
@@ -281,7 +285,7 @@ void update_score(struct player *p, int amount)
  *
  *****************************************************************************/
 
-void init_explosion(struct explosion *e, const struct vec_2d *pos)
+static void init_explosion(struct explosion *e, const struct vec_2d *pos)
 {
     e->pos.x = pos->x;
     e->pos.y = pos->y;
@@ -289,7 +293,7 @@ void init_explosion(struct explosion *e, const struct vec_2d *pos)
     e->visible = true;
 }
 
-void explode_player()
+static void explode_player()
 {
     unsigned int i;
 
@@ -306,7 +310,8 @@ void explode_player()
     }
 }
 
-void explode_asteroid(struct asteroid *a,
+static void explode_asteroid(
+    struct asteroid *a,
     struct asteroid *aa,
     struct explosion *ea)
 {
@@ -357,7 +362,7 @@ void explode_asteroid(struct asteroid *a,
     }
 }
 
-void update_explosions(struct explosion *ee, unsigned int n, float f)
+static void update_explosions(struct explosion *ee, unsigned int n, float f)
 {
     unsigned int i;
 
@@ -377,10 +382,23 @@ void update_explosions(struct explosion *ee, unsigned int n, float f)
  *
  *****************************************************************************/
 
-void check_collisions()
+static bool should_test_collisions(const struct vec_2d *a, const struct vec_2d *b)
+{
+    const float dx = a->x - b->x;
+    const float dy = a->y - b->y;
+    const float dist_sq = dx * dx + dy + dy;
+    const float threshold = COLLISION_THRESHOLD;
+    const float threshold_sq = threshold * threshold;
+
+    return dist_sq < threshold_sq;
+}
+
+static void check_collisions()
 {
     unsigned int i, j;
     bool asteroid_hit = false;
+    bool collision = false;
+    float ascale;
 
     // Check for asteroid collisions
     for (j = 0; j < MAX_ASTEROIDS; j++) {
@@ -388,29 +406,31 @@ void check_collisions()
             continue;
         }
 
-        if (asteroid_hit == false) {
-            // Check for bullet collisions
-            for (i = 0; i < MAX_BULLETS; i++) {
-                if (bullets[i].visible == false) {
-                    continue;
-                }
+        // Check for bullet collisions
+        for (i = 0; i < MAX_BULLETS; i++) {
+            if (bullets[i].visible == false) {
+                continue;
+            }
 
-                // Player bullet, test against asteroids
-                const bool collision = collision_test_shapes(
-                    &bullet_shape_data, &bullets[i].pos, 0, 1.0f,
-                    &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
+            if (!should_test_collisions(&bullets[i].pos, &asteroids[j].pos)) {
+                continue;
+            }
 
-                if (collision) {
-                    // Bullets can only hit one asteroid
-                    bullets[i].visible = false;
-                    asteroid_hit = true;
-                    break;
-                }
+            // Player bullet, test against asteroids
+            collision = collision_test_shapes(
+                &bullet_shape_data, &bullets[i].pos, 0, 1.0f,
+                &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
+
+            if (collision) {
+                // Bullets can only hit one asteroid
+                bullets[i].visible = false;
+                asteroid_hit = true;
+                break;
             }
         }
 
         if (player.state == PS_NORMAL && asteroid_hit == false) {
-            const bool collision = collision_test_shapes(
+            collision = collision_test_shapes(
                 &player_shape_data[0], &player.pos, player.rot, 1.0f,
                 &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
 
@@ -432,7 +452,7 @@ void check_collisions()
             }
             explosion_channel = mixer_play_sample(SOUND_EXPLOSION);
             
-            const float ascale = asteroids[j].scale;
+            ascale = asteroids[j].scale;
             if (ascale < 0.49f) {
                 update_score(&player, 100);
             } else if (ascale < 0.99f) {
@@ -450,8 +470,11 @@ void check_collisions()
  *
  *****************************************************************************/
 
-void level_draw()
+static void level_draw()
 {
+    struct vec_2d position;
+    struct vec_2d scale;
+
     const float residual = (float)residual_simulation_time() / 1000.f;
 
     canvas_start_drawing(true);
@@ -473,15 +496,11 @@ void level_draw()
             continue;
         }
 
-        const struct vec_2d position = {
-            asteroids[i].pos.x + asteroids[i].vel.x * residual,
-            asteroids[i].pos.y + asteroids[i].vel.y * residual
-        };
+        position.x = asteroids[i].pos.x + asteroids[i].vel.x * residual;
+        position.y = asteroids[i].pos.y + asteroids[i].vel.y * residual;
 
-        const struct vec_2d scale = {
-            asteroids[i].scale,
-            asteroids[i].scale
-        };
+        scale.x = asteroids[i].scale;
+        scale.y = asteroids[i].scale;
 
         canvas_draw_shape(
                 asteroid_shapes[asteroids[i].shape],
@@ -498,9 +517,10 @@ void level_draw()
     canvas_finish_drawing(true);
 }
 
-void level_update()
+static void level_update()
 {
     int8_t joystick_x;
+    unsigned int num_asteroids = 0;
 
     input_update();
     input_read_joystick(&joystick_x, NULL);
@@ -547,7 +567,6 @@ void level_update()
 
         check_collisions();
 
-        unsigned int num_asteroids = 0;
         for (int i = 0; i < MAX_ASTEROIDS; ++i) {
             if (true == asteroids[i].visible) {
                 num_asteroids++;

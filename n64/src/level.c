@@ -170,10 +170,14 @@ static void explode_asteroid(int i)
 
     debug_printf("explode_asteroid\n");
 
+    // destroy small asteroids
     if (a->scale < 0.49f) {
         a->visible = false;
         return;
-    } else if (a->scale < 0.99f) {
+    }
+
+    // other asteroids just become smaller
+    if (a->scale < 0.99f) {
         a->scale = 0.25f;
         vel_scale = 1.5f;
     } else {
@@ -218,7 +222,7 @@ static bool should_test_collisions(const struct vec_2d *a, const struct vec_2d *
     const float threshold = COLLISION_THRESHOLD;
     const float threshold_sq = threshold * threshold;
 
-    return dist_sq < threshold;
+    return dist_sq < threshold_sq;
 }
 
 static void check_collisions()
@@ -233,28 +237,26 @@ static void check_collisions()
             continue;
         }
 
-        if (asteroid_hit == false) {
-            // Check for bullet collisions
-            for (i = 0; i < MAX_BULLETS; i++) {
-                if (bullets[i].visible == false) {
-                    continue;
-                }
+        // Check for bullet collisions
+        for (i = 0; i < MAX_BULLETS; i++) {
+            if (bullets[i].visible == false) {
+                continue;
+            }
 
-                if (!should_test_collisions(&bullets[i].pos, &asteroids[j].pos)) {
-                    continue;
-                }
+            if (!should_test_collisions(&bullets[i].pos, &asteroids[j].pos)) {
+                continue;
+            }
 
-                // Player bullet, test against asteroids
-                collision = collision_test_shapes(
-                    &bullet_shape_data, &bullets[i].pos, 0, 1.0f,
-                    &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
+            // Player bullet, test against asteroids
+            collision = collision_test_shapes(
+                &bullet_shape_data, &bullets[i].pos, 0, 1.0f,
+                &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
 
-                if (collision) {
-                    // Bullets can only hit one asteroid
-                    bullets[i].visible = false;
-                    asteroid_hit = true;
-                    break;
-                }
+            if (collision) {
+                // Bullets can only hit one asteroid
+                bullets[i].visible = false;
+                asteroid_hit = true;
+                break;
             }
         }
 
@@ -366,6 +368,7 @@ static void level_update()
     int i;
     float rot;
     int8_t joystick_x;
+    unsigned int num_asteroids = 0;
 
     input_update();
     input_read_joystick(&joystick_x, NULL);
@@ -437,12 +440,11 @@ static void level_update()
 
         check_collisions();
 
-        // unsigned int num_asteroids = 0;
-        // for (int i = 0; i < MAX_ASTEROIDS; ++i) {
-        //     if (true == asteroids[i].visible) {
-        //         num_asteroids++;
-        //     }
-        // }
+        for (i = 0; i < MAX_ASTEROIDS; ++i) {
+            if (asteroids[i].visible) {
+                num_asteroids++;
+            }
+        }
 
         // if (0 == num_asteroids) {
         //     next_level_countdown -= factor;

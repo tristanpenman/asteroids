@@ -7,7 +7,6 @@
 #include "loop.h"
 #include "options.h"
 #include "timing.h"
-#include "video.h"
 
 static unsigned int level = 1;
 static unsigned int lives = 3;
@@ -31,12 +30,14 @@ void transition_init(unsigned int next_level, unsigned int next_lives, unsigned 
 
 void transition_loop(bool draw)
 {
+    uint32_t residual;
+
     input_update();
 
     produce_simulation_time();
-    const uint32_t residual = residual_simulation_time();
+    residual = residual_simulation_time();
     while (maybe_consume_simulation_time(residual)) {
-        elapsed += residual;
+        elapsed += (float) residual;
     }
 
     if (elapsed >= START_LEVEL_DELAY_MS) {

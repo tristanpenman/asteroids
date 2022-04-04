@@ -88,6 +88,8 @@ bool titlescreen_init()
 
 void titlescreen_loop(bool draw)
 {
+    float residual;
+
     input_update();
 
     if (input_active(input_highscores)) {
@@ -127,7 +129,7 @@ void titlescreen_loop(bool draw)
     }
 
     // Unused simulation time, used to smooth animation
-    const float residual = (float) residual_simulation_time() / 1000.f;
+    residual = (float) residual_simulation_time() / 1000.f;
     if (residual < 0.f) {
         printf("%f\n", residual);
     }

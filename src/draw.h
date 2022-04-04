@@ -11,7 +11,7 @@ void draw_explosions(const struct explosion *, unsigned int n);
 void draw_highscores(const struct highscores *);
 void draw_instructions();
 void draw_level_title();
-void draw_lives(int lives);
+void draw_lives(unsigned int lives);
 void draw_new_high_score_input(const char initials[4]);
 void draw_new_high_score_message();
 void draw_new_high_score_enter_to_continue();

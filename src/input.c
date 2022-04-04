@@ -107,6 +107,7 @@ bool input_map(int handle, enum input inp)
 
 void input_update()
 {
+    SDL_Event event;
     int i = 0;
 
     for (i = 0; i < num_handles; i++) {
@@ -115,7 +116,6 @@ void input_update()
         }
     }
 
-    SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
         case SDL_KEYDOWN:

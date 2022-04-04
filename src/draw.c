@@ -245,7 +245,7 @@ void draw_level_title(unsigned int level)
     draw_text_centered(titlecard, 0.35f, .30f);
 }
 
-void draw_lives(int lives)
+void draw_lives(unsigned int lives)
 {
     int i;
     glMatrixMode(GL_MODELVIEW);

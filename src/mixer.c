@@ -62,6 +62,13 @@ void mixer_set_channel_completion_handler(void (*callback)(int))
 
 int mixer_load_sample_from_file(const char *path)
 {
+    long sz;
+    unsigned long result;
+    FILE *f;
+    void *buffer;
+    Mix_Chunk **realloc_samples;
+    SDL_RWops *rw;
+
     static const size_t PTR_SIZE = sizeof(Mix_Chunk *);
 
     // Do not attempt to allocate more than size_t type can allow
@@ -71,7 +78,7 @@ int mixer_load_sample_from_file(const char *path)
         return MIXER_INVALID_SAMPLE;
     }
 
-    Mix_Chunk ** const realloc_samples = realloc(samples, (num_samples + 1) * PTR_SIZE);
+    realloc_samples = realloc(samples, (num_samples + 1) * PTR_SIZE);
     if (NULL == realloc_samples) {
         fprintf(stderr, "realloc failed while loading audio file (%s): %s", path, strerror(errno));
         return MIXER_INVALID_SAMPLE;
@@ -79,7 +86,7 @@ int mixer_load_sample_from_file(const char *path)
         samples = realloc_samples;
     }
 
-    FILE * const f = fopen(path, "rb");
+    f = fopen(path, "rb");
     if (NULL == f) {
         fprintf(stderr, "Failed to open file (%s): %s\n", path, strerror(errno));
         return MIXER_INVALID_SAMPLE;
@@ -87,10 +94,10 @@ int mixer_load_sample_from_file(const char *path)
 
     // Read sample
     fseek(f, 0L, SEEK_END);
-    const int sz = ftell(f);
+    sz = ftell(f);
     fseek(f, 0L, SEEK_SET);
-    void *buffer = malloc(sz);
-    int result = fread(buffer, sz, 1, f);
+    buffer = malloc(sz);
+    result = fread(buffer, sz, 1, f);
     fclose(f);
     if (result != 1) {
         fprintf(stderr, "Failed to read sample from file (%s)\n", path);
@@ -98,7 +105,7 @@ int mixer_load_sample_from_file(const char *path)
     }
 
     // Load sample from temporary buffer, to ensure that Web Audio API is used in Emscripten
-    SDL_RWops * const rw = SDL_RWFromMem(buffer, sz);
+    rw = SDL_RWFromMem(buffer, (int)sz);
     if (NULL == rw) {
         free(buffer);
         fprintf(stderr, "SDL_RWFromMem failed while loading audio file (%s): %s\n", path,
