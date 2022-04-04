@@ -8,16 +8,10 @@
 #include "entities.h"
 #include "highscores.h"
 #include "input.h"
-#include "level.h"
 #include "loop.h"
-#include "mathdefs.h"
-#include "options.h"
-#include "shape.h"
 #include "timing.h"
 #include "transition.h"
-#include "util.h"
 #include "vec.h"
-#include "video.h"
 
 #define NUM_ASTEROID_SHAPES 4
 #define NUM_ASTEROIDS 5

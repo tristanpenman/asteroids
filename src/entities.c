@@ -9,7 +9,6 @@
 #include "defines.h"
 #include "entities.h"
 #include "mathdefs.h"
-#include "shape.h"
 #include "util.h"
 
 extern const struct vec_2d origin;
@@ -38,7 +37,7 @@ void randomise_asteroid_position(struct asteroid *a)
 {
     float x;
     float y;
-    float dist = 0.0f;
+    float dist;
 
     do {
         x = random_float(0 - origin.x, origin.x);

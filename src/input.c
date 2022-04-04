@@ -108,7 +108,7 @@ bool input_map(int handle, enum input inp)
 void input_update()
 {
     SDL_Event event;
-    int i = 0;
+    int i;
 
     for (i = 0; i < num_handles; i++) {
         if (!last_active[i] && active[i]) {

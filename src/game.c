@@ -1,20 +1,12 @@
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "collision.h"
 #include "debug.h"
-#include "draw.h"
 #include "highscores.h"
 #include "loop.h"
 #include "mixer.h"
-#include "options.h"
 #include "sandbox.h"
 #include "titlescreen.h"
-#include "util.h"
-#include "vec.h"
-#include "video.h"
 
 #define MAX_SAMPLES 20
 

@@ -2,7 +2,6 @@
 #include "collision.h"
 #include "data.h"
 #include "input.h"
-#include "options.h"
 #include "sandbox.h"
 #include "timing.h"
 #include "vec.h"
@@ -68,7 +67,7 @@ bool sandbox_init()
         return false;
     }
 
-    pos1.x = -0.2;
+    pos1.x = -0.2f;
     pos1.y = 0;
 
     pos2.x = 0;

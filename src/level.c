@@ -16,13 +16,11 @@
 #include "mathdefs.h"
 #include "mixer.h"
 #include "options.h"
-#include "shape.h"
 #include "timing.h"
 #include "titlescreen.h"
 #include "transition.h"
 #include "util.h"
 #include "vec.h"
-#include "video.h"
 
 // how close objects need to be before performing collision detection
 #define COLLISION_THRESHOLD 0.5f
@@ -63,7 +61,6 @@ static int input_thruster;
 // misc state
 static float beat_delay;
 static float beat_delay_limit;
-static float gameover_countdown;
 static float next_level_countdown;
 
 /******************************************************************************
@@ -72,7 +69,7 @@ static float next_level_countdown;
  *
  *****************************************************************************/
 
-static unsigned int num_asteroids_for_level(int level) {
+static unsigned int num_asteroids_for_level(unsigned int level) {
     switch (level) {
         case 1:
             return 4;
@@ -104,7 +101,7 @@ static void update_player(struct player *p, float factor)
             spin = 1;
         }
 
-        p->rot = wrap_angle(p->rot + SHIP_ROTATION_SPEED * factor * spin);
+        p->rot = wrap_angle(p->rot + SHIP_ROTATION_SPEED * factor * (float) spin);
 
         if (KS_DOWN == p->keys.up) {
             vel->x += sinf(rot) * SHIP_ACCELERATION * factor;
@@ -613,7 +610,6 @@ void level_init(unsigned int new_level, unsigned int new_lives, unsigned int new
     beat_delay = 0.0f;
     beat_delay_limit = 1.2f;
     next_level_countdown = NEXT_WAVE_DELAY;
-    gameover_countdown = GAMEOVER_COUNTDOWN;
     gameover = false;
     asteroids_hit = 0;
 

@@ -65,7 +65,7 @@ struct player
     bool reloading;
     enum player_state state;
     unsigned int score;
-    int lives;
+    unsigned int lives;
     float phase;
     float reload_delay;
     float death_delay;

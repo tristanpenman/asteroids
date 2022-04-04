@@ -1,6 +1,5 @@
 #include <errno.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "canvas.h"
@@ -10,7 +9,6 @@
 #include "loop.h"
 #include "options.h"
 #include "titlescreen.h"
-#include "video.h"
 
 #define HIGHSCORES_BUFFER_SIZE 100
 
@@ -20,8 +18,8 @@ static int input_return;
 
 void load_highscores()
 {
-    int current_entry = 0;
-    int result = 0;
+    int current_entry;
+    int result;
     char buffer[HIGHSCORES_BUFFER_SIZE];
     struct score *current_score;
     FILE *file;

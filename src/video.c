@@ -132,6 +132,19 @@ static int event_filter(void *userdata, SDL_Event *event)
 
 bool video_init(int width, int height, const char *title, bool fullscreen)
 {
+#ifdef __EMSCRIPTEN__
+    int client_width;
+    int client_height;
+#else
+    SDL_Rect rect;
+#endif
+    int inner_width;
+    int inner_height;
+    int new_width;
+    int new_height;
+    int flags;
+    int sdl_gl_doublebuffer;
+
     if (0 > SDL_InitSubSystem(SDL_INIT_VIDEO)) {
         fprintf(stderr, "SDL_InitSubSystem failed: %s\n", SDL_GetError());
         return false;
@@ -140,24 +153,23 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
     logical_width = width;
     logical_height = height;
 
-    int new_width = width;
-    int new_height = height;
+    new_width = width;
+    new_height = height;
 
 #ifdef __EMSCRIPTEN__
-    const int inner_width = EM_ASM_INT({
+    inner_width = EM_ASM_INT({
         return window.innerWidth;
     });
-    const int inner_height = EM_ASM_INT({
+    inner_height = EM_ASM_INT({
         return window.innerHeight;
     });
 #else
-    SDL_Rect rect;
     if (0 != SDL_GetDisplayUsableBounds(0, &rect)) {
         fprintf(stderr, "SDL_GetDisplayUsableBounds failed: %s\n", SDL_GetError());
         return false;
     }
-    const int inner_width = rect.w;
-    const int inner_height = rect.h;
+    inner_width = rect.w;
+    inner_height = rect.h;
 #endif
 
     debug_printf("client area = (%d, %d)\n", inner_width, inner_height);
@@ -167,7 +179,7 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
         new_height *= 2;
     }
 
-    int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+    flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
     if (fullscreen == true) {
         flags |= SDL_WINDOW_FULLSCREEN;
     }
@@ -189,10 +201,10 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
 #ifdef __EMSCRIPTEN__
     emscripten_set_element_css_size(EM_TARGET, new_width, new_height);
 
-    const int client_width = EM_ASM_INT({
+    client_width = EM_ASM_INT({
         return document.body.clientWidth;
     });
-    const int client_height = EM_ASM_INT({
+    client_height = EM_ASM_INT({
         return document.body.clientHeight;
     });
 
@@ -223,7 +235,7 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
         return false;
     }
 
-    int sdl_gl_doublebuffer = -1;
+    sdl_gl_doublebuffer = -1;
     if (0 > SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &sdl_gl_doublebuffer)) {
         fprintf(stderr, "SDL_GL_GetAttribute failed: %s\n", SDL_GetError());
         return false;
@@ -267,6 +279,15 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
 
 void video_clear()
 {
+#ifdef __EMSCRIPTEN__
+    int swap_interval;
+#else
+    GLfloat viewport_width;
+    GLfloat viewport_height;
+    GLfloat x;
+    GLfloat y;
+#endif
+
     const GLfloat ratio = (GLfloat)logical_height / (GLfloat)logical_width;
 
     SDL_GL_MakeCurrent(sdl_window, sdl_glcontext);
@@ -275,7 +296,7 @@ void video_clear()
     // Can't call SDL_GL_SetSwapInterval until we're in Emscripten's main loop, and even then,
     // calling it repeatedly will cause Emscripten to produce an excessive number of warning
     // messages about using requestAnimationFrame for the main loop.
-    const int swap_interval = SDL_GL_GetSwapInterval();
+    swap_interval = SDL_GL_GetSwapInterval();
     if (swap_interval != 0) {
         SDL_GL_SetSwapInterval(0);
     }
@@ -294,8 +315,6 @@ void video_clear()
     }
 
     // Calculate viewport size based aspect ratio
-    GLfloat viewport_width;
-    GLfloat viewport_height;
     if (canvas_width * ratio >= canvas_height) {
         viewport_width = (GLfloat) (canvas_height / ratio);
         viewport_height = (GLfloat) canvas_height;
@@ -319,8 +338,8 @@ void video_clear()
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Playable area
-    const GLfloat x = (canvas_width - viewport_width) / 2.f;
-    const GLfloat y = (canvas_height - viewport_height) / 2.f;
+    x = (canvas_width - viewport_width) / 2.f;
+    y = (canvas_height - viewport_height) / 2.f;
     glScissor((GLint) x, (GLint) y, (GLsizei) viewport_width, (GLsizei) viewport_height);
     glViewport((GLint) x, (GLint) y, (GLsizei) viewport_width, (GLsizei) viewport_height);
 #endif

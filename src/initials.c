@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <string.h>
 
 #include "canvas.h"
@@ -8,7 +7,6 @@
 #include "loop.h"
 #include "timing.h"
 #include "titlescreen.h"
-#include "video.h"
 
 static int current_initial;
 static char initials[4];
