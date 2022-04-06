@@ -146,7 +146,7 @@ void sandbox_loop(bool draw)
     if (draw) {
         canvas_start_drawing(true);
 
-        canvas_draw_line_segments(
+        canvas_draw_shape(
             asteroid_shape_ids[0],
             pos1,
             0,
@@ -159,7 +159,7 @@ void sandbox_loop(bool draw)
             canvas_set_colour(255.f, 255.f, 255.f);
         }
 
-        canvas_draw_line_segments(
+        canvas_draw_shape(
             collision ? box_shape_active_id : box_shape_id,
             pos2,
             0,

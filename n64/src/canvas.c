@@ -127,7 +127,7 @@ void canvas_set_colour(float r, float g, float b)
     primitive_color.b = b;
 }
 
-bool canvas_draw_line_segments(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
+bool canvas_draw_shape(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
 {
     Dynamic *transform = &transforms[num_transforms++];
 

@@ -301,7 +301,7 @@ static void level_draw()
     canvas_start_drawing(true);
 
     // draw player ship
-    canvas_draw_line_segments(player_frame_1_shape, player.pos, player.rot, vec_2d_unit);
+    canvas_draw_shape(player_frame_1_shape, player.pos, player.rot, vec_2d_unit);
 
     // draw asteroids
     for (i = 0; i < MAX_ASTEROIDS; i++) {
@@ -312,7 +312,7 @@ static void level_draw()
         scale.x = asteroids[i].scale;
         scale.y = asteroids[i].scale;
 
-        canvas_draw_line_segments(
+        canvas_draw_shape(
             asteroid_shapes[asteroids[i].shape],
             asteroids[i].pos,
             asteroids[i].rot,
@@ -322,7 +322,7 @@ static void level_draw()
     // draw bullets
     for (i = 0; i < MAX_BULLETS; i++) {
         if (bullets[i].visible) {
-            canvas_draw_line_segments(bullet_shape, bullets[i].pos, bullets[i].rot, vec_2d_unit);
+            canvas_draw_shape(bullet_shape, bullets[i].pos, bullets[i].rot, vec_2d_unit);
         }
     }
 
