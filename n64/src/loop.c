@@ -30,6 +30,7 @@ void set_main_loop(main_loop_fn_t new_main_loop)
 {
     assert(exit_loop != main_loop);
     assert(NULL != new_main_loop);
+
     main_loop = new_main_loop;
 }
 
@@ -47,6 +48,7 @@ void run_main_loop()
 void cancel_main_loop(int new_exit_code)
 {
     assert(exit_loop != main_loop);
+
     main_loop = exit_loop;
     exit_code = new_exit_code;
 }

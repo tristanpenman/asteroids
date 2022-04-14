@@ -10,6 +10,7 @@
 #include "rumble.h"
 #include "sandbox.h"
 #include "segment.h"
+#include "titlescreen.h"
 #include "vec.h"
 
 #define NUM_PI_MSGS 8
@@ -42,6 +43,14 @@ char* level()
     return "ok";
 }
 
+char* titlescreen()
+{
+    titlescreen_init();
+    set_main_loop(titlescreen_loop);
+
+    return "ok";
+}
+
 void mainproc()
 {
     nuGfxInit();
@@ -49,13 +58,15 @@ void mainproc()
     debug_init();
     debug_addcommand("sandbox", "Switch to sandbox mode", sandbox);
     debug_addcommand("level", "Switch to level mode", level);
+    debug_addcommand("titlescreen", "Switch to titlescreen", titlescreen);
     debug_printf("Starting...\n");
 
     input_init();
     rumble_init();
     audio_init();
 
-    level_init(INITIAL_LEVEL, INITIAL_LIVES, INITIAL_SCORE);
-    set_main_loop(level_loop);
+    titlescreen_init();
+    set_main_loop(titlescreen_loop);
+
     run_main_loop();
 }

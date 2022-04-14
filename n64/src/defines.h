@@ -34,4 +34,6 @@
 #define MAX_EXPLOSIONS 20
 #define MAX_EXPLOSION_SHARDS 10
 
+#define START_LEVEL_DELAY_MS 2000.0f
+
 #endif

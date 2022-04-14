@@ -2,7 +2,6 @@
 
 #include "canvas.h"
 #include "defines.h"
-#include "draw.h"
 #include "input.h"
 #include "level.h"
 #include "loop.h"
@@ -32,7 +31,7 @@ void transition_loop(bool draw)
 {
     uint32_t residual;
 
-    input_update();
+    // input_update();
 
     produce_simulation_time();
     residual = residual_simulation_time();
@@ -51,8 +50,8 @@ void transition_loop(bool draw)
     }
 
     canvas_start_drawing(true);
-    draw_score(score);
-    draw_lives(lives);
-    draw_level_title(level);
+    // draw_score(score);
+    // draw_lives(lives);
+    // draw_level_title(level);
     canvas_finish_drawing(true);
 }
