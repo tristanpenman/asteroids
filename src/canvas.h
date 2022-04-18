@@ -34,6 +34,11 @@ void canvas_set_colour(float r, float g, float b);
 bool canvas_draw_shape(int shape, struct vec_2d position, float rotation, struct vec_2d scale);
 
 /**
+ * Draw text
+ */
+void canvas_draw_text(const char *text, float, float y, float spacing, float scale);
+
+/**
  * Finish drawing shapes to the canvas
  */
 void canvas_finish_drawing(bool swap);

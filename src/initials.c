@@ -17,11 +17,9 @@ static int input_done;
 static int input_escape;
 static int input_letters[26];
 
-void initials_handle_input()
+static void handle_input()
 {
     int i;
-
-    input_update();
 
     if (input_triggered(input_escape)) {
         titlescreen_init();
@@ -35,7 +33,7 @@ void initials_handle_input()
                 continue;
             }
 
-            initials[current_initial] = i + 'A';
+            initials[current_initial] = (char)(i + 'A');
             reset_simulation_time();
             current_initial++;
             if (current_initial < 3) {
@@ -75,6 +73,8 @@ void initials_init(unsigned int new_score)
 {
     int i;
 
+    canvas_reset();
+
     input_reset();
 
     input_backspace = input_register();
@@ -100,7 +100,9 @@ void initials_init(unsigned int new_score)
 
 void initials_loop(bool draw)
 {
-    initials_handle_input();
+    input_update();
+
+    handle_input();
 
     produce_simulation_time();
     if (maybe_consume_simulation_time(500)) {

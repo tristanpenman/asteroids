@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -68,8 +67,8 @@ static float next_level_countdown;
  *
  *****************************************************************************/
 
-static int num_asteroids_for_level(int level) {
-    switch (level) {
+static int num_asteroids_for_level(int next_level) {
+    switch (next_level) {
         case 1:
             return 4;
         case 2:

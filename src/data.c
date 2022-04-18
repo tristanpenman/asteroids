@@ -16,7 +16,8 @@ static const float asteroid1_vertices[] = {
      .04f,  .02f,
      .00f,  .04f,
     -.04f,  .02f,
-    -.04f, -.02f
+    -.04f, -.02f,
+    -.02f, -.04f
 };
 
 // ----------------------------------------------------------------------------
@@ -36,7 +37,8 @@ static const float asteroid2_vertices[] = {
     -.02f,  .04f,
     -.04f,  .02f,
     -.03f,  .00f,
-    -.04f, -.02f
+    -.04f, -.02f,
+    -.02f, -.04f
 };
 
 // ----------------------------------------------------------------------------
@@ -55,7 +57,8 @@ static const float asteroid3_vertices[] = {
     -.02f,  .04f,
     -.04f,  .01f,
     -.02f,  .00f,
-    -.04f, -.01f
+    -.04f, -.01f,
+    -.01f, -.04f
 };
 
 // ----------------------------------------------------------------------------
@@ -75,7 +78,8 @@ static const float asteroid4_vertices[] = {
     -.02f,  .04f,
     -.04f,  .01f,
     -.04f, -.01f,
-    -.01f, -.02f
+    -.01f, -.02f,
+    -.02f, -.04f
 };
 
 // ----------------------------------------------------------------------------
@@ -196,124 +200,626 @@ const struct shape player_shape_data[] = {
 //
 // Font
 //
+// TODO: Use a common set of vertices, with different line segments
+//
 
-const float
-    _a[] = { 7.0f, .00f,  .06f, .00f,  .02f,  .015f, .00f, .03f,  .02f, .03f,  .06f, .03f, .03f, .00f, .03f},
-    _b[] = {12.0f, .00f,  .06f, .00f,  .00f,  .02f,  .00f, .03f,  .01f, .03f,  .02f, .02f, .03f, .00f, .03f,  .02f, .03f, .03f, .04f, .03f, .05f, .02f, .06f, .00f, .06f},
-    _c[] = { 6.0f, .03f,  .00f, .01f,  .00f,  .00f,  .01f, .00f,  .05f, .01f,  .06f, .03f, .06f},
-    _d[] = { 7.0f, .00f,  .00f, .02f,  .00f,  .03f,  .01f, .03f,  .05f, .02f,  .06f, .00f, .06f, .00f, .00f},
-    _e[] = { 7.0f, .03f,  .00f, .00f,  .00f,  .00f,  .03f, .02f,  .03f, .00f,  .03f, .00f, .06f, .03f, .06f},
-    _f[] = { 6.0f, .03f,  .00f, .00f,  .00f,  .00f,  .03f, .02f,  .03f, .00f,  .03f, .00f, .06f},
-    _g[] = {10.0f, .03f,  .01f, .02f,  .00f,  .01f,  .00f, .00f,  .01f, .00f,  .05f, .01f, .06f, .02f, .06f,  .03f, .05f, .03f, .04f, .02f, .04f},
-    _h[] = { 6.0f, .00f,  .00f, .00f,  .06f,  .00f,  .03f, .03f,  .03f, .03f,  .00f, .03f, .06f},
-    _i[] = { 6.0f, .00f,  .00f, .03f,  .00f,  .015f, .00f, .015f, .06f, .00f,  .06f, .03f, .06f},
-    _j[] = { 5.0f, .01f,  .00f, .03f,  .00f,  .03f,  .06f, .01f,  .06f, .00f,  .05f},
-    _k[] = { 6.0f, .00f,  .00f, .00f,  .06f,  .00f,  .03f, .03f,  .00f, .00f,  .03f, .03f, .06f},
-    _l[] = { 3.0f, .00f,  .00f, .00f,  .06f,  .03f,  .06f},
-    _m[] = { 5.0f, .00f,  .06f, .00f,  .00f,  .015f, .02f, .03f,  .00f, .03f,  .06f},
-    _n[] = { 4.0f, .00f,  .06f, .00f,  .00f,  .03f,  .06f, .03f,  .00f},
-    _o[] = { 5.0f, .00f,  .00f, .03f,  .00f,  .03f,  .06f, .00f,  .06f, .00f,  .00f},
-    _p[] = { 5.0f, .00f,  .06f, .00f,  .00f,  .03f,  .00f, .03f,  .03f, .00f,  .03f},
-    _q[] = { 9.0f, .02f,  .05f, .025f, .055f, .02f,  .06f, .00f,  .06f, .00f,  .00f, .03f, .00f, .03f, .05f, .025f, .055f, .03f, .06f},
-    _r[] = { 7.0f, .00f,  .06f, .00f,  .00f,  .03f,  .00f, .03f,  .03f, .00f,  .03f, .01f, .03f, .03f, .06f},
-    _s[] = { 6.0f, .03f,  .00f, .00f,  .00f,  .00f,  .03f, .03f,  .03f, .03f,  .06f, .00f, .06f},
-    _t[] = { 4.0f, .00f,  .00f, .03f,  .00f,  .015f, .00f, .015f, .06f},
-    _u[] = { 4.0f, .00f,  .00f, .00f,  .06f,  .03f,  .06f, .03f,  .00f},
-    _v[] = { 3.0f, .00f,  .00f, .015f, .06f,  .03f,  .00f},
-    _w[] = { 5.0f, .00f,  .00f, .00f,  .06f,  .015f, .04f, .03f,  .06f, .03f,  .00f},
-    _x[] = { 5.0f, .00f,  .00f, .03f,  .06f,  .015f, .03f, .03f,  .00f, .00f,  .06f},
-    _y[] = { 5.0f, .00f,  .00f, .015f, .03f,  .03f,  .00f, .015f, .03f, .015f, .06f},
-    _z[] = { 4.0f, .00f,  .00f, .03f,  .00f,  .00f,  .06f, .03f,  .06f},
-    _0[] = { 6.0f, .00f,  .00f, .03f,  .00f,  .03f,  .06f, .00f,  .06f, .00f,  .00f, .03f, .06f},
-    _1[] = { 2.0f, .015f, .00f, .015f, .06f},
-    _2[] = { 6.0f, .00f,  .00f, .03f,  .00f,  .03f,  .03f, .00f,  .03f, .00f,  .06f, .03f, .06f},
-    _3[] = { 7.0f, .00f,  .00f, .03f,  .00f,  .03f,  .03f, .00f,  .03f, .03f,  .03f, .03f, .06f, .00f, .06f},
-    _4[] = { 5.0f, .00f,  .00f, .00f,  .03f,  .03f,  .03f, .03f,  .00f, .03f,  .06f},
-    _5[] = { 6.0f, .03f,  .00f, .00f,  .00f,  .00f,  .03f, .03f,  .03f, .03f,  .06f, .00f, .06f},
-    _6[] = { 7.0f, .03f,  .00f, .01f,  .00f,  .00f,  .01f, .00f,  .06f, .03f,  .06f, .03f, .03f, .00f, .03f},
-    _7[] = { 3.0f, .00f,  .00f, .03f,  .00f,  .03f,  .06f},
-    _8[] = { 8.0f, .00f,  .03f, .00f,  .00f,  .03f,  .00f, .03f,  .03f, .00f,  .03f, .00f, .06f, .03f, .06f,  .03f, .03f},
-    _9[] = { 6.0f, .03f,  .06f, .03f,  .03f,  .00f,  .03f, .00f,  .00f, .03f,  .00f, .03f, .03f},
-    __[] = { 2.0f, .00f,  .06f, .03f,  .06f},
-
-    _minus[] = { 2.0f, .00f, .03f, .03f, .03f};
-
-const float *font[256] = {
-
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   /* 00 - 0F */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   /* 10 - 1F */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,            /* 20 - 2C */
-
-    _minus, 0, 0,           /* 2D - 2F */
-
-    _0,     /* 30 */
-    _1,     /* 31 */
-    _2,     /* 32 */
-    _3,     /* 33 */
-    _4,     /* 34 */
-    _5,     /* 35 */
-    _6,     /* 36 */
-    _7,     /* 37 */
-    _8,     /* 38 */
-    _9,     /* 39 */
-
-    0, 0, 0, 0, 0, 0, 0,    /* 3A - 40 */
-
-    _a,     /* 41 */
-    _b,     /* 42 */
-    _c,     /* 43 */
-    _d,     /* 44 */
-    _e,     /* 45 */
-    _f,     /* 46 */
-    _g,     /* 47 */
-    _h,     /* 48 */
-    _i,     /* 49 */
-    _j,     /* 4A */
-    _k,     /* 4B */
-    _l,     /* 4C */
-    _m,     /* 4D */
-    _n,     /* 4E */
-    _o,     /* 4F */
-    _p,     /* 50 */
-    _q,     /* 51 */
-    _r,     /* 52 */
-    _s,     /* 53 */
-    _t,     /* 54 */
-    _u,     /* 55 */
-    _v,     /* 56 */
-    _w,     /* 57 */
-    _x,     /* 58 */
-    _y,     /* 59 */
-    _z,     /* 5A */
-
-    0, 0, 0, 0, __, 0, 0,   /* 5B - 60 */
-
-    _a,     /* 61 */
-    _b,     /* 62 */
-    _c,     /* 63 */
-    _d,     /* 64 */
-    _e,     /* 65 */
-    _f,     /* 66 */
-    _g,     /* 67 */
-    _h,     /* 68 */
-    _i,     /* 69 */
-    _j,     /* 6A */
-    _k,     /* 6B */
-    _l,     /* 6C */
-    _m,     /* 6D */
-    _n,     /* 6E */
-    _o,     /* 6F */
-    _p,     /* 70 */
-    _q,     /* 71 */
-    _r,     /* 72 */
-    _s,     /* 73 */
-    _t,     /* 74 */
-    _u,     /* 75 */
-    _v,     /* 76 */
-    _w,     /* 77 */
-    _x,     /* 78 */
-    _y,     /* 79 */
-    _z      /* 7A */
-
+static const float font_a_vertices[] = {
+    .00f,  .06f,
+    .00f,  .02f,
+    .015f, .00f,
+    .03f,  .02f,
+    .03f,  .06f,
+    .03f,  .03f,
+    .00f,  .03f
 };
 
+static const float font_b_vertices[] = {
+    .00f, .06f,
+    .00f, .00f,
+    .02f, .00f,
+    .03f, .01f,
+    .03f, .02f,
+    .02f, .03f,
+    .00f, .03f,
+    .02f, .03f,
+    .03f, .04f,
+    .03f, .05f,
+    .02f, .06f,
+    .00f, .06f
+};
+
+static const float font_c_vertices[] = {
+    .03f, .00f,
+    .01f, .00f,
+    .00f, .01f,
+    .00f, .05f,
+    .01f, .06f,
+    .03f, .06f
+};
+
+static const float font_d_vertices[] = {
+    .00f, .00f,
+    .02f, .00f,
+    .03f, .01f,
+    .03f, .05f,
+    .02f, .06f,
+    .00f, .06f,
+    .00f, .00f
+};
+
+static const float font_e_vertices[] = {
+    .03f, .00f,
+    .00f, .00f,
+    .00f, .03f,
+    .02f, .03f,
+    .00f, .03f,
+    .00f, .06f,
+    .03f, .06f
+};
+
+static const float font_f_vertices[] = {
+    .03f, .00f,
+    .00f, .00f,
+    .00f, .03f,
+    .02f, .03f,
+    .00f, .03f,
+    .00f, .06f
+};
+
+static const float font_g_vertices[] = {
+    .03f, .01f,
+    .02f, .00f,
+    .01f, .00f,
+    .00f, .01f,
+    .00f, .05f,
+    .01f, .06f,
+    .02f, .06f,
+    .03f, .05f,
+    .03f, .04f,
+    .02f, .04f
+};
+
+static const float font_h_vertices[] = {
+    .00f, .00f,
+    .00f, .06f,
+    .00f, .03f,
+    .03f, .03f,
+    .03f, .00f,
+    .03f, .06f
+};
+
+static const float font_i_vertices[] = {
+    .00f,  .00f,
+    .03f,  .00f,
+    .015f, .00f,
+    .015f, .06f,
+    .00f,  .06f,
+    .03f,  .06f
+};
+
+static const float font_j_vertices[] = {
+    .01f, .00f,
+    .03f, .00f,
+    .03f, .06f,
+    .01f, .06f,
+    .00f, .05f
+};
+
+static const float font_k_vertices[] = {
+    .00f, .00f,
+    .00f, .06f,
+    .00f, .03f,
+    .03f, .00f,
+    .00f, .03f,
+    .03f, .06f
+};
+
+static const float font_l_vertices[] = {
+    .00f, .00f,
+    .00f, .06f,
+    .03f, .06f
+};
+
+static const float font_m_vertices[] = {
+    .00f,  .06f,
+    .00f,  .00f,
+    .015f, .02f,
+    .03f,  .00f,
+    .03f,  .06f
+};
+
+static const float font_n_vertices[] = {
+    .00f, .06f,
+    .00f, .00f,
+    .03f, .06f,
+    .03f, .00f
+};
+
+static const float font_o_vertices[] = {
+    .00f, .00f,
+    .03f, .00f,
+    .03f, .06f,
+    .00f, .06f,
+    .00f, .00f
+};
+
+static const float font_p_vertices[] = {
+    .00f, .06f,
+    .00f, .00f,
+    .03f, .00f,
+    .03f, .03f,
+    .00f, .03f
+};
+
+static const float font_q_vertices[] = {
+    .02f,  .05f,
+    .025f, .055f,
+    .02f,  .06f,
+    .00f,  .06f,
+    .00f,  .00f,
+    .03f,  .00f,
+    .03f,  .05f,
+    .025f, .055f,
+    .03f,  .06f
+};
+
+static const float font_r_vertices[] = {
+    .00f, .06f,
+    .00f, .00f,
+    .03f, .00f,
+    .03f, .03f,
+    .00f, .03f,
+    .01f, .03f,
+    .03f, .06f
+};
+
+static const float font_s_vertices[] = {
+    .03f, .00f,
+    .00f, .00f,
+    .00f, .03f,
+    .03f, .03f,
+    .03f, .06f,
+    .00f, .06f
+};
+
+static const float font_t_vertices[] = {
+    .00f,  .00f,
+    .03f,  .00f,
+    .015f, .00f,
+    .015f, .06f
+};
+
+static const float font_u_vertices[] = {
+    .00f, .00f,
+    .00f, .06f,
+    .03f, .06f,
+    .03f, .00f
+};
+
+static const float font_v_vertices[] = {
+    .00f,  .00f,
+    .015f, .06f,
+    .03f,  .00f
+};
+
+static const float font_w_vertices[] = {
+    .00f,  .00f,
+    .00f,  .06f,
+    .015f, .04f,
+    .03f,  .06f,
+    .03f,  .00f
+};
+
+static const float font_x_vertices[] = {
+    .00f,  .00f,
+    .03f,  .06f,
+    .015f, .03f,
+    .03f,  .00f,
+    .00f,  .06f
+};
+
+static const float font_y_vertices[] = {
+    .00f,  .00f,
+    .015f, .03f,
+    .03f,  .00f,
+    .015f, .03f,
+    .015f, .06f
+};
+
+static const float font_z_vertices[] = {
+    .00f, .00f,
+    .03f, .00f,
+    .00f, .06f,
+    .03f, .06f
+};
+
+static const float font_0_vertices[] = {
+    .00f, .00f,
+    .03f, .00f,
+    .03f, .06f,
+    .00f, .06f,
+    .00f, .00f,
+    .03f, .06f
+};
+
+static const float font_1_vertices[] = {
+    .015f, .00f,
+    .015f, .06f
+};
+
+static const float font_2_vertices[] = {
+    .00f, .00f,
+    .03f, .00f,
+    .03f, .03f,
+    .00f, .03f,
+    .00f, .06f,
+    .03f, .06f
+};
+
+static const float font_3_vertices[] = {
+    .00f, .00f,
+    .03f, .00f,
+    .03f, .03f,
+    .00f, .03f,
+    .03f, .03f,
+    .03f, .06f,
+    .00f, .06f
+};
+
+static const float font_4_vertices[] = {
+    .00f, .00f,
+    .00f, .03f,
+    .03f, .03f,
+    .03f, .00f,
+    .03f, .06f
+};
+
+static const float font_5_vertices[] = {
+    .03f, .00f,
+    .00f, .00f,
+    .00f, .03f,
+    .03f, .03f,
+    .03f, .06f,
+    .00f, .06f
+};
+
+static const float font_6_vertices[] = {
+    .03f, .00f,
+    .01f, .00f,
+    .00f, .01f,
+    .00f, .06f,
+    .03f, .06f,
+    .03f, .03f,
+    .00f, .03f
+};
+
+static const float font_7_vertices[] = {
+    .00f, .00f,
+    .03f, .00f,
+    .03f, .06f
+};
+
+static const float font_8_vertices[] = {
+    .00f, .03f,
+    .00f, .00f,
+    .03f, .00f,
+    .03f, .03f,
+    .00f, .03f,
+    .00f, .06f,
+    .03f, .06f,
+    .03f, .03f
+};
+
+static const float font_9_vertices[] = {
+    .03f, .06f,
+    .03f, .03f,
+    .00f, .03f,
+    .00f, .00f,
+    .03f, .00f,
+    .03f, .03f
+};
+
+static const float font_underscore_vertices[] = {
+    .00f, .06f,
+    .03f, .06f
+};
+
+static const float font_minus_vertices[] = {
+    .00f, .03f,
+    .03f, .03f
+};
+
+const struct shape font_shape_data[] = {
+    {
+        font_a_vertices,
+        sizeof(font_a_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_b_vertices,
+        sizeof(font_b_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_c_vertices,
+        sizeof(font_c_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_d_vertices,
+        sizeof(font_d_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_e_vertices,
+        sizeof(font_e_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_f_vertices,
+        sizeof(font_f_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_g_vertices,
+        sizeof(font_g_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_h_vertices,
+        sizeof(font_h_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_i_vertices,
+        sizeof(font_i_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_j_vertices,
+        sizeof(font_j_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_k_vertices,
+        sizeof(font_k_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_l_vertices,
+        sizeof(font_l_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_m_vertices,
+        sizeof(font_m_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_n_vertices,
+        sizeof(font_n_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_o_vertices,
+        sizeof(font_o_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_p_vertices,
+        sizeof(font_p_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_q_vertices,
+        sizeof(font_q_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_r_vertices,
+        sizeof(font_r_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_s_vertices,
+        sizeof(font_s_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_t_vertices,
+        sizeof(font_t_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_u_vertices,
+        sizeof(font_u_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_v_vertices,
+        sizeof(font_v_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_w_vertices,
+        sizeof(font_w_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_x_vertices,
+        sizeof(font_x_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_y_vertices,
+        sizeof(font_y_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_z_vertices,
+        sizeof(font_z_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_0_vertices,
+        sizeof(font_0_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_1_vertices,
+        sizeof(font_1_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_2_vertices,
+        sizeof(font_2_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_3_vertices,
+        sizeof(font_3_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_4_vertices,
+        sizeof(font_4_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_5_vertices,
+        sizeof(font_5_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_6_vertices,
+        sizeof(font_6_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_7_vertices,
+        sizeof(font_7_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_8_vertices,
+        sizeof(font_8_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_9_vertices,
+        sizeof(font_9_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_underscore_vertices,
+        sizeof(font_underscore_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }, {
+        font_minus_vertices,
+        sizeof(font_minus_vertices) / sizeof(float) / 2,
+        NULL,
+        0
+    }
+};
+
+const uint8_t font_glyph_count = sizeof(font_shape_data) / sizeof(struct shape);
+
+const int8_t ascii_to_font_mapping[128] = {
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,   // 00 - 2C
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,   // 10 - 1F
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,               // 20 - 2C
+
+    37,     // 2D (minus)
+
+    -1,     // 2E
+    -1,     // 2F
+
+    26,     // 30 (0)
+    27,     // 31 (1)
+    28,     // 32 (2)
+    29,     // 33 (3)
+    30,     // 34 (4)
+    31,     // 35 (5)
+    32,     // 36 (6)
+    33,     // 37 (7)
+    34,     // 38 (8)
+    35,     // 39 (9)
+
+    -1,     // 3A
+    -1,     // 3B
+    -1,     // 3C
+    -1,     // 3D
+    -1,     // 3E
+    -1,     // 3F
+    -1,     // 40
+
+    0,      // 41 (A)
+    1,      // 42 (B)
+    2,      // 43 (C)
+    3,      // 44 (D)
+    4,      // 45 (E)
+    5,      // 46 (F)
+    6,      // 47 (G)
+    7,      // 48 (H)
+    8,      // 49 (I)
+    9,      // 4A (J)
+    10,     // 4B (K)
+    11,     // 4C (L)
+    12,     // 4D (M)
+    13,     // 4E (N)
+    14,     // 4F (O)
+    15,     // 50 (P)
+    16,     // 51 (Q)
+    17,     // 52 (R)
+    18,     // 53 (S)
+    19,     // 54 (T)
+    20,     // 55 (U)
+    21,     // 56 (V)
+    22,     // 57 (W)
+    23,     // 58 (X)
+    24,     // 59 (Y)
+    25,     // 5A (Z)
+
+    -1,     // 5B
+    -1,     // 5C
+    -1,     // 5D
+    -1,     // 5E
+
+    36,     // 5F (underscore)
+
+    -1,     // 60
+
+    0,      // 61 (a)
+    1,      // 62 (b)
+    2,      // 63 (c)
+    3,      // 64 (d)
+    4,      // 65 (e)
+    5,      // 66 (f)
+    6,      // 67 (g)
+    7,      // 68 (h)
+    8,      // 69 (i)
+    9,      // 6A (j)
+    10,     // 6B (k)
+    11,     // 6C (l)
+    12,     // 6D (m)
+    13,     // 6E (n)
+    14,     // 6F (o)
+    15,     // 70 (p)
+    16,     // 71 (q)
+    17,     // 72 (r)
+    18,     // 73 (s)
+    19,     // 74 (t)
+    20,     // 75 (u)
+    21,     // 76 (v)
+    22,     // 77 (w)
+    23,     // 78 (x)
+    24,     // 79 (y)
+    25      // 7A (z)
+
+    -1,     // 7B
+    -1,     // 7C
+    -1,     // 7D
+    -1,     // 7E
+    -1,     // 7F
+};

@@ -3,6 +3,7 @@
 #include "collision.h"
 #include "debug.h"
 #include "highscores.h"
+#include "initials.h"
 #include "loop.h"
 #include "mixer.h"
 #include "sandbox.h"

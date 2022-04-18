@@ -7,21 +7,19 @@
 
 #include <SDL_opengl.h>
 
+#include "canvas.h"
 #include "entities.h"
 #include "highscores.h"
 #include "mathdefs.h"
 #include "options.h"
-#include "shape.h"
 #include "vec.h"
 
 #define RAD_TO_DEG (180.0 / M_PI)
 
-extern float pixel_density;
-extern struct shape asteroid_shapes[];
-extern GLfloat *font[];
-
-const struct vec_2d origin = {1.0f / 2.0f,
-    ((GLfloat)LOGICAL_HEIGHT_PX / (GLfloat)LOGICAL_WIDTH_PX) / 2.0f};
+const struct vec_2d origin = {
+    1.0f / 2.0f,
+    ((GLfloat)LOGICAL_HEIGHT_PX / (GLfloat)LOGICAL_WIDTH_PX) / 2.0f
+};
 
 /******************************************************************************
  *
@@ -32,23 +30,6 @@ const struct vec_2d origin = {1.0f / 2.0f,
 void glVertex_2f(float x, float y)
 {
     glVertex3f(x, y, 0.f);
-}
-
-static void draw_colon()
-{
-    glBegin(GL_LINE_LOOP);
-    glVertex_2f(.0125f, .0125f);
-    glVertex_2f(.0175f, .0125f);
-    glVertex_2f(.0175f, .0175f);
-    glVertex_2f(.0125f, .0175f);
-    glEnd();
-
-    glBegin(GL_LINE_LOOP);
-    glVertex_2f(.0125f, .0425f);
-    glVertex_2f(.0175f, .0425f);
-    glVertex_2f(.0175f, .0475f);
-    glVertex_2f(.0125f, .0475f);
-    glEnd();
 }
 
 static void draw_ship(float c)
@@ -103,41 +84,7 @@ static void draw_ship_explosion(const struct player *p)
 
 static void draw_text_ex(const char *s, GLfloat size, GLfloat x, GLfloat y, float spacing)
 {
-    const GLfloat *g = NULL;
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glColor3f(1.0f, 1.0f, 1.0f);
-
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glTranslatef(x, y, 0.0f);
-
-    x = 0.0f;
-
-    while (*s) {
-        glPushMatrix();
-        glScalef(size, size, 1.0f);
-        glTranslatef(x, 0.0f, 0.0f);
-
-        if (*s == ':') {
-            draw_colon();
-        } else {
-            g = font[(int) *s];  // First element of each glyph is vertex count
-            if (NULL != g) {
-                glVertexPointer(2, GL_FLOAT, 0, g + 1);
-                glDrawArrays(GL_LINE_STRIP, 0, (GLsizei) g[0]);
-            }
-        }
-
-        glPopMatrix();
-
-        x += FONT_WIDTH;
-        x += spacing;
-        s++;
-    }
-
-    glPopMatrix();
-    glDisableClientState(GL_VERTEX_ARRAY);
+    canvas_draw_text(s, x, y, spacing, size);
 }
 
 static void draw_text(const char *s, GLfloat size, GLfloat x, GLfloat y)
@@ -149,7 +96,7 @@ static void draw_text_centered_ex(const char *s, GLfloat size, GLfloat y, float 
 {
     const GLfloat width = ((GLfloat) strlen(s) * (FONT_WIDTH + spacing)) - spacing;
 
-    draw_text_ex(s, size, (1.0f / 2.0f) - (width * size / 2.0f), y, spacing);
+    draw_text_ex(s, size, 0 - (width * size / 2.0f), y, spacing);
 }
 
 static void draw_text_centered(const char *s, GLfloat size, GLfloat y)
@@ -185,12 +132,11 @@ void draw_bullets(const struct bullet *bb, unsigned int n)
 
 void draw_explosions(const struct explosion *ee, unsigned int n)
 {
-    unsigned int i = 0;
-    unsigned int p = 0;
+    unsigned int i;
+    unsigned int p;
     float a;
     for (i = 0; i < n; i++, ee++) {
         if (ee->visible == true) {
-            //glPointSize(pixel_density);
             glMatrixMode(GL_MODELVIEW);
             glPushMatrix();
             glTranslatef((GLfloat)(origin.x + ee->pos.x), (GLfloat)(origin.y + ee->pos.y), 0.0f);
@@ -198,7 +144,7 @@ void draw_explosions(const struct explosion *ee, unsigned int n)
             glColor3f(1.0f, 1.0f, 1.0f);
             glBegin(GL_POINTS);
             for (p = 0; p < EXPLOSION_PARTICLES; p++) {
-                a = ((2 * M_PI) / (float) EXPLOSION_PARTICLES) * (float) p;
+                a = (float)(2 * M_PI) / (float) EXPLOSION_PARTICLES * (float) p;
                 glVertex_2f((GLfloat)(sinf(a) * ee->time), (GLfloat)(0 - cosf(a) * ee->time));
             }
             glEnd();
@@ -212,7 +158,7 @@ void draw_highscores(const struct highscores *scores)
     int i;
     char str[100];
 
-    draw_text_centered("HIGH SCORES", 0.39f, 0.12f);
+    draw_text_centered("HIGH SCORES", 0.39f, -0.21f);
 
     for (i = 0; i < 10; i++) {
         if (scores->entries[i].used) {
@@ -220,21 +166,21 @@ void draw_highscores(const struct highscores *scores)
         } else {
             sprintf(str, "%2d   ---          - ", i + 1);
         }
-        draw_text_centered(str, 0.24f, 0.21f + 0.03f * (float) i);
+        draw_text_centered(str, 0.24f, -0.14f + 0.03f * (float) i);
     }
 
-    draw_text_centered("PRESS ENTER FOR MAIN MENU", 0.24f, 0.59f);
+    draw_text_centered("PRESS ENTER FOR MAIN MENU", 0.24f, 0.26f);
 }
 
 void draw_instructions()
 {
-    draw_text_centered("PRESS ENTER TO PLAY", 0.3f, 0.30f);
-    draw_text_centered("SPACE - FIRE", 0.20f, 0.385f);
-    draw_text_centered("ARROWS - DIRECTION", 0.20f, .415f);
-    draw_text_centered("UP - THRUSTER", 0.20f, .445f);
+    draw_text_centered("PRESS ENTER TO PLAY", 0.3f, -0.07f);
+    draw_text_centered("SPACE - FIRE", 0.20f, 0.025f);
+    draw_text_centered("ARROWS - DIRECTION", 0.20f, 0.055f);
+    draw_text_centered("UP - THRUSTER", 0.20f, 0.085f);
 #ifndef __EMSCRIPTEN__
-    draw_text_centered("ESC - EXIT", 0.20f, .475f);
-    draw_text_centered("PRESS H FOR HIGH SCORES", 0.24f, 0.555f);
+    draw_text_centered("ESC - EXIT", 0.20f, 0.115f);
+    draw_text_centered("PRESS H FOR HIGH SCORES", 0.24f, 0.20f);
 #endif
 }
 
@@ -242,7 +188,7 @@ void draw_level_title(unsigned int level)
 {
     char titlecard[100];
     snprintf(titlecard, 100, "LEVEL %u", level);
-    draw_text_centered(titlecard, 0.35f, .30f);
+    draw_text_centered(titlecard, 0.35f, -0.05f);
 }
 
 void draw_lives(unsigned int lives)
@@ -262,19 +208,19 @@ void draw_lives(unsigned int lives)
 
 void draw_new_high_score_input(const char initials[4])
 {
-    draw_text_centered_ex(initials, 0.38f, 0.38f, FONT_SPACE * 10.f);
+    draw_text_centered_ex(initials, 0.38f, 0, FONT_SPACE * 10.f);
 }
 
 void draw_new_high_score_message()
 {
-    draw_text_centered("YOUR SCORE IS ONE OF THE TEN BEST", 0.25f, 0.25f);
-    draw_text_centered("PLEASE ENTER YOUR INITIALS", 0.25f, 0.285f);
+    draw_text_centered("YOUR SCORE IS ONE OF THE TEN BEST", 0.25f, -0.13f);
+    draw_text_centered("PLEASE ENTER YOUR INITIALS", 0.25f, -0.095f);
 }
 
 void draw_new_high_score_enter_to_continue()
 {
-    draw_text_centered("PRESS ENTER TO CONTINUE", 0.25f, 0.5f);
-    draw_text_centered("OR BACKSPACE TO MAKE CHANGES", 0.25f, 0.535f);
+    draw_text_centered("PRESS ENTER TO CONTINUE", 0.25f, 0.12f);
+    draw_text_centered("OR BACKSPACE TO MAKE CHANGES", 0.25f, 0.155f);
 }
 
 void draw_player_exploding(const struct player *p)
@@ -299,10 +245,10 @@ void draw_score(unsigned int score)
         snprintf(buffer, SCORE_BUFFER_SIZE, "ERROR");
     }
 
-    draw_text(buffer, 0.35f, 0.025f, 0.008f);
+    draw_text(buffer, 0.35f, -0.475f, -0.365f);
 }
 
 void draw_title()
 {
-    draw_text_centered("ASTEROIDS", 0.8f, 0.17f);
+    draw_text_centered("ASTEROIDS", 0.8f, -0.20f);
 }
