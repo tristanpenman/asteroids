@@ -8,9 +8,9 @@
 #include "loop.h"
 #include "timing.h"
 
-static unsigned int level = 1;
-static unsigned int lives = 3;
-static unsigned int score = 0;
+static int level = 1;
+static int lives = 3;
+static int score = 0;
 
 static float elapsed = 0.f;
 
@@ -20,7 +20,7 @@ static float elapsed = 0.f;
  *
  *****************************************************************************/
 
-void transition_init(unsigned int next_level, unsigned int next_lives, unsigned int next_score)
+void transition_init(int next_level, int next_lives, int next_score)
 {
     level = next_level;
     lives = next_lives;

@@ -34,10 +34,9 @@ extern int thruster_channel;
 
 // level state
 static unsigned int asteroids_hit;
-static bool gameover;
-static unsigned int level;
-static unsigned int next_beat;
-static unsigned int starting_asteroids;
+static int level;
+static int next_beat;
+static int starting_asteroids;
 
 // entities
 static struct asteroid asteroids[MAX_ASTEROIDS];
@@ -69,7 +68,7 @@ static float next_level_countdown;
  *
  *****************************************************************************/
 
-static unsigned int num_asteroids_for_level(unsigned int level) {
+static int num_asteroids_for_level(int level) {
     switch (level) {
         case 1:
             return 4;
@@ -574,7 +573,7 @@ static void level_update()
             next_level_countdown -= factor;
         } else {
             beat_delay += factor;
-            beat_delay_limit = 1.2f - 0.6f * ((float)asteroids_hit / (float)(starting_asteroids * 5.f));
+            beat_delay_limit = 1.2f - 0.6f * ((float)asteroids_hit / ((float)starting_asteroids * 5.f));
 
             if (beat_delay >= beat_delay_limit) {
                 if (next_beat == 0) {
@@ -603,14 +602,13 @@ static void level_update()
  *
  *****************************************************************************/
 
-void level_init(unsigned int new_level, unsigned int new_lives, unsigned int new_score)
+void level_init(int new_level, int new_lives, int new_score)
 {
     level = new_level;
     next_beat = 0;
     beat_delay = 0.0f;
     beat_delay_limit = 1.2f;
     next_level_countdown = NEXT_WAVE_DELAY;
-    gameover = false;
     asteroids_hit = 0;
 
     input_reset();
