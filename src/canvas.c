@@ -9,8 +9,8 @@
 
 #include "canvas.h"
 #include "data.h"
+#include "defines.h"
 #include "mathdefs.h"
-#include "options.h"
 #include "shape.h"
 #include "vec.h"
 #include "video.h"
