@@ -34,6 +34,11 @@
 #define MAX_EXPLOSIONS 20
 #define MAX_EXPLOSION_SHARDS 10
 
+// font
+#define FONT_WIDTH 0.04f
+#define FONT_SPACE 0.0025f
+
+// general
 #define START_LEVEL_DELAY_MS 2000.0f
 
 #endif

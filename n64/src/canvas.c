@@ -5,6 +5,7 @@
 #include <nusys.h>
 
 #include "canvas.h"
+#include "data.h"
 #include "defines.h"
 #include "gfx.h"
 #include "shape.h"
@@ -12,7 +13,8 @@
 
 #define MAX_TRANSFORMS 30
 #define MAX_SHAPES 64
-#define MAX_VERTICES 100
+#define MAX_VERTICES 128
+#define MAX_GLYPHS 128
 
 #define RAD_TO_DEG (180.0 / M_PI)
 
@@ -42,8 +44,16 @@ static int num_transforms = 0;
 
 static struct color primitive_color;
 
+static int font_shape_ids[MAX_GLYPHS];
+
 void canvas_reset()
 {
+    int i = 0;
+
+    for (i = 0; i < MAX_GLYPHS; i++) {
+        font_shape_ids[i] = CANVAS_INVALID_SHAPE;
+    }
+
     num_shapes = 0;
     num_vertices = 0;
 
@@ -53,11 +63,6 @@ void canvas_reset()
 }
 
 int canvas_load_shape(const struct shape *shape)
-{
-    return canvas_load_shape_with_color(shape, 0xff, 0xff, 0xff);
-}
-
-int canvas_load_shape_with_color(const struct shape *shape, int r, int g, int b)
 {
     int i;
 
@@ -78,9 +83,9 @@ int canvas_load_shape_with_color(const struct shape *shape, int r, int g, int b)
         vertex->v.ob[1] = shape->vertices[i * 2 + 1] * (float)SCREEN_WD;
         vertex->v.ob[2] = -5;
 
-        vertex->v.cn[0] = r;
-        vertex->v.cn[1] = g;
-        vertex->v.cn[2] = b;
+        vertex->v.cn[0] = 0xFF;
+        vertex->v.cn[1] = 0xFF;
+        vertex->v.cn[2] = 0XFF;
         vertex->v.cn[3] = 0xFF;
     }
 
@@ -109,8 +114,6 @@ void canvas_start_drawing(bool clear)
         // Clear the frame buffer and the Z-buffer
         gfx_clear_cfb();
     }
-
-    // TODO: not sure how important these are. Disabling them seems to make things smoother
 
     // Synchronizes RDP attribute updates by waiting for pixels to be processed
     // during the rendering of primitives
@@ -178,13 +181,61 @@ bool canvas_draw_shape(int shape, struct vec_2d position, float rotation, struct
             }
         } else {
             const size_t num_vertices = shapes[shape].num_vertices;
-            for (i = 0; i < shapes[shape].num_vertices; i++) {
-                gSPLineW3D(glistp++, i, (i + 1) % num_vertices, 0.5, 0);
+            for (i = 0; i < shapes[shape].num_vertices - 1; i++) {
+                gSPLineW3D(glistp++, i, (i + 1), 0.5, 0);
             }
         }
     }
 
     return true;
+}
+
+void canvas_draw_text(const char *text, float x, float y, float spacing, float scale_factor)
+{
+    struct vec_2d position = {
+        x,
+        y
+    };
+
+    struct vec_2d scale = {
+        scale_factor,
+        scale_factor
+    };
+
+    const char *s = text;
+
+    while (*s) {
+        int shape_index;
+        int c = *s;
+        if (c >= MAX_GLYPHS) {
+            goto next;
+        }
+            
+        if (font_shape_ids[c] == CANVAS_INVALID_SHAPE) {
+            shape_index = ascii_to_font_mapping[c];
+            if (shape_index < 0) {
+                goto next;
+            }
+
+            font_shape_ids[c] = canvas_load_shape(&font_shape_data[shape_index]);
+            if (font_shape_ids[c] == CANVAS_INVALID_SHAPE) {
+                goto next;
+            }
+        }
+
+        canvas_draw_shape(font_shape_ids[c], position, 0, scale);
+next:
+        position.x += FONT_WIDTH * scale_factor;
+        position.x += spacing * scale_factor;
+        s++;
+    }
+}
+
+void canvas_draw_text_centered(const char *text, float size, float y, float spacing)
+{
+    const float width = ((float)strlen(text) * (FONT_WIDTH + spacing)) - spacing;
+
+    canvas_draw_text(text, 0 - (width * size / 2.0f), y, spacing, size);
 }
 
 void canvas_finish_drawing(bool swap)
