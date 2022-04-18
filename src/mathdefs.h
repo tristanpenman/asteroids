@@ -1,5 +1,5 @@
-#ifndef __MATHF_H
-#define __MATHF_H
+#ifndef __MATHDEFS_H
+#define __MATHDEFS_H
 
 #include <math.h>
 
@@ -14,5 +14,7 @@
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288
 #endif
+
+#define RAD_TO_DEG (180.0 / M_PI)
 
 #endif

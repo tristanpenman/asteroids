@@ -14,8 +14,6 @@
 #include "options.h"
 #include "vec.h"
 
-#define RAD_TO_DEG (180.0 / M_PI)
-
 const struct vec_2d origin = {
     1.0f / 2.0f,
     ((GLfloat)LOGICAL_HEIGHT_PX / (GLfloat)LOGICAL_WIDTH_PX) / 2.0f

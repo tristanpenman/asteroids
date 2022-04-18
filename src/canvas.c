@@ -18,8 +18,6 @@
 #define MAX_SHAPES 64
 #define MAX_GLYPHS 128
 
-#define RAD_TO_DEG (180.0f / (float) M_PI)
-
 extern struct vec_2d origin;
 
 static const struct shape* shapes[MAX_SHAPES];
