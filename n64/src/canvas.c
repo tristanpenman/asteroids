@@ -6,12 +6,13 @@
 
 #include "canvas.h"
 #include "data.h"
+#include "debug.h"
 #include "defines.h"
 #include "gfx.h"
 #include "shape.h"
 #include "vec.h"
 
-#define MAX_TRANSFORMS 30
+#define MAX_TRANSFORMS 64
 #define MAX_SHAPES 64
 #define MAX_VERTICES 128
 #define MAX_GLYPHS 128
@@ -133,6 +134,9 @@ void canvas_set_colour(float r, float g, float b)
 bool canvas_draw_shape(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
 {
     Dynamic *transform = &transforms[num_transforms++];
+    if (num_transforms > MAX_TRANSFORMS) {
+        debug_printf("MAX_TRANSFORMS exceeeded");
+    }
 
     guOrtho(&transform->projection,
         -SCREEN_WD / 2.f,  // left
@@ -240,10 +244,16 @@ void canvas_draw_text_centered(const char *text, float size, float y, float spac
 
 void canvas_finish_drawing(bool swap)
 {
+    size_t glist_size;
+
     gDPFullSync(glistp++);
     gSPEndDisplayList(glistp++);
 
-    assert(glistp - gfx_glist < GFX_GLIST_LEN);
+    glist_size = glistp - gfx_glist;
+    if (glist_size >= GFX_GLIST_LEN) {
+        debug_printf("display list size: %d", glist_size);
+    }
+    assert(glist_size < GFX_GLIST_LEN);
 
     // Activate the RSP task
     nuGfxTaskStart(gfx_glist, (s32)(glistp - gfx_glist) * sizeof (Gfx),
