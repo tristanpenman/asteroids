@@ -30,6 +30,7 @@ struct bullet
     struct vec_2d pos_prev;
     struct vec_2d pos;
     struct vec_2d vel;
+    float rot;
     float travelled;
 };
 

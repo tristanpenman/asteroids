@@ -108,26 +108,6 @@ static void draw_text_centered(const char *s, GLfloat size, GLfloat y)
  *
  *****************************************************************************/
 
-void draw_bullets(const struct bullet *bb, unsigned int n)
-{
-    unsigned int i;
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glTranslatef((GLfloat) origin.x, (GLfloat) origin.y, 0.0f);
-    glColor3f(1.f, 1.f, 1.f);
-    glBegin(GL_LINES);
-    for (i = 0; i < n; i++) {
-        if (true == bb[i].visible) {
-            const float dx = bb[i].vel.x / 300.f;
-            const float dy = bb[i].vel.y / 300.f;
-            glVertex_2f((GLfloat)(bb[i].pos.x + dx), (GLfloat)(bb[i].pos.y + dy));
-            glVertex_2f((GLfloat)(bb[i].pos.x - dx), (GLfloat)(bb[i].pos.y - dy));
-        }
-    }
-    glEnd();
-    glPopMatrix();
-}
-
 void draw_explosions(const struct explosion *ee, unsigned int n)
 {
     unsigned int i;

@@ -6,7 +6,6 @@ struct explosion;
 struct highscores;
 struct player;
 
-void draw_bullets(const struct bullet *, unsigned int n);
 void draw_explosions(const struct explosion *, unsigned int n);
 void draw_highscores(const struct highscores *);
 void draw_instructions();

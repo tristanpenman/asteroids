@@ -223,6 +223,7 @@ static void check_fire_button(struct player *p, struct bullet *bb, unsigned int 
 
             bb->vel.x = sinf(p->rot);
             bb->vel.y = 0 - cosf(p->rot);
+            bb->rot = p->rot;
 
             vec_2d_normalise(&bb->vel);
             vec_2d_scale(&bb->vel, BULLET_SPEED);
@@ -467,6 +468,7 @@ static void check_collisions()
 
 static void level_draw()
 {
+    int i;
     struct vec_2d position;
     struct vec_2d scale;
 
@@ -486,7 +488,7 @@ static void level_draw()
     }
 
     // draw asteroids
-    for (int i = 0; i < MAX_ASTEROIDS; i++) {
+    for (i = 0; i < MAX_ASTEROIDS; i++) {
         if (asteroids[i].visible == false) {
             continue;
         }
@@ -504,7 +506,13 @@ static void level_draw()
                 scale);
     }
 
-    draw_bullets(bullets, MAX_BULLETS);
+    // draw bullets
+    for (i = 0; i < MAX_BULLETS; i++) {
+        if (bullets[i].visible) {
+            canvas_draw_shape(bullet_shape, bullets[i].pos, bullets[i].rot, vec_2d_unit);
+        }
+    }
+
     draw_explosions(explosions, MAX_EXPLOSIONS);
     draw_score(player.score);
     draw_lives(player.lives);
