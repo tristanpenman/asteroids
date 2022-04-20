@@ -2,9 +2,21 @@
 
 This is the code for a work-in-progress N64 port of my Asteroids clone.
 
-The general approach that I've taken is to gradually refactor the code so that platform-specific code is well encapsulated, before back-porting those changes to the original codebase.
+The general approach that I've taken is to gradually refactor the code so that platform-specific code is well encapsulated, before back-porting those changes to the original codebase. My plan is to eventually merge the two codebases, and build both versions from the same set of source and data files.
 
-My hope is that this will eventually make it possible to merge the two codebases, and build both versions from the same set of source and data files.
+You can get the latest build [here](misc/asteroids.z64).
+
+## Emulator Support
+
+The code is frequently tested using [cen64](https://github.com/n64dev/cen64). It has also been tested using [Sixtyforce](https://sixtyforce.com/) on macOS and [Project64](https://www.pj64-emu.com/) on Windows.
+
+Here's the game running in cen64:
+
+![Screenshot in cen64](misc/screenshot.png)
+
+## Real Hardware
+
+The ROM can simply be copied to a flash cart such as the [EverDrive-64](https://krikzz.com/store/home/55-everdrive-64-x7.html). I've tested this using an X7 cart, however it should work on any flash cart.
 
 ## Compiling the ROM
 
@@ -13,14 +25,6 @@ This code has been written to compile using the original Nintendo 64 SDK on Wind
 To compile on Windows or Wine, you can run `compile.bat`. A script for running via wine has also been included in `build.sh`.
 
 To compile on Linux using the Modern SDK, simply run `make`.
-
-## Emulator Support
-
-The code is frequently tested using [Sixtyforce](https://sixtyforce.com/) on macOS and [Project64](https://www.pj64-emu.com/) on Windows.
-
-## Real Hardware
-
-The ROM can simply be copied to a flash cart such as the [EverDrive-64](https://krikzz.com/store/home/55-everdrive-64-x7.html). I've tested this using an X7 cart, however it should work on any flash cart.
 
 ### UNFLoader
 
