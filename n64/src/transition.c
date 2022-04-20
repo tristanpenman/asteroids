@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "canvas.h"
@@ -13,6 +14,8 @@ static unsigned int score = 0;
 
 static float elapsed = 0.f;
 
+static char titlecard[100];
+
 /******************************************************************************
  *
  * Public interface
@@ -25,13 +28,16 @@ void transition_init(unsigned int next_level, unsigned int next_lives, unsigned 
     lives = next_lives;
     score = next_score;
     elapsed = 0.f;
+
+    sprintf(titlecard, "LEVEL %u", next_level);
 }
 
 void transition_loop(bool draw)
 {
+
     uint32_t residual;
 
-    // input_update();
+    input_update();
 
     produce_simulation_time();
     residual = residual_simulation_time();
@@ -50,8 +56,6 @@ void transition_loop(bool draw)
     }
 
     canvas_start_drawing(true);
-    // draw_score(score);
-    // draw_lives(lives);
-    // draw_level_title(level);
+    canvas_draw_text_centered(titlecard, 0.35f, -0.05f, FONT_SPACE);
     canvas_finish_drawing(true);
 }
