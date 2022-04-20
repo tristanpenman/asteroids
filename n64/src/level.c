@@ -13,10 +13,12 @@
 #include "entities.h"
 #include "gfx.h"
 #include "input.h"
+#include "loop.h"
 #include "mathdefs.h"
 #include "rumble.h"
 #include "shape.h"
 #include "timing.h"
+#include "titlescreen.h"
 #include "util.h"
 #include "vec.h"
 
@@ -66,6 +68,23 @@ static musHandle snd_handle;
  * Helper functions
  *
  *****************************************************************************/
+
+static void draw_score(int score)
+{
+    static char buffer[SCORE_BUFFER_SIZE];
+
+    sprintf(buffer, "%u", score);
+
+    canvas_draw_text(buffer, -0.45f, -0.33f, FONT_SPACE, 0.65f);
+}
+
+static void update_score(int amount)
+{
+    const int lives_given = player.score / 10000;
+
+    player.score += amount;
+    player.lives += player.score / 10000 - lives_given;
+}
 
 static unsigned int num_asteroids_for_level(int level) {
     switch (level) {
@@ -278,7 +297,13 @@ static void check_collisions()
             asteroids_hit++;
             explode_asteroid(j);
 
-            // TODO: score logic
+            if (asteroids[j].scale < 0.49f) {
+                update_score(100);
+            } else if (asteroids[j].scale < 0.99f) {
+                update_score(50);
+            } else {
+                update_score(20);
+            }
 
             // feedback
             rumble_start(0.3, 0.3);
@@ -295,7 +320,6 @@ static void check_collisions()
 static void level_draw()
 {
     int i;
-    char conbuf[20];
     struct vec_2d scale;
 
     canvas_start_drawing(true);
@@ -326,38 +350,9 @@ static void level_draw()
         }
     }
 
-    canvas_finish_drawing(false);
+    draw_score(player.score);
 
-    // Print score using debug output
-    sprintf(conbuf, "%d", player.score);
-    nuDebConTextPos(0, 3, 3);
-    nuDebConCPuts(0, conbuf);
-
-    // Player hit?
-    sprintf(conbuf, "%d", player.hit);
-    nuDebConTextPos(0, 5, 3);
-    nuDebConCPuts(0, conbuf);
-
-    {
-        int num_bullets = 0;
-        int i = 0;
-        for (i = 0; i < MAX_BULLETS; i++) {
-            if (bullets[i].visible) {
-                num_bullets++;
-            }
-        }
-
-        // Fire?
-        sprintf(conbuf, "%d", num_bullets);
-        nuDebConTextPos(0, 7, 3);
-        nuDebConCPuts(0, conbuf);
-    }
-
-    sprintf(conbuf, "%d", asteroids_hit);
-    nuDebConTextPos(0, 7, 3);
-    nuDebConCPuts(0, conbuf);
-
-    nuDebConDisp(NU_SC_SWAPBUFFER);
+    canvas_finish_drawing(true);
 }
 
 static void level_update()
@@ -373,11 +368,11 @@ static void level_update()
     input_update();
     input_read_joystick(&joystick_x, NULL);
 
-    // if (input_active(input_escape)) {
-    //     titlescreen_init();
-    //     set_main_loop(titlescreen_loop);
-    //     return;
-    // }
+    if (input_active(input_escape)) {
+        titlescreen_init();
+        set_main_loop(titlescreen_loop);
+        return;
+    }
 
     produce_simulation_time();
     while (maybe_consume_simulation_time(TIME_STEP_MILLIS)) {

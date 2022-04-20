@@ -56,6 +56,6 @@ void transition_loop(bool draw)
     }
 
     canvas_start_drawing(true);
-    canvas_draw_text_centered(titlecard, 0.35f, -0.05f, FONT_SPACE);
+    canvas_draw_text_centered(titlecard, 0.65f, -0.05f, FONT_SPACE);
     canvas_finish_drawing(true);
 }
