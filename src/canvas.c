@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <SDL_opengl.h>
 
@@ -129,6 +130,13 @@ next:
         position.x += spacing * scale_factor;
         s++;
     }
+}
+
+void canvas_draw_text_centered(const char *text, float size, float y, float spacing)
+{
+    const float width = ((float)strlen(text) * (FONT_WIDTH + spacing)) - spacing;
+
+    canvas_draw_text(text, 0 - (width * size / 2.0f), y, spacing, size);
 }
 
 void canvas_finish_drawing(bool swap)

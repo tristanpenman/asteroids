@@ -16,6 +16,5 @@ void draw_new_high_score_message();
 void draw_new_high_score_enter_to_continue();
 void draw_player_exploding(const struct player *);
 void draw_score(unsigned int score);
-void draw_title();
 
 #endif

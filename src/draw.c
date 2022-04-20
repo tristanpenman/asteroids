@@ -225,8 +225,3 @@ void draw_score(unsigned int score)
 
     draw_text(buffer, 0.35f, -0.475f, -0.365f);
 }
-
-void draw_title()
-{
-    draw_text_centered("ASTEROIDS", 0.8f, -0.20f);
-}

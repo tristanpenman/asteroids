@@ -143,7 +143,8 @@ void titlescreen_loop(bool draw)
             vec_2d_unit);
     }
 
-    draw_title();
+    canvas_draw_text_centered("ASTEROIDS", 0.8f, -0.20f, FONT_SPACE);
+
     draw_instructions();
 
     canvas_finish_drawing(true);

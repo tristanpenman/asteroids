@@ -39,6 +39,11 @@ bool canvas_draw_shape(int shape, struct vec_2d position, float rotation, struct
 void canvas_draw_text(const char *text, float, float y, float spacing, float scale);
 
 /**
+ * Draw text centered
+ */
+void canvas_draw_text_centered(const char *text, float size, float y, float spacing);
+
+/**
  * Finish drawing shapes to the canvas
  */
 void canvas_finish_drawing(bool swap);
