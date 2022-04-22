@@ -9,15 +9,15 @@
 #include "shape.h"
 #include "util.h"
 
-float calculate_asteroid_radius(unsigned int shape)
+float calculate_asteroid_radius(int shape)
 {
     float r;
     float r_max = 0.0f;
 
     const float *vertices = asteroid_shape_data[shape].vertices;
 
-    unsigned int i;
-    unsigned int n = asteroid_shape_data[shape].num_vertices;;
+    int i;
+    uint8_t n = asteroid_shape_data[shape].num_vertices;
 
     for (i = 0; i < n * 2; i += 2) {
         r = sqrt(vertices[i] * vertices[i] + vertices[i + 1] * vertices[i + 1]);

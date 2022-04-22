@@ -21,6 +21,10 @@ void produce_simulation_time()
 
 bool maybe_consume_simulation_time(uint32_t millis)
 {
+    if (millis == 0) {
+        return false;
+    }
+
     if (millis > simulation_time) {
         return false;
     }

@@ -11,6 +11,7 @@
 #include "debug.h"
 #include "defines.h"
 #include "entities.h"
+#include "gameover.h"
 #include "gfx.h"
 #include "input.h"
 #include "loop.h"
@@ -19,6 +20,7 @@
 #include "shape.h"
 #include "timing.h"
 #include "titlescreen.h"
+#include "transition.h"
 #include "util.h"
 #include "vec.h"
 
@@ -35,11 +37,11 @@ static const float max_y =  SCREEN_RATIO / 2.0f + SHIP_RADIUS;
 static const float min_y = -SCREEN_RATIO / 2.0f - SHIP_RADIUS;
 
 // level state
-static unsigned int asteroids_hit;
+static int asteroids_hit;
 static bool gameover;
-static unsigned int level;
-static unsigned int next_beat;
-static unsigned int starting_asteroids;
+static int level;
+static int next_beat;
+static int starting_asteroids;
 
 // entities
 static struct asteroid asteroids[MAX_ASTEROIDS];
@@ -61,6 +63,9 @@ static int input_pause;
 static int input_right;
 static int input_thruster;
 
+// misc state
+static float next_level_countdown;
+
 static musHandle snd_handle;
 
 /******************************************************************************
@@ -78,14 +83,6 @@ static void draw_score(int score)
     canvas_draw_text(buffer, -0.45f, -0.33f, FONT_SPACE, 0.65f);
 }
 
-static void update_score(int amount)
-{
-    const int lives_given = player.score / 10000;
-
-    player.score += amount;
-    player.lives += player.score / 10000 - lives_given;
-}
-
 static unsigned int num_asteroids_for_level(int level) {
     switch (level) {
         case 1:
@@ -101,6 +98,29 @@ static unsigned int num_asteroids_for_level(int level) {
     }
 
     return 11;
+}
+
+static void update_player(float factor)
+{
+    int i;
+
+    if (player.state == PS_EXPLODING) {
+        for (i = 0; i < SHIP_EXPLOSION_SHARDS; i++) {
+            player.shards[i].rot = wrap_angle(
+                player.shards[i].rot +
+                SHIP_EXPLOSION_SHARD_ROT_SPEED * factor * (float) player.shards[i].dir);
+        }
+
+        player.death_delay += factor;
+        if (player.death_delay >= SHIP_DEATH_DELAY) {
+            if (player.lives >= 0) {
+                player_reset(&player);
+            } else {
+                gameover_init();
+                set_main_loop(gameover_loop);
+            }
+        }
+    }
 }
 
 static void check_fire_button(float factor)
@@ -159,6 +179,14 @@ static void check_fire_button(float factor)
     }
 }
 
+static void update_score(int amount)
+{
+    const int lives_given = player.score / 10000;
+
+    player.score += amount;
+    player.lives += player.score / 10000 - lives_given;
+}
+
 /******************************************************************************
  *
  * Explosion helpers
@@ -167,7 +195,7 @@ static void check_fire_button(float factor)
 
 static void explode_player()
 {
-    unsigned int i;
+    int i;
 
     player.state = PS_EXPLODING;
 
@@ -246,9 +274,11 @@ static bool should_test_collisions(const struct vec_2d *a, const struct vec_2d *
 
 static void check_collisions()
 {
-    unsigned int i, j;
+    int i;
+    int j;
     bool asteroid_hit = false;
     bool collision = false;
+    float asteroid_scale;
 
     // Check for asteroid collisions
     for (j = 0; j < MAX_ASTEROIDS; j++) {
@@ -286,6 +316,7 @@ static void check_collisions()
                 &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
 
             if (collision) {
+                debug_printf("collision between ship and asteroid %d\n", j);
                 explode_player();
                 asteroid_hit = true;
                 player.lives--;
@@ -297,9 +328,15 @@ static void check_collisions()
             asteroids_hit++;
             explode_asteroid(j);
 
-            if (asteroids[j].scale < 0.49f) {
+            // if (explosion_channel > -1) {
+            //     mixer_stop_playing_on_channel(explosion_channel);
+            // }
+            // explosion_channel = mixer_play_sample(SOUND_EXPLOSION);
+
+            asteroid_scale = asteroids[j].scale;
+            if (asteroid_scale < 0.49f) {
                 update_score(100);
-            } else if (asteroids[j].scale < 0.99f) {
+            } else if (asteroid_scale < 0.99f) {
                 update_score(50);
             } else {
                 update_score(20);
@@ -324,8 +361,18 @@ static void level_draw()
 
     canvas_start_drawing(true);
 
+    if (player.state == PS_EXPLODING) {
+        float c = 255.0f - player.death_delay / SHIP_DEATH_DELAY * 255.0f;
+        if (c < 0.f) {
+            c = 0.f;
+        }
+        canvas_set_colour(c, c, c);
+    }
+
     // draw player ship
     canvas_draw_shape(player_frame_1_shape, player.pos, player.rot, vec_2d_unit);
+
+    canvas_set_colour(255.0f, 255.0f, 255.0f);
 
     // draw asteroids
     for (i = 0; i < MAX_ASTEROIDS; i++) {
@@ -377,6 +424,8 @@ static void level_update()
     produce_simulation_time();
     while (maybe_consume_simulation_time(TIME_STEP_MILLIS)) {
         const float factor = (float)(TIME_STEP_MILLIS) / 1000.f;
+
+        update_player(factor);
 
         if (joystick_x < -20 || input_active(input_left)) {
             player.rot -= SHIP_ROTATION_SPEED;
@@ -441,9 +490,9 @@ static void level_update()
             }
         }
 
-        // if (0 == num_asteroids) {
-        //     next_level_countdown -= factor;
-        // } else {
+        if (0 == num_asteroids) {
+            next_level_countdown -= factor;
+        } else {
         //     beat_delay += factor;
         //     beat_delay_limit = 1.2f - 0.6f * ((float)asteroids_hit / (float)(starting_asteroids * 5.f));
 
@@ -457,12 +506,12 @@ static void level_update()
         //         }
         //         beat_delay = 0.0f;
         //     }
-        // }
+        }
 
-        // if (next_level_countdown <= 0.f) {
-        //     transition_init(level + 1, player.lives, player.score);
-        //     set_main_loop(transition_loop);
-        // }
+        if (next_level_countdown <= 0.f) {
+            transition_init(level + 1, player.lives, player.score);
+            set_main_loop(transition_loop);
+        }
 
         // update_explosions(explosions, MAX_EXPLOSIONS, factor);
     }
@@ -474,10 +523,11 @@ static void level_update()
  *
  *****************************************************************************/
 
-void level_init(unsigned int new_level, unsigned int new_lives, unsigned int new_score)
+void level_init(int new_level, int new_lives, int new_score)
 {
     int i;
 
+    next_level_countdown = NEXT_WAVE_DELAY;
     asteroids_hit = 0;
 
     input_reset();

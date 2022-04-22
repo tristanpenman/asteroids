@@ -16,10 +16,9 @@
   + ~~Port physics sandbox~~
   + ~~Figure out how to get UNFLoader fault handler working~~
   + UNFLoader command interface (in progress)
-  + Packer template for dev environment (in progress)
-  + Basic menu system
+  + Basic menu system (in progress)
   + Scripts for pre-processing audio files
-  + Asteroids font for main screen
+  + ~~Asteroids font for main screen~~
   + Mixer interface
   + High score screens
     + Store high scores on controller pak

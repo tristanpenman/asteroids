@@ -102,7 +102,7 @@ void titlescreen_loop(bool draw)
     if (input_active(input_start) || joystick_x < -20) {
         enter_down = true;
     } else if (enter_down) {
-        transition_init(1, 3, 0);
+        transition_init(1, SHIP_LIVES, 0);
         set_main_loop(transition_loop);
         return;
     } else {

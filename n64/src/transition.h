@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-void transition_init(unsigned int next_level, unsigned int lives, unsigned int score);
+void transition_init(int next_level, int lives, int score);
 
 void transition_loop(bool draw);
 

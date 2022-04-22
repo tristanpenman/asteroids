@@ -66,9 +66,9 @@ struct player
 {
     bool reloading;
     enum player_state state;
-    unsigned int score;
-    unsigned int hit;
-    unsigned int lives;
+    int score;
+    int hit;
+    int lives;
     float phase;
     float reload_delay;
     float death_delay;
@@ -80,7 +80,7 @@ struct player
     struct shard shards[SHIP_EXPLOSION_SHARDS];
 };
 
-float calculate_asteroid_radius(unsigned int shape);
+float calculate_asteroid_radius(int shape);
 void randomise_asteroid_rotation(struct asteroid *a);
 void randomise_asteroid_velocity(struct asteroid *a, float vel_scale);
 

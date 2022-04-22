@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-void level_init(unsigned int level, unsigned int lives, unsigned int score);
+void level_init(int level, int lives, int score);
 
 void level_loop(bool draw);
 
