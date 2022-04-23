@@ -50,6 +50,8 @@ static void draw_ship(float c)
     glEnd();
 
     glPopMatrix();
+
+    glColor3f(1.f, 1.f, 1.f);
 }
 
 static void draw_ship_explosion(const struct player *p)
@@ -78,6 +80,8 @@ static void draw_ship_explosion(const struct player *p)
 
         glPopMatrix();
     }
+
+    glColor3f(1.f, 1.f, 1.f);
 }
 
 static void draw_text_ex(const char *s, GLfloat size, GLfloat x, GLfloat y, float spacing)
