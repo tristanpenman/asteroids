@@ -162,14 +162,14 @@ void draw_instructions()
 #endif
 }
 
-void draw_level_title(unsigned int level)
+void draw_level_title(int level)
 {
     char titlecard[100];
     snprintf(titlecard, 100, "LEVEL %u", level);
     draw_text_centered(titlecard, 0.35f, -0.05f);
 }
 
-void draw_lives(unsigned int lives)
+void draw_lives(int lives)
 {
     int i;
     glMatrixMode(GL_MODELVIEW);

@@ -86,7 +86,7 @@ static int num_asteroids_for_level(int next_level) {
 
 static void update_player(struct player *p, float factor)
 {
-    unsigned int i;
+    int i;
     float s, d, rot = p->rot;
     struct vec_2d *pos = &p->pos;
     struct vec_2d *vel = &p->vel;
