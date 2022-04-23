@@ -649,13 +649,22 @@ void level_init(int new_level, int new_lives, int new_score)
 
     for (int i = 0; i < NUM_PLAYER_FRAMES; i++) {
         player_shapes[i] = canvas_load_shape(&player_shape_data[i]);
+        if (player_shapes[i] == CANVAS_INVALID_SHAPE) {
+            debug_printf("failed to load player shape %d\n", i);
+        }
     }
 
     for (int i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
         asteroid_shapes[i] = canvas_load_shape(&asteroid_shape_data[i]);
+        if (asteroid_shapes[i] == CANVAS_INVALID_SHAPE) {
+            debug_printf("failed to load asteroid shape %d\n", i);
+        }
     }
 
     bullet_shape = canvas_load_shape(&bullet_shape_data);
+    if (bullet_shape == CANVAS_INVALID_SHAPE) {
+        debug_printf("failed to load bullet shape\n");
+    }
 
     // Create some asteroids!
     starting_asteroids = num_asteroids_for_level(level);

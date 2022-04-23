@@ -90,25 +90,25 @@ static const float asteroid4_vertices[] = {
 const struct shape asteroid_shape_data[] = {
     {
         asteroid1_vertices,
-        sizeof(asteroid1_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(asteroid1_vertices),
         NULL,
         0
     },
     {
         asteroid2_vertices,
-        sizeof(asteroid2_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(asteroid2_vertices),
         NULL,
         0
     },
     {
         asteroid3_vertices,
-        sizeof(asteroid3_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(asteroid3_vertices),
         NULL,
         0
     },
     {
         asteroid4_vertices,
-        sizeof(asteroid4_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(asteroid4_vertices),
         NULL,
         0
     }
@@ -128,7 +128,7 @@ static const float box_vertices[] = {
 
 const struct shape box_shape_data = {
     box_vertices,
-    sizeof(box_vertices) / sizeof(float) / 2,
+    NUM_VERTICES(box_vertices),
     NULL,
     0
 };
@@ -143,15 +143,15 @@ static const float bullet_vertices[] = {
     0.0f, 0.02f
 };
 
-static const uint8_t bullet_line_segments[] = {
+static const uint16_t bullet_line_segments[] = {
     0, 1
 };
 
 const struct shape bullet_shape_data = {
     bullet_vertices,
-    sizeof(bullet_vertices) / sizeof(float) / 2,
+    NUM_VERTICES(bullet_vertices),
     bullet_line_segments,
-    sizeof(bullet_line_segments) / sizeof(uint8_t) / 2
+    NUM_LINE_SEGMENTS(bullet_line_segments)
 };
 
 // ----------------------------------------------------------------------------
@@ -168,13 +168,13 @@ static const float player_vertices[] = {
     0.000f,  0.02f
 };
 
-static const uint8_t player_frame_1_line_segments[] = {
+static const uint16_t player_frame_1_line_segments[] = {
     0, 1,
     0, 2,
     3, 4
 };
 
-static const uint8_t player_frame_2_line_segments[] = {
+static const uint16_t player_frame_2_line_segments[] = {
     0, 1,
     0, 2,
     3, 4,
@@ -185,14 +185,14 @@ static const uint8_t player_frame_2_line_segments[] = {
 const struct shape player_shape_data[] = {
     {
         player_vertices,
-        sizeof(player_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(player_vertices),
         player_frame_1_line_segments,
-        sizeof(player_frame_1_line_segments) / sizeof(uint8_t) / 2
+        NUM_LINE_SEGMENTS(player_frame_1_line_segments)
     }, {
         player_vertices,
-        sizeof(player_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(player_vertices),
         player_frame_2_line_segments,
-        sizeof(player_frame_2_line_segments) / sizeof(uint8_t) / 2
+        NUM_LINE_SEGMENTS(player_frame_2_line_segments)
     }
 };
 
@@ -532,198 +532,196 @@ static const float font_minus_vertices[] = {
 const struct shape font_shape_data[] = {
     {
         font_a_vertices,
-        sizeof(font_a_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_a_vertices),
         NULL,
         0
     }, {
         font_b_vertices,
-        sizeof(font_b_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_b_vertices),
         NULL,
         0
     }, {
         font_c_vertices,
-        sizeof(font_c_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_c_vertices),
         NULL,
         0
     }, {
         font_d_vertices,
-        sizeof(font_d_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_d_vertices),
         NULL,
         0
     }, {
         font_e_vertices,
-        sizeof(font_e_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_e_vertices),
         NULL,
         0
     }, {
         font_f_vertices,
-        sizeof(font_f_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_f_vertices),
         NULL,
         0
     }, {
         font_g_vertices,
-        sizeof(font_g_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_g_vertices),
         NULL,
         0
     }, {
         font_h_vertices,
-        sizeof(font_h_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_h_vertices),
         NULL,
         0
     }, {
         font_i_vertices,
-        sizeof(font_i_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_i_vertices),
         NULL,
         0
     }, {
         font_j_vertices,
-        sizeof(font_j_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_j_vertices),
         NULL,
         0
     }, {
         font_k_vertices,
-        sizeof(font_k_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_k_vertices),
         NULL,
         0
     }, {
         font_l_vertices,
-        sizeof(font_l_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_l_vertices),
         NULL,
         0
     }, {
         font_m_vertices,
-        sizeof(font_m_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_m_vertices),
         NULL,
         0
     }, {
         font_n_vertices,
-        sizeof(font_n_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_n_vertices),
         NULL,
         0
     }, {
         font_o_vertices,
-        sizeof(font_o_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_o_vertices),
         NULL,
         0
     }, {
         font_p_vertices,
-        sizeof(font_p_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_p_vertices),
         NULL,
         0
     }, {
         font_q_vertices,
-        sizeof(font_q_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_q_vertices),
         NULL,
         0
     }, {
         font_r_vertices,
-        sizeof(font_r_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_r_vertices),
         NULL,
         0
     }, {
         font_s_vertices,
-        sizeof(font_s_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_s_vertices),
         NULL,
         0
     }, {
         font_t_vertices,
-        sizeof(font_t_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_t_vertices),
         NULL,
         0
     }, {
         font_u_vertices,
-        sizeof(font_u_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_u_vertices),
         NULL,
         0
     }, {
         font_v_vertices,
-        sizeof(font_v_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_v_vertices),
         NULL,
         0
     }, {
         font_w_vertices,
-        sizeof(font_w_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_w_vertices),
         NULL,
         0
     }, {
         font_x_vertices,
-        sizeof(font_x_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_x_vertices),
         NULL,
         0
     }, {
         font_y_vertices,
-        sizeof(font_y_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_y_vertices),
         NULL,
         0
     }, {
         font_z_vertices,
-        sizeof(font_z_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_z_vertices),
         NULL,
         0
     }, {
         font_0_vertices,
-        sizeof(font_0_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_0_vertices),
         NULL,
         0
     }, {
         font_1_vertices,
-        sizeof(font_1_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_1_vertices),
         NULL,
         0
     }, {
         font_2_vertices,
-        sizeof(font_2_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_2_vertices),
         NULL,
         0
     }, {
         font_3_vertices,
-        sizeof(font_3_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_3_vertices),
         NULL,
         0
     }, {
         font_4_vertices,
-        sizeof(font_4_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_4_vertices),
         NULL,
         0
     }, {
         font_5_vertices,
-        sizeof(font_5_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_5_vertices),
         NULL,
         0
     }, {
         font_6_vertices,
-        sizeof(font_6_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_6_vertices),
         NULL,
         0
     }, {
         font_7_vertices,
-        sizeof(font_7_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_7_vertices),
         NULL,
         0
     }, {
         font_8_vertices,
-        sizeof(font_8_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_8_vertices),
         NULL,
         0
     }, {
         font_9_vertices,
-        sizeof(font_9_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_9_vertices),
         NULL,
         0
     }, {
         font_underscore_vertices,
-        sizeof(font_underscore_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_underscore_vertices),
         NULL,
         0
     }, {
         font_minus_vertices,
-        sizeof(font_minus_vertices) / sizeof(float) / 2,
+        NUM_VERTICES(font_minus_vertices),
         NULL,
         0
     }
 };
-
-const uint8_t font_glyph_count = sizeof(font_shape_data) / sizeof(struct shape);
 
 const int8_t ascii_to_font_mapping[128] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,   // 00 - 2C

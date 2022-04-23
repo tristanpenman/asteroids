@@ -10,6 +10,7 @@
 
 #include "canvas.h"
 #include "data.h"
+#include "debug.h"
 #include "defines.h"
 #include "mathdefs.h"
 #include "shape.h"
@@ -65,6 +66,7 @@ void canvas_set_colour(float r, float g, float b)
 bool canvas_draw_shape(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
 {
     if (shape + 1 > num_shapes || shape < 0) {
+        debug_printf("shape out of range: %d\n", shape);
         return false;
     }
 
@@ -79,7 +81,7 @@ bool canvas_draw_shape(int shape, struct vec_2d position, float rotation, struct
 
     glVertexPointer(2, GL_FLOAT, 0, shapes[shape]->vertices);
     if (shapes[shape]->line_segments) {
-        glDrawElements(GL_LINES, shapes[shape]->num_line_segments * 2, GL_UNSIGNED_BYTE, shapes[shape]->line_segments);
+        glDrawElements(GL_LINES, shapes[shape]->num_line_segments * 2, GL_UNSIGNED_SHORT, shapes[shape]->line_segments);
     } else {
         glDrawArrays(GL_LINE_STRIP, 0, shapes[shape]->num_vertices);
     }
@@ -111,7 +113,7 @@ void canvas_draw_text(const char *text, float x, float y, float spacing, float s
         if (c >= MAX_GLYPHS) {
             goto next;
         }
-            
+
         if (font_shape_ids[c] == CANVAS_INVALID_SHAPE) {
             shape_index = ascii_to_font_mapping[c];
             if (shape_index < 0) {
