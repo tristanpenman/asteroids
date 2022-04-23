@@ -8,7 +8,7 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/html5.h>
-#define EM_TARGET "canvas"
+#define EM_TARGET "#canvas"
 #endif
 
 #include "debug.h"
@@ -37,63 +37,7 @@ static float pixel_density = 1.f;
  *
  *****************************************************************************/
 
-#ifdef __EMSCRIPTEN__
-
-static int prev_inner_width = 0;
-static int prev_inner_height = 0;
-
-static EM_BOOL resize_callback(int eventType, const EmscriptenUiEvent *uiEvent, void *userdata)
-{
-    const int inner_width = uiEvent->windowInnerWidth;
-    const int inner_height = uiEvent->windowInnerHeight;
-
-    // Calculate actual canvas size as power of logical canvas size
-    int new_width = logical_width;
-    int new_height = logical_height;
-    while (new_width * 2 < inner_width && new_height * 2 < inner_height) {
-        new_width *= 2;
-        new_height *= 2;
-    }
-
-    // Update canvas size so that further CSS calculations reflect new size
-    emscripten_set_element_css_size(EM_TARGET, new_width, new_height);
-
-    // Ensure that resizing won't cause page contents to overflow, but only if shrinking the
-    // canvas wouldn't make it smaller than it's logical size
-    if (new_width > logical_width && new_height > logical_height) {
-        const bool window_shrunk = inner_width < prev_inner_width || inner_height < prev_inner_height;
-        const bool canvas_expanded = new_width > canvas_width || new_height > canvas_height;
-        if (window_shrunk || canvas_expanded) {
-            const int client_width = EM_ASM_INT({
-                return document.body.clientWidth;
-            }, NULL);
-            const int client_height = EM_ASM_INT({
-                return document.body.clientHeight;
-            }, NULL);
-
-            if (client_width > inner_width || client_height > inner_height) {
-                new_width /= 2;
-                new_height /= 2;
-                emscripten_set_element_css_size(EM_TARGET, new_width, new_height);
-            }
-        }
-    }
-
-    if (new_width != canvas_width || new_height != canvas_height) {
-        debug_printf("resizing canvas from (%d, %d) to (%d, %d)\n", canvas_width, canvas_height,
-            new_width, new_height);
-        SDL_SetWindowSize(sdl_window, new_width, new_height);
-        canvas_width = new_width;
-        canvas_height = new_height;
-    }
-
-    prev_inner_width = inner_width;
-    prev_inner_height = inner_height;
-
-    return true;
-}
-
-#else
+#ifndef __EMSCRIPTEN__
 
 static int window_width;
 static int window_height;
@@ -132,12 +76,10 @@ static int event_filter(void *userdata, SDL_Event *event)
 
 bool video_init(int width, int height, const char *title, bool fullscreen)
 {
-#ifdef __EMSCRIPTEN__
-    int client_width;
-    int client_height;
-#else
+#ifndef __EMSCRIPTEN__
     SDL_Rect rect;
 #endif
+
     int inner_width;
     int inner_height;
     int new_width;
@@ -153,31 +95,39 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
     logical_width = width;
     logical_height = height;
 
-    new_width = width;
-    new_height = height;
-
 #ifdef __EMSCRIPTEN__
+    // canvas size may be wrong here, just use window instead
     inner_width = EM_ASM_INT({
         return window.innerWidth;
     });
     inner_height = EM_ASM_INT({
         return window.innerHeight;
     });
+
+    debug_printf("inner area = (%d, %d)\n", inner_width, inner_height);
+
+    new_width = inner_width;
+    new_height = inner_height;
 #else
     if (0 != SDL_GetDisplayUsableBounds(0, &rect)) {
         fprintf(stderr, "SDL_GetDisplayUsableBounds failed: %s\n", SDL_GetError());
         return false;
     }
+
     inner_width = rect.w;
     inner_height = rect.h;
-#endif
+    debug_printf("inner area = (%d, %d)\n", inner_width, inner_height);
 
-    debug_printf("client area = (%d, %d)\n", inner_width, inner_height);
-
+    // scale up until it takes up a reasonable portion of the screen
+    new_width = width;
+    new_height = height;
     while (new_width * 2 < inner_width && new_height * 2 < inner_height) {
         new_width *= 2;
         new_height *= 2;
     }
+#endif
+
+    debug_printf("new area = (%d, %d)\n", new_width, new_height);
 
     flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
     if (fullscreen == true) {
@@ -198,26 +148,7 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
         return false;
     }
 
-#ifdef __EMSCRIPTEN__
-    emscripten_set_element_css_size(EM_TARGET, new_width, new_height);
-
-    client_width = EM_ASM_INT({
-        return document.body.clientWidth;
-    });
-    client_height = EM_ASM_INT({
-        return document.body.clientHeight;
-    });
-
-    if (client_width > inner_width || client_height > inner_height) {
-        new_width /= 2;
-        new_height /= 2;
-        emscripten_set_element_css_size(EM_TARGET, new_width, new_height);
-        SDL_SetWindowSize(sdl_window, new_width, new_height);
-    }
-
-    prev_inner_width = inner_width;
-    prev_inner_height = inner_height;
-#else
+#ifndef __EMSCRIPTEN__
     window_width = new_width;
     window_height = new_height;
 #endif
@@ -251,7 +182,6 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
     SDL_GL_MakeCurrent(sdl_window, sdl_glcontext);
 
 #ifdef __EMSCRIPTEN__
-    emscripten_set_resize_callback("canvas", NULL, true, resize_callback);
     canvas_width = new_width;
     canvas_height = new_height;
 #else
@@ -281,12 +211,11 @@ void video_clear()
 {
 #ifdef __EMSCRIPTEN__
     int swap_interval;
-#else
+#endif
     GLfloat viewport_width;
     GLfloat viewport_height;
     GLfloat x;
     GLfloat y;
-#endif
 
     const GLfloat ratio = (GLfloat)logical_height / (GLfloat)logical_width;
 
@@ -301,6 +230,14 @@ void video_clear()
         SDL_GL_SetSwapInterval(0);
     }
 
+    canvas_width = EM_ASM_INT({
+        return canvas.width;
+    });
+
+    canvas_height = EM_ASM_INT({
+        return canvas.height;
+    });
+
     glViewport(0, 0, canvas_width, canvas_height);
 #else
     // TODO: Emscripten's canvas supports high DPI displays, but does not
@@ -313,6 +250,7 @@ void video_clear()
 
         glLineWidth(1.5f * pixel_density);
     }
+#endif
 
     // Calculate viewport size based aspect ratio
     if (canvas_width * ratio >= canvas_height) {
@@ -342,7 +280,6 @@ void video_clear()
     y = (canvas_height - viewport_height) / 2.f;
     glScissor((GLint) x, (GLint) y, (GLsizei) viewport_width, (GLsizei) viewport_height);
     glViewport((GLint) x, (GLint) y, (GLsizei) viewport_width, (GLsizei) viewport_height);
-#endif
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
