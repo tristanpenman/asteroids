@@ -6,13 +6,7 @@
 #include "timing.h"
 #include "titlescreen.h"
 
-static unsigned int level = 1;
-static unsigned int lives = 3;
-static unsigned int score = 0;
-
-static float elapsed = 0.f;
-
-static char titlecard[100];
+static float elapsed;
 
 /******************************************************************************
  *
@@ -24,6 +18,8 @@ void gameover_init()
 {
     canvas_reset();
     input_reset();
+
+    elapsed = 0.f;
 }
 
 void gameover_loop(bool draw)

@@ -6,7 +6,7 @@
 #include "timing.h"
 #include "titlescreen.h"
 
-static float elapsed = 0.f;
+static float elapsed;
 
 /******************************************************************************
  *
@@ -18,6 +18,8 @@ void gameover_init()
 {
     canvas_reset();
     input_reset();
+
+    elapsed = 0.f;
 }
 
 void gameover_loop(bool draw)
