@@ -49,8 +49,6 @@ bool titlescreen_init()
     assert(input_start != INPUT_INVALID_HANDLE);
     input_map(input_start, INPUT_KEY_ENTER);
     input_map(input_start, INPUT_KEY_RETURN);
-    input_map(input_start, INPUT_BUTTON_A);
-    input_map(input_start, INPUT_BUTTON_B);
     input_map(input_start, INPUT_BUTTON_START);
 
     // quit aciton
@@ -139,6 +137,8 @@ void titlescreen_loop(bool draw)
     }
 
     canvas_draw_text_centered("ASTEROIDS", 1.1f, -0.20f, FONT_SPACE);
+
+    canvas_draw_text_centered("PRESS START", 0.6f, 0, FONT_SPACE);
 
     canvas_finish_drawing(true);
 }
