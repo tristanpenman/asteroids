@@ -52,6 +52,7 @@ set(SRCS
     src/draw.c
     src/entities.c
     src/game.c
+    src/gameover.c
     src/highscores.c
     src/initials.c
     src/input.c

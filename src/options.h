@@ -15,9 +15,6 @@
 #define SOUND_PHASER 3
 #define SOUND_THRUSTER 4
 
-#define START_LEVEL_DELAY_MS 2000.0f
-#define NEXT_WAVE_DELAY 3.0f
-
 #define HIGHSCORES_FILE "highscores.csv"
 
 #endif

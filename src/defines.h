@@ -40,6 +40,8 @@
 #define FONT_SPACE 0.0025f
 
 // general
+#define GAME_OVER_DELAY_MS 5000.0f
 #define START_LEVEL_DELAY_MS 2000.0f
+#define NEXT_WAVE_DELAY 3.0f
 
 #endif

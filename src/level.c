@@ -8,6 +8,7 @@
 #include "defines.h"
 #include "draw.h"
 #include "entities.h"
+#include "gameover.h"
 #include "highscores.h"
 #include "initials.h"
 #include "input.h"
@@ -180,8 +181,8 @@ static void update_player(struct player *p, float factor)
                 set_main_loop(initials_loop);
 #endif
             } else {
-                titlescreen_init();
-                set_main_loop(titlescreen_loop);
+                gameover_init();
+                set_main_loop(gameover_loop);
             }
         }
     }
@@ -268,11 +269,12 @@ static void update_bullets(struct bullet *bb, unsigned int n, float f)
     }
 }
 
-static void update_score(struct player *p, int amount)
+static void update_score(int amount)
 {
-    const int lives_given = p->score / 10000;
-    p->score += amount;
-    p->lives += p->score / 10000 - lives_given;
+    const int lives_given = player.score / 10000;
+
+    player.score += amount;
+    player.lives += player.score / 10000 - lives_given;
 }
 
 /******************************************************************************
@@ -394,7 +396,7 @@ static void check_collisions()
     unsigned int i, j;
     bool asteroid_hit = false;
     bool collision = false;
-    float ascale;
+    float asteroid_scale;
 
     // Check for asteroid collisions
     for (j = 0; j < MAX_ASTEROIDS; j++) {
@@ -425,6 +427,7 @@ static void check_collisions()
             }
         }
 
+        // deal with player-asteroid collisions
         if (player.state == PS_NORMAL && asteroid_hit == false) {
             collision = collision_test_shapes(
                 &player_shape_data[0], &player.pos, player.rot, 1.0f,
@@ -448,13 +451,13 @@ static void check_collisions()
             }
             explosion_channel = mixer_play_sample(SOUND_EXPLOSION);
             
-            ascale = asteroids[j].scale;
-            if (ascale < 0.49f) {
-                update_score(&player, 100);
-            } else if (ascale < 0.99f) {
-                update_score(&player, 50);
+            asteroid_scale = asteroids[j].scale;
+            if (asteroid_scale < 0.49f) {
+                update_score(100);
+            } else if (asteroid_scale < 0.99f) {
+                update_score(50);
             } else {
-                update_score(&player, 20);
+                update_score(20);
             }
         }
     }
