@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -23,7 +24,7 @@
 #include "vec.h"
 
 // how close objects need to be before performing collision detection
-#define COLLISION_THRESHOLD 0.5f
+#define COLLISION_THRESHOLD 0.1f
 
 // number of milliseconds that should be simulated in each timestep
 #define TIME_STEP_MILLIS 10
@@ -61,6 +62,9 @@ static int input_thruster;
 static float beat_delay;
 static float beat_delay_limit;
 static float next_level_countdown;
+
+// debug
+static int collision_tests_per_frame;
 
 /******************************************************************************
  *
@@ -384,7 +388,7 @@ static bool should_test_collisions(const struct vec_2d *a, const struct vec_2d *
 {
     const float dx = a->x - b->x;
     const float dy = a->y - b->y;
-    const float dist_sq = dx * dx + dy + dy;
+    const float dist_sq = dx * dx + dy * dy;
     const float threshold = COLLISION_THRESHOLD;
     const float threshold_sq = threshold * threshold;
 
@@ -400,24 +404,28 @@ static void check_collisions()
 
     // Check for asteroid collisions
     for (j = 0; j < MAX_ASTEROIDS; j++) {
-        if (asteroids[j].visible == false) {
+        struct asteroid *asteroid = &asteroids[j];
+        if (asteroid->visible == false) {
             continue;
         }
 
-        // Check for bullet collisions
+        // Check for asteroid-bullet collisions
         for (i = 0; i < MAX_BULLETS; i++) {
             if (bullets[i].visible == false) {
                 continue;
             }
 
-            if (!should_test_collisions(&bullets[i].pos, &asteroids[j].pos)) {
+            // broad phase
+            if (!should_test_collisions(&bullets[i].pos, &asteroid->pos)) {
                 continue;
             }
 
-            // Player bullet, test against asteroids
+            collision_tests_per_frame++;
+
+            // narrow phase
             collision = collision_test_shapes(
-                &bullet_shape_data, &bullets[i].pos, 0, 1.0f,
-                &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
+                &bullet_shape_data, &bullets[i].pos, bullets[i].rot, 1.0f,
+                &asteroid_shape_data[asteroid->shape], &asteroid->pos, 0, asteroid->scale);
 
             if (collision) {
                 // Bullets can only hit one asteroid
@@ -429,29 +437,35 @@ static void check_collisions()
 
         // deal with player-asteroid collisions
         if (player.state == PS_NORMAL && asteroid_hit == false) {
-            collision = collision_test_shapes(
-                &player_shape_data[0], &player.pos, player.rot, 1.0f,
-                &asteroid_shape_data[asteroids[j].shape], &asteroids[j].pos, 0, asteroids[j].scale);
+            // broad phase
+            if (should_test_collisions(&player.pos, &asteroid->pos)) {
+                collision_tests_per_frame++;
 
-            if (collision) {
-                debug_printf("collision between ship and asteroid %d\n", j);
-                explode_player();
-                asteroid_hit = true;
-                player.lives--;
+                // narrow phase
+                collision = collision_test_shapes(
+                    &player_shape_data[0], &player.pos, player.rot, 1.0f,
+                    &asteroid_shape_data[asteroid->shape], &asteroid->pos, 0, asteroid->scale);
+
+                if (collision) {
+                    debug_printf("collision between ship and asteroid %d\n", j);
+                    explode_player();
+                    asteroid_hit = true;
+                    player.lives--;
+                }
             }
         }
 
         if (asteroid_hit) {
             asteroid_hit = false;
             asteroids_hit++;
-            explode_asteroid(&asteroids[j], asteroids, explosions);
+            explode_asteroid(asteroid, asteroids, explosions);
 
             if (explosion_channel > -1) {
                 mixer_stop_playing_on_channel(explosion_channel);
             }
             explosion_channel = mixer_play_sample(SOUND_EXPLOSION);
-            
-            asteroid_scale = asteroids[j].scale;
+
+            asteroid_scale = asteroid->scale;
             if (asteroid_scale < 0.49f) {
                 update_score(100);
             } else if (asteroid_scale < 0.99f) {
@@ -476,6 +490,11 @@ static void level_draw()
     struct vec_2d scale;
 
     const float residual = (float)residual_simulation_time() / 1000.f;
+
+#ifdef DEBUG
+    char debug[100];
+    sprintf(debug, "collision tests: %d\n", collision_tests_per_frame);
+#endif
 
     canvas_start_drawing(true);
 
@@ -520,6 +539,10 @@ static void level_draw()
     draw_score(player.score);
     draw_lives(player.lives);
 
+#ifdef DEBUG
+    canvas_draw_text_centered(debug, 0.3, -0.35, FONT_SPACE);
+#endif
+
     canvas_finish_drawing(true);
 }
 
@@ -527,6 +550,8 @@ static void level_update()
 {
     int8_t joystick_x;
     unsigned int num_asteroids = 0;
+
+    collision_tests_per_frame = 0;
 
     input_update();
     input_read_joystick(&joystick_x, NULL);

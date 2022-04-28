@@ -1,4 +1,4 @@
-#include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -346,7 +346,7 @@ static void check_collisions()
             // }
             // explosion_channel = mixer_play_sample(SOUND_EXPLOSION);
 
-            asteroid_scale = asteroids[j].scale;
+            asteroid_scale = asteroid->scale;
             if (asteroid_scale < 0.49f) {
                 update_score(100);
             } else if (asteroid_scale < 0.99f) {
