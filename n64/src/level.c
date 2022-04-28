@@ -83,7 +83,7 @@ static void draw_score(int score)
 
     sprintf(buffer, "%u", score);
 
-    canvas_draw_text(buffer, -0.45f, -0.33f, FONT_SPACE, 0.65f);
+    canvas_draw_text(buffer, -0.45f, -0.33f, 0.65f);
 }
 
 static unsigned int num_asteroids_for_level(int level) {
@@ -418,7 +418,7 @@ static void level_draw()
     draw_score(player.score);
 
 #ifdef DEBUG
-    canvas_draw_text_centered(debug, 0.3, -0.35, FONT_SPACE);
+    canvas_draw_text_centered(debug, -0.35f, 0.3f);
 #endif
 
     canvas_finish_drawing(true);

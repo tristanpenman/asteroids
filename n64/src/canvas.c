@@ -194,7 +194,7 @@ bool canvas_draw_shape(int shape, struct vec_2d position, float rotation, struct
     return true;
 }
 
-void canvas_draw_text(const char *text, float x, float y, float spacing, float scale_factor)
+void canvas_draw_text(const char *text, float x, float y, float scale_factor)
 {
     struct vec_2d position = {
         x,
@@ -214,7 +214,7 @@ void canvas_draw_text(const char *text, float x, float y, float spacing, float s
         if (c >= MAX_GLYPHS) {
             goto next;
         }
-            
+
         if (font_shape_ids[c] == CANVAS_INVALID_SHAPE) {
             shape_index = ascii_to_font_mapping[c];
             if (shape_index < 0) {
@@ -230,16 +230,16 @@ void canvas_draw_text(const char *text, float x, float y, float spacing, float s
         canvas_draw_shape(font_shape_ids[c], position, 0, scale);
 next:
         position.x += FONT_WIDTH * scale_factor;
-        position.x += spacing * scale_factor;
+        position.x += FONT_SPACE * scale_factor;
         s++;
     }
 }
 
-void canvas_draw_text_centered(const char *text, float size, float y, float spacing)
+void canvas_draw_text_centered(const char *text, float y, float scale_factor)
 {
-    const float width = ((float)strlen(text) * (FONT_WIDTH + spacing)) - spacing;
+    const float width = ((float)strlen(text) * (FONT_WIDTH + FONT_SPACE)) - FONT_SPACE;
 
-    canvas_draw_text(text, 0 - (width * size / 2.0f), y, spacing, size);
+    canvas_draw_text(text, 0 - (width * scale_factor / 2.0f), y, scale_factor);
 }
 
 void canvas_finish_drawing(bool swap)

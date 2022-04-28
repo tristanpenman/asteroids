@@ -84,21 +84,21 @@ static void draw_ship_explosion(const struct player *p)
     glColor3f(1.f, 1.f, 1.f);
 }
 
-static void draw_text_ex(const char *s, GLfloat size, GLfloat x, GLfloat y, float spacing)
+static void draw_text_ex(const char *s, GLfloat size, GLfloat x, GLfloat y)
 {
-    canvas_draw_text(s, x, y, spacing, size);
+    canvas_draw_text(s, x, y, size);
 }
 
 static void draw_text(const char *s, GLfloat size, GLfloat x, GLfloat y)
 {
-    draw_text_ex(s, size, x, y, FONT_SPACE);
+    draw_text_ex(s, size, x, y);
 }
 
-static void draw_text_centered_ex(const char *s, GLfloat size, GLfloat y, float spacing)
+static void draw_text_centered_ex(const char *s, GLfloat size, GLfloat y, GLfloat spacing)
 {
     const GLfloat width = ((GLfloat) strlen(s) * (FONT_WIDTH + spacing)) - spacing;
 
-    draw_text_ex(s, size, 0 - (width * size / 2.0f), y, spacing);
+    draw_text_ex(s, size, 0 - (width * size / 2.0f), y);
 }
 
 static void draw_text_centered(const char *s, GLfloat size, GLfloat y)

@@ -540,7 +540,7 @@ static void level_draw()
     draw_lives(player.lives);
 
 #ifdef DEBUG
-    canvas_draw_text_centered(debug, 0.3, -0.35, FONT_SPACE);
+    canvas_draw_text_centered(debug, -0.35f, 0.3f);
 #endif
 
     canvas_finish_drawing(true);
