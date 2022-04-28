@@ -34,7 +34,7 @@ extern int phaser_channel;
 extern int thruster_channel;
 
 // level state
-static unsigned int asteroids_hit;
+static int asteroids_hit;
 static int level;
 static int next_beat;
 static int starting_asteroids;
@@ -89,24 +89,24 @@ static int num_asteroids_for_level(int next_level) {
     return 11;
 }
 
-static void update_player(struct player *p, float factor)
+static void update_player(float factor)
 {
     int i;
-    float s, d, rot = p->rot;
-    struct vec_2d *pos = &p->pos;
-    struct vec_2d *vel = &p->vel;
+    float s, d, rot = player.rot;
+    struct vec_2d *pos = &player.pos;
+    struct vec_2d *vel = &player.vel;
     int spin = 0;
 
-    if (p->state == PS_NORMAL) {
-        if (KS_DOWN == p->keys.left) {
+    if (player.state == PS_NORMAL) {
+        if (KS_DOWN == player.keys.left) {
             spin = -1;
-        } else if (KS_DOWN == p->keys.right) {
+        } else if (KS_DOWN == player.keys.right) {
             spin = 1;
         }
 
-        p->rot = wrap_angle(p->rot + SHIP_ROTATION_SPEED * factor * (float) spin);
+        player.rot = wrap_angle(player.rot + SHIP_ROTATION_SPEED * factor * (float) spin);
 
-        if (KS_DOWN == p->keys.up) {
+        if (KS_DOWN == player.keys.up) {
             vel->x += sinf(rot) * SHIP_ACCELERATION * factor;
             vel->y -= cosf(rot) * SHIP_ACCELERATION * factor;
             if (thruster_channel == -1) {
@@ -126,13 +126,13 @@ static void update_player(struct player *p, float factor)
         vec_2d_scale(vel, MAX_SPEED);
     }
 
-    p->pos_prev.x = pos->x;
-    p->pos_prev.y = pos->y;
+    player.pos_prev.x = pos->x;
+    player.pos_prev.y = pos->y;
 
     pos->x += vel->x * factor;                    /* Calculate position */
     pos->y += vel->y * factor;
 
-    if (p->state == PS_EXPLODING) {
+    if (player.state == PS_EXPLODING) {
         d = s * (1.0f - 1.5f * factor);
     } else {
         d = s * (1.0f - 0.5f * factor);           /* Calculate dampening */
@@ -143,45 +143,45 @@ static void update_player(struct player *p, float factor)
         vec_2d_scale(vel, d);
     }
 
-    if (p->state == PS_NORMAL) {
-        if (wrap_position(&p->pos, SHIP_RADIUS)) {
-            p->pos_prev.x = pos->x;
-            p->pos_prev.y = pos->y;
+    if (player.state == PS_NORMAL) {
+        if (wrap_position(&player.pos, SHIP_RADIUS)) {
+            player.pos_prev.x = pos->x;
+            player.pos_prev.y = pos->y;
         }
 
-        if (p->keys.up == KS_UP) {
-            p->phase = 0.0f;
+        if (player.keys.up == KS_UP) {
+            player.phase = 0.0f;
         } else {
-            p->phase += factor;
-            if (p->phase > SHIP_THRUSTER_BLINK * 2.0f) {
-                p->phase = 0.0f;
+            player.phase += factor;
+            if (player.phase > SHIP_THRUSTER_BLINK * 2.0f) {
+                player.phase = 0.0f;
             }
         }
 
-        if (p->reloading == true) {
-            p->reload_delay += factor;
+        if (player.reloading == true) {
+            player.reload_delay += factor;
         }
 
-        if (p->reload_delay >= BULLET_DELAY) {
-            p->reload_delay = 0.0f;
-            p->reloading = false;
+        if (player.reload_delay >= BULLET_DELAY) {
+            player.reload_delay = 0.0f;
+            player.reloading = false;
         }
 
-    } else if (p->state == PS_EXPLODING) {
+    } else if (player.state == PS_EXPLODING) {
         for (i = 0; i < SHIP_EXPLOSION_SHARDS; i++) {
-            p->shards[i].rot = wrap_angle(
-                p->shards[i].rot +
-                SHIP_EXPLOSION_SHARD_ROT_SPEED * factor * (float) p->shards[i].dir);
+            player.shards[i].rot = wrap_angle(
+                player.shards[i].rot +
+                SHIP_EXPLOSION_SHARD_ROT_SPEED * factor * (float) player.shards[i].dir);
         }
 
-        p->death_delay += factor;
-        if (p->death_delay >= SHIP_DEATH_DELAY) {
-            if (p->lives >= 0) {
+        player.death_delay += factor;
+        if (player.death_delay >= SHIP_DEATH_DELAY) {
+            if (player.lives >= 0) {
                 /* TODO: Make sure that ship won't reappear near asteroids */
-                player_reset(p);
+                player_reset(&player);
 #ifndef __EMSCRIPTEN__
-            } else if (is_high_score(p->score)) {
-                initials_init(p->score);
+            } else if (is_high_score(player.score)) {
+                initials_init(player.score);
                 set_main_loop(initials_loop);
 #endif
             } else {
@@ -566,7 +566,7 @@ static void level_update()
     while (maybe_consume_simulation_time(TIME_STEP_MILLIS)) {
         const float factor = (float)(TIME_STEP_MILLIS) / 1000.f;
 
-        update_player(&player, factor);
+        update_player(factor);
 
         if (player.state == PS_NORMAL) {
             if (input_active(input_left)) {

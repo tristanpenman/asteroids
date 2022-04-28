@@ -38,7 +38,6 @@ static const float min_y = -SCREEN_RATIO / 2.0f - SHIP_RADIUS;
 
 // level state
 static int asteroids_hit;
-static bool gameover;
 static int level;
 static int next_beat;
 static int starting_asteroids;
@@ -50,10 +49,10 @@ static struct explosion explosions[MAX_EXPLOSIONS];
 static struct player player;
 
 // shapes
-static uint8_t asteroid_shapes[NUM_ASTEROID_SHAPES];
-static uint8_t bullet_shape;
-static uint8_t player_frame_1_shape;
-static uint8_t player_frame_2_shape;
+static int asteroid_shapes[NUM_ASTEROID_SHAPES];
+static int bullet_shape;
+static int player_frame_1_shape;
+static int player_frame_2_shape;
 
 // inputs
 static int input_escape;
@@ -107,7 +106,9 @@ static void update_player(float factor)
 {
     int i;
 
-    if (player.state == PS_EXPLODING) {
+    if (player.state == PS_NORMAL) {
+        // TODO
+    } else if (player.state == PS_EXPLODING) {
         for (i = 0; i < SHIP_EXPLOSION_SHARDS; i++) {
             player.shards[i].rot = wrap_angle(
                 player.shards[i].rot +
