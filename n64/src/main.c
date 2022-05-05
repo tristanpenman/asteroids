@@ -10,6 +10,7 @@
 #include "rumble.h"
 #include "sandbox.h"
 #include "segment.h"
+#include "storage.h"
 #include "titlescreen.h"
 #include "vec.h"
 
@@ -61,8 +62,16 @@ void mainproc()
     debug_addcommand("titlescreen", "Switch to titlescreen", titlescreen);
     debug_printf("Starting...\n");
 
+    debug_printf("input_init...\n");
     input_init();
+   
+    debug_printf("storage_init...\n");
+    storage_init();
+
+    debug_printf("rumble_init...\n");
     rumble_init();
+
+    debug_printf("audio_init...\n");
     audio_init();
 
     titlescreen_init();
