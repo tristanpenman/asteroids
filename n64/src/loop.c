@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <nusys.h>
 
 #include "debug.h"
@@ -28,16 +27,16 @@ static void nusys_loop(int pendingGfx)
 
 void set_main_loop(main_loop_fn_t new_main_loop)
 {
-    assert(exit_loop != main_loop);
-    assert(NULL != new_main_loop);
+    debug_assert(exit_loop != main_loop);
+    debug_assert(NULL != new_main_loop);
 
     main_loop = new_main_loop;
 }
 
 void run_main_loop()
 {
-    assert(NULL != main_loop);
-    assert(exit_loop != main_loop);
+    debug_assert(NULL != main_loop);
+    debug_assert(exit_loop != main_loop);
 
     nuGfxFuncSet((NUGfxFunc) nusys_loop);
     nuGfxDisplayOn();
@@ -47,7 +46,7 @@ void run_main_loop()
 
 void cancel_main_loop(int new_exit_code)
 {
-    assert(exit_loop != main_loop);
+    debug_assert(exit_loop != main_loop);
 
     main_loop = exit_loop;
     exit_code = new_exit_code;

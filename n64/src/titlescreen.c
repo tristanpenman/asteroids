@@ -1,9 +1,9 @@
-#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 #include "canvas.h"
 #include "data.h"
+#include "debug.h"
 #include "entities.h"
 #include "input.h"
 #include "loop.h"
@@ -39,21 +39,21 @@ bool titlescreen_init()
 
     // high scores action
     input_highscores = input_register();
-    assert(input_highscores != INPUT_INVALID_HANDLE);
+    debug_assert(input_highscores != INPUT_INVALID_HANDLE);
 #ifndef __EMSCRIPTEN__
     input_map(input_highscores, INPUT_KEY_H);
 #endif
 
     // start action
     input_start = input_register();
-    assert(input_start != INPUT_INVALID_HANDLE);
+    debug_assert(input_start != INPUT_INVALID_HANDLE);
     input_map(input_start, INPUT_KEY_ENTER);
     input_map(input_start, INPUT_KEY_RETURN);
     input_map(input_start, INPUT_BUTTON_START);
 
     // quit aciton
     input_quit = input_register();
-    assert(input_quit != INPUT_INVALID_HANDLE);
+    debug_assert(input_quit != INPUT_INVALID_HANDLE);
 #ifndef __EMSCRIPTEN__
     input_map(input_quit, INPUT_KEY_ESCAPE);
 #endif

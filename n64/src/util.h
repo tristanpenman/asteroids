@@ -5,6 +5,10 @@
 
 struct vec_2d;
 
+uint32_t htonl(uint32_t x);
+
+uint32_t ntohl(uint32_t x);
+
 float random_float(float low, float high);
 
 float wrap_angle(float angle);

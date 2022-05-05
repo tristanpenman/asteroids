@@ -4,6 +4,7 @@
 #include <nualstl_n.h>
 
 #include "debug.h"
+#include "highscores.h"
 #include "input.h"
 #include "level.h"
 #include "loop.h"
@@ -73,6 +74,12 @@ void mainproc()
 
     debug_printf("audio_init...\n");
     audio_init();
+
+    debug_printf("highscores_load...\n");
+    if (!highscores_load()) {
+      debug_printf("highscores_save...\n");
+      highscores_save();
+    }
 
     titlescreen_init();
     set_main_loop(titlescreen_loop);

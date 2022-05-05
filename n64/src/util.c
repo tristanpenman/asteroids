@@ -4,6 +4,7 @@
 
 #include "defines.h"
 #include "mathdefs.h"
+#include "types.h"
 #include "util.h"
 #include "vec.h"
 
@@ -12,6 +13,21 @@
  * Public interface
  *
  *****************************************************************************/
+
+uint32_t htonl(uint32_t x)
+{
+#if BYTE_ORDER == LITTLE_ENDIAN
+    uint8_t *s = (uint8_t *)&x;
+    return (uint32_t)(s[0] << 24 | s[1] << 16 | s[2] << 8 | s[3]);
+#else
+    return x;
+#endif
+}
+
+uint32_t ntohl(uint32_t x)
+{
+    return htonl(x);
+}
 
 float random_float(float low, float high)
 {

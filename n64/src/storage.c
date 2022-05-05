@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <string.h>
 
 #include <nusys.h>
 
@@ -87,23 +88,26 @@ bool storage_available()
 int storage_read(const char *filename, char *buffer, int read_offset, int read_size)
 {
     s32 err;
+    char notename[16];
 
+    assert(strlen(filename) <= 16);
     assert(read_offset % 32 == 0);
     assert(read_size % 32 == 0);
 
-    if (!available || !open_controller_pak()) {
+    if (!available) {
         return STORAGE_ERR_NOT_AVAILABLE;
     }
 
-    err = nuContPakFileOpen(&pak_file, (char*)filename, 0, NU_CONT_PAK_MODE_NOCREATE, 0);
+    memset(notename, 0, 16);
+    memcpy(notename, filename, strlen(filename));
+
+    err = nuContPakFileOpen(&pak_file, notename, "", NU_CONT_PAK_MODE_NOCREATE, 0);
     if (err) {
-        debug_printf("nuContPakFileOpen failed: %d\n", err);
         return STORAGE_ERR_OPEN_FILE;
     }
 
     nuContPakFileRead(&pak_file, read_offset, read_size, (u8*) buffer);
     if (pak_file.error) {
-        debug_printf("nuContPakFileRead failed: %d\n", pak_file.error);
         return STORAGE_ERR_READ_FILE;
     }
 
@@ -113,25 +117,29 @@ int storage_read(const char *filename, char *buffer, int read_offset, int read_s
 int storage_write(const char *filename, const char *buffer, int write_offset, int write_size)
 {
     s32 err;
+    char notename[16];
 
-    assert(write_offset % 32 == 0);
-    assert(write_size % 32 == 0);
+    // assert(strlen(filename) <= 16);
+    // assert(write_offset % 32 == 0);
+    // assert(write_size % 32 == 0);
 
-    if (!available || !open_controller_pak()) {
+    if (!available) {
         return STORAGE_ERR_NOT_AVAILABLE;
     }
 
-    err = nuContPakFileOpen(&pak_file, (char*)filename, 0, NU_CONT_PAK_MODE_NOCREATE, 0);
-    if (err) {
-        debug_printf("nuContPakFileOpen failed: %d\n", err);
-        return STORAGE_ERR_OPEN_FILE;
-    }
+    // memset(notename, 0, 16);
+    // memcpy(notename, filename, strlen(filename));
 
-    nuContPakFileWrite(&pak_file, write_offset, write_size, (u8*) buffer);
-    if (pak_file.error) {
-        debug_printf("nuContPakFileWrite failed: %d\n", pak_file.error);
-        return STORAGE_ERR_WRITE_FILE;
-    }
+    // err = nuContPakFileOpen(&pak_file, notename, "", NU_CONT_PAK_MODE_CREATE, write_size);
+    // if (err) {
+    //     debug_printf(" - nuContPakFileOpen return: %d\n");
+    //     return STORAGE_ERR_OPEN_FILE;
+    // }
+
+    // nuContPakFileWrite(&pak_file, write_offset, write_size, (u8*) buffer);
+    // if (pak_file.error) {
+    //     return STORAGE_ERR_WRITE_FILE;
+    // }
 
     return STORAGE_OK;
 }
