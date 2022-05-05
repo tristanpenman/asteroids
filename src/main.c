@@ -13,6 +13,7 @@
 #include "input.h"
 #include "mixer.h"
 #include "options.h"
+#include "storage.h"
 #include "video.h"
 
 #define FULLSCREEN_FLAG "--fullscreen"
@@ -80,12 +81,19 @@ int main(int argc, char **argv)
 
     if (!silent) {
         debug_printf("mixer_init...\n");
-        if (false == mixer_init(MIXER_DEFAULT)) {
-            exit(1);
+        if (!mixer_init(MIXER_DEFAULT)) {
+            debug_printf(" - mixer not available");
         }
     }
 
+    debug_printf("input_init...\n");
     input_init();
+
+    debug_printf("storage_init...\n");
+    storage_init();
+    if (!storage_available()) {
+        debug_printf(" - storage not available\n");
+    }
 
     debug_printf("game_init...\n");
     if (false == game_init(silent)) {

@@ -3,14 +3,16 @@
 #include <string.h>
 
 #include "canvas.h"
+#include "debug.h"
 #include "draw.h"
 #include "highscores.h"
 #include "input.h"
 #include "loop.h"
 #include "options.h"
+#include "storage.h"
 #include "titlescreen.h"
 
-#define HIGHSCORES_BUFFER_SIZE 100
+#define HIGHSCORES_BUFFER_SIZE 96
 
 static struct highscores scores;
 
@@ -21,8 +23,9 @@ void load_highscores()
     int current_entry;
     int result;
     char buffer[HIGHSCORES_BUFFER_SIZE];
+    char *p;
     struct score *current_score;
-    FILE *file;
+    int n;
 
     // Clear highscores data structure
     memset(&scores, 0, sizeof(struct highscores));
@@ -30,65 +33,52 @@ void load_highscores()
         memcpy(&scores.entries[current_entry].initials, "---", sizeof(char) * 4);
     }
 
-    // Attempt to open high-scores file
-    file = fopen(HIGHSCORES_FILE, "r");
-    if (!file) {
-        if (ENOENT != errno) {
-            fprintf(stderr, "Failed to open high scores file: %s\n", strerror(errno));
-        }
+    result = storage_read(HIGHSCORES_FILE, buffer, 0, HIGHSCORES_BUFFER_SIZE);
+    if (result < STORAGE_OK) {
+        debug_printf("Failed to read high scores: %d\n", result);
         return;
     }
 
+    p = buffer;
     current_entry = 0;
-    while (!feof(file) && !ferror(file) && current_entry < 10) {
-        // Read up to [HIGHSCORES_BUFFER_SIZE - 1] characters into buffer
-        buffer[0] = '\0';
-        if (NULL == fgets(buffer, HIGHSCORES_BUFFER_SIZE, file)) {
-            if (ferror(file)) {
-                fprintf(stderr, "Failed to read line %d of %s: %s",
-                    current_entry + 1, HIGHSCORES_FILE, strerror(errno));
-                clearerr(file);
-            }
+    while (current_entry < 10) {
+        current_score = &scores.entries[current_entry];
+        result = sscanf(p, "%3[A-Z0-9 ],%u%n", current_score->initials, &current_score->score, &n);
+        if (result != 2) {
+            debug_printf("failed to parse high score entry %d\n", current_entry);
             break;
         }
 
-        // Parse initials and score
-        current_score = &scores.entries[current_entry];
-        result = sscanf(buffer, "%3[A-Z0-9 ],%u", current_score->initials, &current_score->score);
-        if (result != 2) {
-            fprintf(stderr, "Skipping line %d of %s due to invalid data.\n",
-                current_entry + 1, HIGHSCORES_FILE);
-            continue;
-        }
-
+        p += n;
         current_score->used = true;
         current_entry++;
     }
-
-    if (ferror(file)) {
-        fprintf(stderr, "Failed to read high scores file: %s\n", strerror(errno));
-    }
-
-    fclose(file);
 }
 
 void dump_highscores()
 {
-    FILE *file = fopen(HIGHSCORES_FILE, "w");
-    if (!file) {
-        fprintf(stderr, "Could not open high scores file: %s\n", strerror(errno));
-        return;
-    }
+    int current_entry;
+    int result;
+    char buffer[HIGHSCORES_BUFFER_SIZE];
+    char *p;
 
-    for (int current_entry = 0; current_entry < 10 && scores.entries[current_entry].used; ++current_entry) {
-        fprintf(file, "%s,%u\n", scores.entries[current_entry].initials, scores.entries[current_entry].score);
-        if (ferror(file)) {
-            fprintf(stderr, "Error while writing high scores file: %s\n", strerror(errno));
+    memset(buffer, 0, HIGHSCORES_BUFFER_SIZE);
+
+    p = buffer;
+    for (current_entry = 0; current_entry < 10 && scores.entries[current_entry].used; ++current_entry) {
+        result = sprintf(p, "%s,%u\n", scores.entries[current_entry].initials, scores.entries[current_entry].score);
+        if (result < 0) {
+            fprintf(stderr, "Error while preparing high score data: %s\n", strerror(errno));
             break;
         }
+
+        p += result;
     }
 
-    fclose(file);
+    result = storage_write(HIGHSCORES_FILE, buffer, 0, HIGHSCORES_BUFFER_SIZE);
+    if (result < STORAGE_OK) {
+        debug_printf("Failed to write high scores: %d\n", result);
+    }
 }
 
 bool is_high_score(unsigned int score)

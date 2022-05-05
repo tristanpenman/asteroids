@@ -61,6 +61,7 @@ set(SRCS
     src/main.c
     src/mixer.c
     src/sandbox.c
+    src/storage.c
     src/timing.c
     src/titlescreen.c
     src/transition.c
