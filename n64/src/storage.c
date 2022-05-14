@@ -34,7 +34,7 @@ bool open_controller_pak()
         return false;
     }
 
-	  nuContPakOpen(&pak_file, 0);
+    nuContPakOpen(&pak_file, 0);
 
     if (pak_file.type == NU_CONT_PAK_TYPE_PAK) {
         debug_printf(" - nuContPakOpen says card is controller pak\n");
