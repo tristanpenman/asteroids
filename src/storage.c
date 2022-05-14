@@ -17,7 +17,7 @@ bool storage_available()
 #endif
 }
 
-int storage_read(const char *filename, char *buffer, int read_offset, int read_size)
+int storage_read(const char *filename, char *buffer, int read_size)
 {
 #ifdef __EMSCRIPTEN__
     return -1;
@@ -31,8 +31,6 @@ int storage_read(const char *filename, char *buffer, int read_offset, int read_s
         return STORAGE_ERR_OPEN_FILE;
     }
 
-    fseek(f, read_offset, SEEK_SET);
-
     sz = fread(buffer, 1, read_size, f);
     fclose(f);
 
@@ -43,7 +41,7 @@ int storage_read(const char *filename, char *buffer, int read_offset, int read_s
     return sz;
 }
 
-int storage_write(const char *filename, const char *buffer, int write_offset, int write_size)
+int storage_write(const char *filename, const char *buffer, int write_size)
 {
 #ifdef __EMSCRIPTEN__
     return -1;
@@ -56,8 +54,6 @@ int storage_write(const char *filename, const char *buffer, int write_offset, in
     if (!f) {
         return STORAGE_ERR_OPEN_FILE;
     }
-
-    fseek(f, write_offset, SEEK_SET);
 
     sz = fwrite(buffer, 1, write_size, f);
     fclose(f);

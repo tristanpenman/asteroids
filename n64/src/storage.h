@@ -13,8 +13,8 @@ void storage_init();
 
 bool storage_available();
 
-int storage_read(const char *filename, char *buffer, int read_offset, int read_size);
+int storage_read(const char *filename, char *buffer, int read_size);
 
-int storage_write(const char *filename, const char *buffer, int write_offset, int write_size);
+int storage_write(const char *filename, const char *buffer, int write_size);
 
 #endif

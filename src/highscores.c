@@ -12,13 +12,23 @@
 #include "storage.h"
 #include "titlescreen.h"
 
-#define HIGHSCORES_BUFFER_SIZE 96
+#define HIGHSCORES_BUFFER_SIZE 128
 
 static struct highscores scores;
 
 static int input_return;
 
-void load_highscores()
+void highscores_reset()
+{
+    int current_entry;
+
+    memset(&scores, 0, sizeof(struct highscores));
+    for (current_entry = 0; current_entry < 10; ++current_entry) {
+        memcpy(&scores.entries[current_entry].initials, "---", sizeof(char) * 4);
+    }
+}
+
+bool highscores_load()
 {
     int current_entry;
     int result;
@@ -27,16 +37,12 @@ void load_highscores()
     struct score *current_score;
     int n;
 
-    // Clear highscores data structure
-    memset(&scores, 0, sizeof(struct highscores));
-    for (current_entry = 0; current_entry < 10; ++current_entry) {
-        memcpy(&scores.entries[current_entry].initials, "---", sizeof(char) * 4);
-    }
+    highscores_reset();
 
-    result = storage_read(HIGHSCORES_FILE, buffer, 0, HIGHSCORES_BUFFER_SIZE);
+    result = storage_read(HIGHSCORES_FILE, buffer, HIGHSCORES_BUFFER_SIZE);
     if (result < STORAGE_OK) {
-        debug_printf("Failed to read high scores: %d\n", result);
-        return;
+        debug_printf(" - failed to read high scores: %d\n", result);
+        return false;
     }
 
     p = buffer;
@@ -45,17 +51,19 @@ void load_highscores()
         current_score = &scores.entries[current_entry];
         result = sscanf(p, "%3[A-Z0-9 ],%u%n", current_score->initials, &current_score->score, &n);
         if (result != 2) {
-            debug_printf("failed to parse high score entry %d\n", current_entry);
-            break;
+            debug_printf(" - failed to parse high score entry %d\n", current_entry);
+            highscores_reset();
+            return false;
         }
 
         p += n;
-        current_score->used = true;
         current_entry++;
     }
+
+    return true;
 }
 
-void dump_highscores()
+void highscores_save()
 {
     int current_entry;
     int result;
@@ -65,7 +73,7 @@ void dump_highscores()
     memset(buffer, 0, HIGHSCORES_BUFFER_SIZE);
 
     p = buffer;
-    for (current_entry = 0; current_entry < 10 && scores.entries[current_entry].used; ++current_entry) {
+    for (current_entry = 0; current_entry < 10 && scores.entries[current_entry].initials[0] != '-'; ++current_entry) {
         result = sprintf(p, "%s,%u\n", scores.entries[current_entry].initials, scores.entries[current_entry].score);
         if (result < 0) {
             fprintf(stderr, "Error while preparing high score data: %s\n", strerror(errno));
@@ -75,7 +83,7 @@ void dump_highscores()
         p += result;
     }
 
-    result = storage_write(HIGHSCORES_FILE, buffer, 0, HIGHSCORES_BUFFER_SIZE);
+    result = storage_write(HIGHSCORES_FILE, buffer, HIGHSCORES_BUFFER_SIZE);
     if (result < STORAGE_OK) {
         debug_printf("Failed to write high scores: %d\n", result);
     }
@@ -84,7 +92,7 @@ void dump_highscores()
 bool is_high_score(unsigned int score)
 {
     for (int i = 0; i < 10; ++i) {
-        if (!scores.entries[i].used || score > scores.entries[i].score) {
+        if (scores.entries[i].initials[0] == '-' || score > scores.entries[i].score) {
             return true;
         }
     }
@@ -97,13 +105,12 @@ void insert_new_high_score(unsigned int score, const char initials[4])
     int i, j;
 
     for (i = 0; i < 10; ++i) {
-        if (!scores.entries[i].used || scores.entries[i].score <= score) {
+        if (scores.entries[i].initials[0] == '-' || scores.entries[i].score <= score) {
             for (j = 9; j > i; --j) {
                 memcpy(&scores.entries[j], &scores.entries[j - 1], sizeof(struct score));
             }
             memcpy(&scores.entries[i].initials, initials, sizeof(char) * 4);
             scores.entries[i].score = score;
-            scores.entries[i].used = true;
             break;
         }
     }

@@ -253,7 +253,7 @@ void canvas_finish_drawing(bool swap)
     if (glist_size >= GFX_GLIST_LEN) {
         debug_printf("display list size: %d", glist_size);
     }
-    assert(glist_size < GFX_GLIST_LEN);
+    debug_assert(glist_size < GFX_GLIST_LEN);
 
     // Activate the RSP task
     nuGfxTaskStart(gfx_glist, (s32)(glistp - gfx_glist) * sizeof (Gfx),

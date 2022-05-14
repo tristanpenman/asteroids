@@ -58,10 +58,6 @@ static void mixer_channel_complete(int channel)
 
 bool game_init(bool silent)
 {
-#ifndef __EMSCRIPTEN__
-    debug_printf("load_highscores...\n");
-    load_highscores();
-#endif
     if (!silent) {
         mixer_set_channel_completion_handler(mixer_channel_complete);
         debug_printf("load_samples...\n");

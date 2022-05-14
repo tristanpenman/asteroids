@@ -10,6 +10,7 @@
 
 #include "debug.h"
 #include "game.h"
+#include "highscores.h"
 #include "input.h"
 #include "mixer.h"
 #include "options.h"
@@ -91,7 +92,14 @@ int main(int argc, char **argv)
 
     debug_printf("storage_init...\n");
     storage_init();
-    if (!storage_available()) {
+
+    if (storage_available()) {
+        debug_printf("highscores_load...\n");
+        if (!highscores_load()) {
+            debug_printf("highscores_save...\n");
+            highscores_save();
+        }
+    } else {
         debug_printf(" - storage not available\n");
     }
 

@@ -143,7 +143,7 @@ void draw_highscores(const struct highscores *scores)
     draw_text_centered("HIGH SCORES", 0.39f, -0.21f);
 
     for (i = 0; i < 10; i++) {
-        if (scores->entries[i].used) {
+        if (scores->entries[i].initials[0] != '-') {
             sprintf(str, "%2d   %.3s %10d ", i + 1, scores->entries[i].initials, scores->entries[i].score);
         } else {
             sprintf(str, "%2d   ---          - ", i + 1);

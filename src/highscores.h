@@ -3,20 +3,21 @@
 
 #include "types.h"
 
+#define NUM_SCORES 10
+
 struct score
 {
-    bool used;
     char initials[4];
-    unsigned int score;
+    uint32_t score;
 };
 
 struct highscores
 {
-    struct score entries[10];
+    struct score entries[NUM_SCORES];
 };
 
-void load_highscores();
-void dump_highscores();
+bool highscores_load();
+void highscores_save();
 
 bool is_high_score(unsigned int score);
 

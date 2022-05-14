@@ -69,17 +69,21 @@ void mainproc()
     debug_printf("storage_init...\n");
     storage_init();
 
+    debug_printf("highscores_load...\n");
+    if (storage_available()) {
+        if (!highscores_load()) {
+            debug_printf("highscores_save...\n");
+            highscores_save();
+        }
+    } else {
+        debug_printf(" - storage not available\n");
+    }
+
     debug_printf("rumble_init...\n");
     rumble_init();
 
     debug_printf("audio_init...\n");
     audio_init();
-
-    debug_printf("highscores_load...\n");
-    if (!highscores_load()) {
-      debug_printf("highscores_save...\n");
-      highscores_save();
-    }
 
     titlescreen_init();
     set_main_loop(titlescreen_loop);

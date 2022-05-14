@@ -56,7 +56,7 @@ static void handle_input()
 
     if (current_initial == 3 && input_triggered(input_done)) {
         insert_new_high_score(score, initials);
-        dump_highscores();
+        highscores_save();
         titlescreen_init();
         set_main_loop(titlescreen_loop);
         return;
