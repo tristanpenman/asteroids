@@ -109,7 +109,7 @@ int storage_read(const char *filename, char *buffer, int read_size)
         return STORAGE_ERR_READ_FILE;
     }
 
-    return STORAGE_OK;
+    return read_size;
 }
 
 int storage_write(const char *filename, const char *buffer, int write_size)

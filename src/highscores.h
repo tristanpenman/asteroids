@@ -3,8 +3,6 @@
 
 #include "types.h"
 
-#define NUM_SCORES 10
-
 bool highscores_load();
 bool highscores_save();
 

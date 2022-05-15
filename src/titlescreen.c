@@ -43,7 +43,7 @@ bool titlescreen_init()
     input_leaderboard = input_register();
     assert(input_leaderboard != INPUT_INVALID_HANDLE);
 #ifndef __EMSCRIPTEN__
-    input_map(input_leaderboard, INPUT_KEY_H);
+    input_map(input_leaderboard, INPUT_KEY_L);
 #endif
 
     // start action

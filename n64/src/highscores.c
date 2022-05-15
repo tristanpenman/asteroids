@@ -5,7 +5,15 @@
 #include "highscores.h"
 #include "storage.h"
 
-#define HIGHSCORES_BUFFER_SIZE 128
+/******************************************************************************
+ *
+ * Definitions
+ *
+ *****************************************************************************/
+
+#define ROUND_UP(N, S) ((((N) + (S) - 1) / (S)) * (S))
+
+#define HIGHSCORES_BUFFER_SIZE ROUND_UP(sizeof(struct highscores), 32)
 
 struct score
 {
@@ -20,6 +28,12 @@ struct highscores
 
 static struct highscores scores;
 
+/******************************************************************************
+ *
+ * Public interface
+ *
+ *****************************************************************************/
+
 bool highscores_load()
 {
     char buffer[HIGHSCORES_BUFFER_SIZE];
@@ -33,8 +47,8 @@ bool highscores_load()
     }
 
     // attempt to load high scores
-    result = storage_read(HIGHSCORES_FILE, buffer, HIGHSCORES_BUFFER_SIZE);
-    if (result != STORAGE_OK) {
+    result = storage_read(HIGHSCORES_FILE, buffer, sizeof(struct highscores));
+    if (result < STORAGE_OK) {
         if (result == STORAGE_ERR_OPEN_FILE) {
             debug_printf(" - high scores not available\n");
         } else {
@@ -69,7 +83,7 @@ bool highscores_check(uint32_t score)
     int i;
 
     for (i = 0; i < NUM_SCORES; ++i) {
-        if (!scores.entries[i].initials[0] != '-' || score > scores.entries[i].score) {
+        if (scores.entries[i].initials[0] == '-' || score > scores.entries[i].score) {
             return true;
         }
     }
@@ -82,7 +96,7 @@ bool highscores_insert(uint32_t score, const char initials[4])
     int i, j;
 
     for (i = 0; i < NUM_SCORES; ++i) {
-        if (!scores.entries[i].initials[0] != '-' || scores.entries[i].score <= score) {
+        if (scores.entries[i].initials[0] == '-' || scores.entries[i].score <= score) {
             for (j = NUM_SCORES - 1; j > i; --j) {
                 memcpy(&scores.entries[j], &scores.entries[j - 1], sizeof(struct score));
             }

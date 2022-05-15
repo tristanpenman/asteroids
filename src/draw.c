@@ -135,28 +135,6 @@ void draw_explosions(const struct explosion *ee, unsigned int n)
     }
 }
 
-void draw_leaderboard()
-{
-    int i;
-    uint32_t score;
-    char initials[4];
-    char str[100];
-
-    draw_text_centered("LEADERBOARD", 0.39f, -0.21f);
-
-    for (i = 0; i < NUM_SCORES; i++) {
-        if (highscores_read(i, &score, initials) && initials[0] != '-') {
-            sprintf(str, "%2d   %.3s %10d ", i + 1, initials, score);
-        } else {
-            sprintf(str, "%2d   ---          - ", i + 1);
-        }
-
-        draw_text_centered(str, 0.24f, -0.14f + 0.03f * (float) i);
-    }
-
-    draw_text_centered("PRESS ENTER FOR MAIN MENU", 0.24f, 0.26f);
-}
-
 void draw_instructions()
 {
     draw_text_centered("PRESS ENTER TO PLAY", 0.3f, -0.07f);

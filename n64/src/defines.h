@@ -49,5 +49,6 @@
 
 // highscores
 #define HIGHSCORES_FILE "highscores"
+#define NUM_SCORES 10
 
 #endif
