@@ -6,6 +6,7 @@
 #include "debug.h"
 #include "entities.h"
 #include "input.h"
+#include "leaderboard.h"
 #include "loop.h"
 #include "timing.h"
 #include "transition.h"
@@ -21,7 +22,7 @@ static struct asteroid asteroids[NUM_ASTEROIDS];
 
 static int asteroid_shape_ids[NUM_ASTEROID_SHAPES];
 
-static int input_highscores;
+static int input_leaderboard;
 static int input_start;
 static int input_quit;
 
@@ -38,11 +39,13 @@ bool titlescreen_init()
     input_reset();
 
     // high scores action
-    input_highscores = input_register();
-    debug_assert(input_highscores != INPUT_INVALID_HANDLE);
+    input_leaderboard = input_register();
+    debug_assert(input_leaderboard != INPUT_INVALID_HANDLE);
 #ifndef __EMSCRIPTEN__
-    input_map(input_highscores, INPUT_KEY_H);
+    input_map(input_leaderboard, INPUT_KEY_H);
 #endif
+    input_map(input_leaderboard, INPUT_BUTTON_A);
+    input_map(input_leaderboard, INPUT_BUTTON_B);
 
     // start action
     input_start = input_register();
@@ -87,11 +90,11 @@ void titlescreen_loop(bool draw)
     input_update();
     input_read_joystick(&joystick_x, NULL);
 
-    if (input_active(input_highscores)) {
+    if (input_active(input_leaderboard)) {
         h_down = true;
     } else if (h_down) {
-        // highscores_init();
-        // set_main_loop(highscores_loop);
+        leaderboard_init();
+        set_main_loop(leaderboard_loop); 
         return;
     } else {
         h_down = false;

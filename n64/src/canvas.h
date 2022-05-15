@@ -25,6 +25,11 @@ int canvas_load_shape(const struct shape *);
 void canvas_start_drawing(bool clear);
 
 /**
+ * Continue drawing shapes, after finishing
+ */
+void canvas_continue_drawing();
+
+/**
  * Change the colour that will be used when drawing lines
  */
 void canvas_set_colour(float r, float g, float b);

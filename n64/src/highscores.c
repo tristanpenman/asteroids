@@ -58,6 +58,11 @@ bool highscores_load()
     }
 
     memcpy(&scores, buffer, sizeof(struct highscores));
+    debug_printf(" - highscore table:\n");
+    for (current_entry = 0; current_entry < NUM_SCORES; ++current_entry) {
+        debug_printf("    - %s %u\n", scores.entries[current_entry].initials, scores.entries[current_entry].score);
+    }
+
     return true;
 }
 

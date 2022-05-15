@@ -12,9 +12,9 @@
 #include "shape.h"
 #include "vec.h"
 
-#define MAX_TRANSFORMS 64
+#define MAX_TRANSFORMS 128
 #define MAX_SHAPES 64
-#define MAX_VERTICES 128
+#define MAX_VERTICES 256
 #define MAX_GLYPHS 128
 
 #define RAD_TO_DEG (180.0 / M_PI)
@@ -47,6 +47,8 @@ static struct color primitive_color;
 
 static int font_shape_ids[MAX_GLYPHS];
 
+static int current_gfx_list = 0;
+
 void canvas_reset()
 {
     int i = 0;
@@ -61,6 +63,8 @@ void canvas_reset()
     primitive_color.r = 255.0f;
     primitive_color.g = 255.0f;
     primitive_color.b = 255.0f;
+
+    current_gfx_list = 0;
 }
 
 int canvas_load_shape(const struct shape *shape)
@@ -68,10 +72,12 @@ int canvas_load_shape(const struct shape *shape)
     int i;
 
     if (num_shapes == MAX_SHAPES) {
+        debug_printf("MAX_SHAPES exceeeded\n");
         return CANVAS_INVALID_SHAPE;
     }
 
     if (num_vertices + shape->num_vertices >= MAX_VERTICES) {
+        debug_printf("MAX_VERTICES exceeeded\n");
         return CANVAS_INVALID_SHAPE;
     }
 
@@ -106,7 +112,7 @@ void canvas_start_drawing(bool clear)
     num_transforms = 0;
 
     // Specify the display list buffer
-    glistp = gfx_glist;
+    glistp = gfx_glist[current_gfx_list];
 
     // The initialization of RCP
     gfx_rcp_init();
@@ -115,6 +121,22 @@ void canvas_start_drawing(bool clear)
         // Clear the frame buffer and the Z-buffer
         gfx_clear_cfb();
     }
+
+    // Synchronizes RDP attribute updates by waiting for pixels to be processed
+    // during the rendering of primitives
+    gDPPipeSync(glistp++);
+
+    // number of pixels per cycle
+    gDPSetCycleType(glistp++, G_CYC_1CYCLE);
+}
+
+void canvas_continue_drawing()
+{
+    // Specify the display list buffer
+    glistp = gfx_glist[current_gfx_list];
+
+    // The initialization of RCP
+    gfx_rcp_init();
 
     // Synchronizes RDP attribute updates by waiting for pixels to be processed
     // during the rendering of primitives
@@ -249,13 +271,19 @@ void canvas_finish_drawing(bool swap)
     gDPFullSync(glistp++);
     gSPEndDisplayList(glistp++);
 
-    glist_size = glistp - gfx_glist;
+    glist_size = glistp - gfx_glist[current_gfx_list];
     if (glist_size >= GFX_GLIST_LEN) {
         debug_printf("display list size: %d", glist_size);
     }
     debug_assert(glist_size < GFX_GLIST_LEN);
 
     // Activate the RSP task
-    nuGfxTaskStart(gfx_glist, (s32)(glistp - gfx_glist) * sizeof (Gfx),
+    nuGfxTaskStart(gfx_glist[current_gfx_list], (s32)(glistp - gfx_glist[current_gfx_list]) * sizeof (Gfx),
         NU_GFX_UCODE_L3DEX2, swap ? NU_SC_SWAPBUFFER : NU_SC_NOSWAPBUFFER);
+
+    if (swap) {
+        current_gfx_list = 0;
+    } else {
+        current_gfx_list++;
+    }
 }

@@ -2,7 +2,7 @@
 
 #include "gfx.h"
 
-Gfx gfx_glist[GFX_GLIST_LEN];
+Gfx gfx_glist[GLX_GLIST_COUNT][GFX_GLIST_LEN];
 Dynamic gfx_dynamic;
 Gfx* glistp;
 
