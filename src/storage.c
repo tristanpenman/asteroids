@@ -27,6 +27,10 @@ int storage_read(const char *filename, char *buffer, int read_size)
     FILE *f;
     size_t sz;
 
+    if (read_size % 32 != 0) {
+        debug_printf("Warning: for maximum compatibility, read size should be a multiple of 32");
+    }
+
     memset(buffer, 0, read_size);
 
     f = fopen(filename, "rb");
@@ -52,6 +56,10 @@ int storage_write(const char *filename, const char *buffer, int write_size)
 
     FILE *f;
     size_t sz;
+
+    if (write_size % 32 != 0) {
+        debug_printf("Warning: for maximum compatibility, write size should be a multiple of 32");
+    }
 
     f = fopen(filename, "wb");
     if (!f) {

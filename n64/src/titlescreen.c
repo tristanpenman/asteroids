@@ -140,8 +140,8 @@ void titlescreen_loop(bool draw)
     }
 
     canvas_draw_text_centered("ASTEROIDS", -0.20f, 1.1f);
-
     canvas_draw_text_centered("PRESS START", 0, 0.6f);
+    canvas_draw_text_centered("PRESS B FOR HIGH SCORES", 0.175f, 0.5f);
 
     canvas_finish_drawing(true);
 }

@@ -28,7 +28,7 @@ extern Dynamic gfx_dynamic;
 extern Gfx* glistp;
 extern Gfx gfx_glist[GLX_GLIST_COUNT][GFX_GLIST_LEN];
 
-extern void gfx_rcp_init(void);
-extern void gfx_clear_cfb(void);
+void gfx_rcp_init(void);
+void gfx_clear_cfb(void);
 
 #endif

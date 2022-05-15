@@ -18,6 +18,8 @@ void leaderboard_draw()
     char initials[4];
     char str[100];
 
+    canvas_start_drawing(true);
+
     canvas_draw_text_centered("LEADERBOARD", -0.21f, 0.39f);
 
     for (i = 0; i < NUM_SCORES; i++) {
@@ -28,9 +30,19 @@ void leaderboard_draw()
         }
 
         canvas_draw_text_centered(str, -0.14f + 0.03f * (float) i, 0.24f);
+
+        // start a new display list
+        canvas_finish_drawing(false);
+        canvas_continue_drawing();
     }
 
-    canvas_draw_text_centered("PRESS ENTER FOR MAIN MENU",  0.26f, 0.24f);
+#ifdef N64
+    canvas_draw_text_centered("PRESS START FOR MAIN MENU", 0.23f, 0.45f);
+#else
+    canvas_draw_text_centered("PRESS ENTER FOR MAIN MENU", 0.26f, 0.24f);
+#endif
+
+    canvas_finish_drawing(true);
 }
 
 /******************************************************************************
@@ -66,7 +78,5 @@ void leaderboard_loop(bool draw)
         return;
     }
 
-    canvas_start_drawing(true);
     leaderboard_draw();
-    canvas_finish_drawing(true);
 }
