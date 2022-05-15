@@ -7,7 +7,7 @@ struct highscores;
 struct player;
 
 void draw_explosions(const struct explosion *, unsigned int n);
-void draw_highscores(const struct highscores *);
+void draw_leaderboard();
 void draw_instructions();
 void draw_level_title(int level);
 void draw_lives(int lives);

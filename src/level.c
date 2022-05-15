@@ -180,7 +180,7 @@ static void update_player(float factor)
                 /* TODO: Make sure that ship won't reappear near asteroids */
                 player_reset(&player);
 #ifndef __EMSCRIPTEN__
-            } else if (is_high_score(player.score)) {
+            } else if (highscores_check(player.score)) {
                 initials_init(player.score);
                 set_main_loop(initials_loop);
 #endif

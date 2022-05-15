@@ -56,6 +56,7 @@ set(SRCS
     src/highscores.c
     src/initials.c
     src/input.c
+    src/leaderboard.c
     src/level.c
     src/loop.c
     src/main.c

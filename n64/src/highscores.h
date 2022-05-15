@@ -5,26 +5,11 @@
 
 #define NUM_SCORES 10
 
-struct score
-{
-    char initials[4];
-    uint32_t score;
-};
-
-struct highscores
-{
-    struct score entries[NUM_SCORES];
-};
-
 bool highscores_load();
-void highscores_save();
+bool highscores_save();
 
-bool is_high_score(uint32_t score);
-
-void insert_new_high_score(uint32_t score, const char initials[4]);
-
-void highscores_init();
-
-void highscores_loop(bool draw);
+bool highscores_check(uint32_t score);
+bool highscores_insert(uint32_t score, const char initials[4]);
+bool highscores_read(uint32_t index, uint32_t *score, char initials[4]);
 
 #endif

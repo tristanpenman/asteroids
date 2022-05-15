@@ -135,19 +135,22 @@ void draw_explosions(const struct explosion *ee, unsigned int n)
     }
 }
 
-void draw_highscores(const struct highscores *scores)
+void draw_leaderboard()
 {
     int i;
+    uint32_t score;
+    char initials[4];
     char str[100];
 
-    draw_text_centered("HIGH SCORES", 0.39f, -0.21f);
+    draw_text_centered("LEADERBOARD", 0.39f, -0.21f);
 
-    for (i = 0; i < 10; i++) {
-        if (scores->entries[i].initials[0] != '-') {
-            sprintf(str, "%2d   %.3s %10d ", i + 1, scores->entries[i].initials, scores->entries[i].score);
+    for (i = 0; i < NUM_SCORES; i++) {
+        if (highscores_read(i, &score, initials) && initials[0] != '-') {
+            sprintf(str, "%2d   %.3s %10d ", i + 1, initials, score);
         } else {
             sprintf(str, "%2d   ---          - ", i + 1);
         }
+
         draw_text_centered(str, 0.24f, -0.14f + 0.03f * (float) i);
     }
 
@@ -162,7 +165,7 @@ void draw_instructions()
     draw_text_centered("UP - THRUSTER", 0.20f, 0.085f);
 #ifndef __EMSCRIPTEN__
     draw_text_centered("ESC - EXIT", 0.20f, 0.115f);
-    draw_text_centered("PRESS H FOR HIGH SCORES", 0.24f, 0.20f);
+    draw_text_centered("PRESS L FOR LEADERBOARD", 0.24f, 0.20f);
 #endif
 }
 

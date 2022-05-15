@@ -1,19 +1,24 @@
 #include <string.h>
 
-#include "canvas.h"
 #include "debug.h"
 #include "defines.h"
 #include "highscores.h"
-#include "input.h"
-#include "loop.h"
 #include "storage.h"
-#include "titlescreen.h"
 
 #define HIGHSCORES_BUFFER_SIZE 128
 
-static struct highscores scores;
+struct score
+{
+    char initials[4];
+    uint32_t score;
+};
 
-static int input_return;
+struct highscores
+{
+    struct score entries[NUM_SCORES];
+};
+
+static struct highscores scores;
 
 bool highscores_load()
 {
@@ -23,7 +28,7 @@ bool highscores_load()
 
     // clear highscores data structure
     memset(&scores, 0, sizeof(struct highscores));
-    for (current_entry = 0; current_entry < 10; ++current_entry) {
+    for (current_entry = 0; current_entry < NUM_SCORES; ++current_entry) {
         memcpy(&scores.entries[current_entry].initials, "---", sizeof(char) * 4);
     }
 
@@ -42,7 +47,7 @@ bool highscores_load()
     return true;
 }
 
-void highscores_save()
+bool highscores_save()
 {
     char buffer[HIGHSCORES_BUFFER_SIZE];
     int result;
@@ -53,14 +58,17 @@ void highscores_save()
     result = storage_write(HIGHSCORES_FILE, buffer, HIGHSCORES_BUFFER_SIZE);
     if (result < STORAGE_OK) {
         debug_printf(" - failed to write high scores: %d\n", result);
+        return false;
     }
+
+    return true;
 }
 
-bool is_high_score(uint32_t score)
+bool highscores_check(uint32_t score)
 {
     int i;
 
-    for (i = 0; i < 10; ++i) {
+    for (i = 0; i < NUM_SCORES; ++i) {
         if (!scores.entries[i].initials[0] != '-' || score > scores.entries[i].score) {
             return true;
         }
@@ -69,50 +77,31 @@ bool is_high_score(uint32_t score)
     return false;
 }
 
-void insert_new_high_score(uint32_t score, const char initials[4])
+bool highscores_insert(uint32_t score, const char initials[4])
 {
     int i, j;
 
-    for (i = 0; i < 10; ++i) {
+    for (i = 0; i < NUM_SCORES; ++i) {
         if (!scores.entries[i].initials[0] != '-' || scores.entries[i].score <= score) {
-            for (j = 9; j > i; --j) {
+            for (j = NUM_SCORES - 1; j > i; --j) {
                 memcpy(&scores.entries[j], &scores.entries[j - 1], sizeof(struct score));
             }
             memcpy(&scores.entries[i].initials, initials, sizeof(char) * 4);
             scores.entries[i].score = score;
-            break;
+            return true;
         }
     }
+
+    return false;
 }
 
-void highscores_init()
+bool highscores_read(uint32_t index, uint32_t *score, char initials[4])
 {
-    input_reset();
-
-    input_return = input_register();
-    input_map(input_return, INPUT_BUTTON_A);
-    input_map(input_return, INPUT_BUTTON_B);
-    input_map(input_return, INPUT_BUTTON_START);
-    input_map(input_return, INPUT_KEY_ENTER);
-    input_map(input_return, INPUT_KEY_ESCAPE);
-    input_map(input_return, INPUT_KEY_RETURN);
-}
-
-void highscores_loop(bool draw)
-{
-    input_update();
-
-    if (input_active(input_return)) {
-        titlescreen_init();
-        set_main_loop(titlescreen_loop);
-        return;
+    if (index >= NUM_SCORES) {
+        return false;
     }
 
-    if (!draw) {
-        return;
-    }
-
-    canvas_start_drawing(true);
-    // draw_highscores(&scores);
-    canvas_finish_drawing(true);
+    *score = scores.entries[index].score;
+    memcpy(initials, scores.entries[index].initials, 4);
+    return true;
 }

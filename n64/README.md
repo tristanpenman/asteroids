@@ -18,6 +18,16 @@ Here's the game running in cen64:
 
 The ROM can simply be copied to a flash cart such as the [EverDrive-64](https://krikzz.com/store/home/55-everdrive-64-x7.html). I've tested this using an X7 cart, however it should work on any flash cart.
 
+## Rumble Pak
+
+The game is compatible with Rumble Paks and Controller Paks.
+
+When a Rumble Pak is inserted, it will be activated by ship explosions.
+
+## Controller Pak
+
+When an Controller Pak is inserted, high scores will be saved into a file on the Controller Pak.
+
 ## Compiling the ROM
 
 This code has been written to compile using the original Nintendo 64 SDK on Windows (or Wine), and also using CrashOverride95's [Modern SDK](https://crashoveride95.github.io/n64hbrew/modernsdk/index.html) which is Linux port of the SDK.
