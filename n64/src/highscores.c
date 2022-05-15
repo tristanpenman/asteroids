@@ -47,7 +47,7 @@ bool highscores_load()
     }
 
     // attempt to load high scores
-    result = storage_read(HIGHSCORES_FILE, buffer, sizeof(struct highscores));
+    result = storage_read(HIGHSCORES_FILE, buffer, HIGHSCORES_BUFFER_SIZE);
     if (result < STORAGE_OK) {
         if (result == STORAGE_ERR_OPEN_FILE) {
             debug_printf(" - high scores not available\n");

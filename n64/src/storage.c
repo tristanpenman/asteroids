@@ -89,12 +89,11 @@ int storage_read(const char *filename, char *buffer, int read_size)
     s32 err;
     char notename[16];
 
-    debug_assert(strlen(filename) <= 16);
-    debug_assert(read_size % 32 == 0);
-
     if (!available) {
         return STORAGE_ERR_NOT_AVAILABLE;
     }
+
+    memset(buffer, 0, read_size);
 
     memset(notename, 0, 16);
     memcpy(notename, filename, strlen(filename));
@@ -116,9 +115,6 @@ int storage_write(const char *filename, const char *buffer, int write_size)
 {
     s32 err;
     char notename[16];
-
-    debug_assert(strlen(filename) <= 16);
-    debug_assert(write_size % 32 == 0);
 
     if (!available) {
         return STORAGE_ERR_NOT_AVAILABLE;

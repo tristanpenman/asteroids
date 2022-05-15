@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "debug.h"
 #include "storage.h"
@@ -25,6 +26,8 @@ int storage_read(const char *filename, char *buffer, int read_size)
 
     FILE *f;
     size_t sz;
+
+    memset(buffer, 0, read_size);
 
     f = fopen(filename, "rb");
     if (!f) {

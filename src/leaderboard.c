@@ -2,7 +2,6 @@
 
 #include "canvas.h"
 #include "defines.h"
-#include "draw.h"
 #include "highscores.h"
 #include "input.h"
 #include "leaderboard.h"
