@@ -8,7 +8,7 @@ This is a tidied up version of an Asteroids clone that I wrote over the course o
 
 ## Ports
 
-This project has also been ported to the web using Emscripten, which I wrote about in [this blog post](https://tristanpenman.com/blog/posts/2018/01/08/porting-an-asteroids-clone-to-javascript/), and later to the venerable Nintendo 64. The code for the N64 version can be found under [n64](./n64).
+This project has also been ported to the web using Emscripten, which I wrote about in [this blog post](https://tristanpenman.com/blog/posts/2018/01/08/porting-an-asteroids-clone-to-javascript/), and later to the venerable Nintendo 64. The code for the N64 port can be found [here](https://github.com/tristanpenman/asteroids64).
 
 ## Demo
 
