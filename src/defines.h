@@ -39,6 +39,10 @@
 #define FONT_WIDTH 0.04f
 #define FONT_SPACE 0.0025f
 
+// score
+#define SCORE_DIGITS 7
+#define SCORE_BUFFER_SIZE (SCORE_DIGITS + 1)
+
 // general
 #define GAME_OVER_DELAY_MS 5000.0f
 #define START_LEVEL_DELAY_MS 2000.0f

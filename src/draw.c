@@ -8,6 +8,7 @@
 #include <SDL_opengl.h>
 
 #include "canvas.h"
+#include "defines.h"
 #include "entities.h"
 #include "highscores.h"
 #include "mathdefs.h"
@@ -89,11 +90,6 @@ static void draw_text_ex(const char *s, GLfloat size, GLfloat x, GLfloat y)
     canvas_draw_text(s, x, y, size);
 }
 
-static void draw_text(const char *s, GLfloat size, GLfloat x, GLfloat y)
-{
-    draw_text_ex(s, size, x, y);
-}
-
 static void draw_text_centered_ex(const char *s, GLfloat size, GLfloat y, GLfloat spacing)
 {
     const GLfloat width = ((GLfloat) strlen(s) * (FONT_WIDTH + spacing)) - spacing;
@@ -135,18 +131,6 @@ void draw_explosions(const struct explosion *ee, unsigned int n)
     }
 }
 
-void draw_instructions()
-{
-    draw_text_centered("PRESS ENTER TO PLAY", 0.3f, -0.07f);
-    draw_text_centered("SPACE - FIRE", 0.20f, 0.025f);
-    draw_text_centered("ARROWS - DIRECTION", 0.20f, 0.055f);
-    draw_text_centered("UP - THRUSTER", 0.20f, 0.085f);
-#ifndef __EMSCRIPTEN__
-    draw_text_centered("ESC - EXIT", 0.20f, 0.115f);
-    draw_text_centered("PRESS L FOR LEADERBOARD", 0.24f, 0.20f);
-#endif
-}
-
 void draw_level_title(int level)
 {
     char titlecard[100];
@@ -169,23 +153,6 @@ void draw_lives(int lives)
     glPopMatrix();
 }
 
-void draw_new_high_score_input(const char initials[4])
-{
-    draw_text_centered_ex(initials, 0.38f, 0, FONT_SPACE * 10.f);
-}
-
-void draw_new_high_score_message()
-{
-    draw_text_centered("YOUR SCORE IS ONE OF THE TEN BEST", 0.25f, -0.13f);
-    draw_text_centered("PLEASE ENTER YOUR INITIALS", 0.25f, -0.095f);
-}
-
-void draw_new_high_score_enter_to_continue()
-{
-    draw_text_centered("PRESS ENTER TO CONTINUE", 0.25f, 0.12f);
-    draw_text_centered("OR BACKSPACE TO MAKE CHANGES", 0.25f, 0.155f);
-}
-
 void draw_player_exploding(const struct player *p)
 {
     const float c = 1.0f - (p->death_delay / SHIP_EXPLOSION_LENGTH);
@@ -198,15 +165,15 @@ void draw_player_exploding(const struct player *p)
     glPopMatrix();
 }
 
-void draw_score(unsigned int score)
+void draw_score(int score)
 {
     static char buffer[SCORE_BUFFER_SIZE];
-    const unsigned int size = (unsigned int) floorf(1.0f + log10f((float) score));
-    if (SCORE_BUFFER_SIZE > size) {
-        snprintf(buffer, SCORE_BUFFER_SIZE, "%u", score);
-    } else {
-        snprintf(buffer, SCORE_BUFFER_SIZE, "ERROR");
-    }
 
-    draw_text(buffer, 0.35f, -0.475f, -0.365f);
+    sprintf(buffer, "%u", score);
+
+#ifdef N64
+    canvas_draw_text(buffer, -0.45f, -0.33f, 0.65f);
+#else
+    canvas_draw_text(buffer, -0.475f, -0.365f, 0.35f);
+#endif
 }

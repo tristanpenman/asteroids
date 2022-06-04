@@ -29,6 +29,24 @@ static int input_quit;
 
 /******************************************************************************
  *
+ * Helper functions
+ *
+ *****************************************************************************/
+
+static void draw_instructions()
+{
+    canvas_draw_text_centered("PRESS ENTER TO PLAY", -0.07f, 0.3f);
+    canvas_draw_text_centered("SPACE - FIRE", 0.025f, 0.20f);
+    canvas_draw_text_centered("ARROWS - DIRECTION", 0.055f, 0.20f);
+    canvas_draw_text_centered("UP - THRUSTER", 0.085f, 0.20f);
+#ifndef __EMSCRIPTEN__
+    canvas_draw_text_centered("ESC - EXIT", 0.115f, 0.20f);
+    canvas_draw_text_centered("PRESS H FOR HIGH SCORES", 0.20f, 0.3f);
+#endif
+}
+
+/******************************************************************************
+ *
  * Public interface
  *
  *****************************************************************************/
@@ -43,7 +61,7 @@ bool titlescreen_init()
     input_leaderboard = input_register();
     assert(input_leaderboard != INPUT_INVALID_HANDLE);
 #ifndef __EMSCRIPTEN__
-    input_map(input_leaderboard, INPUT_KEY_L);
+    input_map(input_leaderboard, INPUT_KEY_H);
 #endif
 
     // start action
