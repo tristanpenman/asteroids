@@ -4,11 +4,6 @@
 #include "debug.h"
 #include "storage.h"
 
-void storage_init()
-{
-    // nothing to do
-}
-
 bool storage_available()
 {
 #ifdef __EMSCRIPTEN__
@@ -21,7 +16,7 @@ bool storage_available()
 int storage_read(const char *filename, char *buffer, int read_size)
 {
 #ifdef __EMSCRIPTEN__
-    return -1;
+    return STORAGE_ERR_NOT_AVAILABLE;
 #endif
 
     FILE *f;
@@ -51,7 +46,7 @@ int storage_read(const char *filename, char *buffer, int read_size)
 int storage_write(const char *filename, const char *buffer, int write_size)
 {
 #ifdef __EMSCRIPTEN__
-    return -1;
+    return STORAGE_ERR_NOT_AVAILABLE;
 #endif
 
     FILE *f;

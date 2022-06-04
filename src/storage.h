@@ -9,8 +9,6 @@
 #define STORAGE_ERR_READ_FILE -3
 #define STORAGE_ERR_WRITE_FILE -4
 
-void storage_init();
-
 bool storage_available();
 
 int storage_read(const char *filename, char *buffer, int read_size);

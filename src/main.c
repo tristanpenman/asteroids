@@ -90,9 +90,6 @@ int main(int argc, char **argv)
     debug_printf("input_init...\n");
     input_init();
 
-    debug_printf("storage_init...\n");
-    storage_init();
-
     if (storage_available()) {
         debug_printf("highscores_load...\n");
         if (!highscores_load()) {
