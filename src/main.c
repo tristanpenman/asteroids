@@ -65,8 +65,6 @@ int main(int argc, char **argv)
         }
     }
 
-    atexit(cleanup);
-
     SDL_Init(0);
 
     srand(SDL_GetTicks());
@@ -107,6 +105,8 @@ int main(int argc, char **argv)
 
     debug_printf("game_play...\n");
     game_play(sandbox);
+
+    cleanup();
 
     return 0;
 }
