@@ -2,8 +2,6 @@
 
 #include "input.h"
 
-#define INPUT_MAX_HANDLES 32
-
 // Number of registered input handles
 static int num_handles = 0;
 
@@ -80,6 +78,7 @@ void input_reset()
     num_handles = 0;
 
     memset(active, 0, sizeof(bool) * INPUT_MAX_HANDLES);
+    memset(last_active, 0, sizeof(bool) * INPUT_MAX_HANDLES);
 
     for (int i = 0; i < __INPUT__COUNT; i++) {
         mappings[i] = INPUT_INVALID_HANDLE;
