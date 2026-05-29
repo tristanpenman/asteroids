@@ -1,0 +1,18 @@
+# docker-compose configuration for building and serving the Emscripten /
+# web version of Asteroids, without installing the Emscripten SDK locally.
+#
+#   docker compose up --build
+#
+# then open http://localhost:6931 in your browser.
+
+services:
+  emscripten:
+    build:
+      context: .
+      dockerfile: Dockerfile.emsdk
+    # emscripten/emsdk is published for linux/amd64 only; runs under
+    # emulation on Apple Silicon.
+    platform: linux/amd64
+    image: asteroids-emscripten
+    ports:
+      - "6931:6931"

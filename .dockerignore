@@ -1,0 +1,14 @@
+# Keep the Docker build context small and avoid copying host build output
+# into the image (the Emscripten build is performed fresh inside the image).
+.git
+build
+embuild
+cmake-build-*
+CMakeFiles
+thirdparty/SDL2-2.0.9
+thirdparty/SDL2_mixer-2.0.4
+highscores.csv
+*.n64
+*.o
+*.out
+.DS_Store

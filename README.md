@@ -48,9 +48,41 @@ The project can also be compiled to Javascript using Emscripten.
     cd embuild
     emcmake cmake ..
     emmake make
-    emrun asteroids.html
+    emrun index.html
 
 Emscripten builds are only supported on Linux and macOS systems.
+
+### Emscripten (via Docker)
+
+If you'd rather not install the Emscripten SDK on your host machine, you can build
+and play the web version using Docker. This uses the official `emscripten/emsdk`
+toolchain image, so the only dependency is Docker itself.
+
+Using Docker Compose:
+
+    docker compose up --build
+
+Then open [http://localhost:6931](http://localhost:6931) in your browser to play.
+
+Press `Ctrl-C` to stop the server, and run `docker compose down` to remove the
+container.
+
+Alternatively, using plain Docker:
+
+    docker build -f Dockerfile.emsdk -t asteroids-emscripten .
+    docker run --rm -p 6931:6931 asteroids-emscripten
+
+The build artifacts (`index.html`, `asteroids.js`, `asteroids.wasm` and
+`asteroids.data`) are produced inside the container under `/src/embuild`. If you
+want to extract them onto your host, you can copy them out of a running container:
+
+    docker create --name asteroids-build asteroids-emscripten
+    docker cp asteroids-build:/src/embuild ./embuild
+    docker rm asteroids-build
+
+> **Note:** the `emscripten/emsdk` image is only published for `linux/amd64`, so
+> on Apple Silicon (arm64) it runs under emulation. This is fine for building and
+> serving the game, though the build will be a little slower.
 
 ## License
 
