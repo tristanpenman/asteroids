@@ -6,6 +6,13 @@ LD_SCRIPT := asteroids.ld
 LD_SCRIPT_SOURCE := n64/asteroids.ld
 BOOT := /usr/lib/n64/PR/bootcode/boot.6102
 BOOT_OBJ := $(BUILD_DIR)/boot.6102.o
+GFX_UCODE_FILES := /usr/lib/n64/PR/rspboot.o \
+	/usr/lib/n64/PR/gspF3DEX2.fifo.o \
+	/usr/lib/n64/PR/gspL3DEX2.fifo.o \
+	/usr/lib/n64/PR/gspF3DEX2.Rej.fifo.o \
+	/usr/lib/n64/PR/gspF3DEX2.NoN.fifo.o \
+	/usr/lib/n64/PR/gspF3DLX2.Rej.fifo.o \
+	/usr/lib/n64/PR/gspS2DEX2.fifo.o
 
 DEFINES := _FINALROM=1 F3DEX_GBI_2=1 N64
 SRC_DIRS := src/platform/n64 n64/asm
@@ -24,6 +31,7 @@ S_FILES := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.s))
 O_FILES := /usr/lib/n64/nusys/nusys_rom.o \
 	$(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=.o)) \
 	$(foreach file,$(S_FILES),$(BUILD_DIR)/$(file:.s=.o)) \
+	$(GFX_UCODE_FILES) \
 	$(BOOT_OBJ)
 DEP_FILES := $(O_FILES:.o=.d)
 
