@@ -9,6 +9,16 @@ BOOT_OBJ := $(BUILD_DIR)/boot.6102.o
 
 DEFINES := _FINALROM=1 F3DEX_GBI_2=1 N64
 SRC_DIRS := src/platform/n64 n64/asm
+
+# Hide tool commands by default; use VERBOSE=1 to show them.
+VERBOSE ?= 0
+ifeq ($(VERBOSE),0)
+V := @
+endif
+
+# Colorize build status messages by default; use COLOR=0 to disable colors.
+COLOR ?= 1
+
 C_FILES := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
 S_FILES := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.s))
 O_FILES := /usr/lib/n64/nusys/nusys_rom.o \
@@ -30,6 +40,19 @@ INCLUDES := $(foreach directory,$(INCLUDE_DIRS),-I$(directory))
 CFLAGS := -G 0 -g -mabi=32 -ffreestanding -mfix4300 $(INCLUDES) $(C_DEFINES)
 CPPFLAGS := -P -Wno-trigraphs $(INCLUDES) $(C_DEFINES)
 
+PRINT := printf
+
+ifeq ($(COLOR),1)
+NO_COL := \033[0m
+GREEN := \033[0;32m
+BLUE := \033[0;34m
+YELLOW := \033[0;33m
+endif
+
+define print
+	@$(PRINT) "$(GREEN)$(1) $(YELLOW)$(2)$(GREEN) -> $(BLUE)$(3)$(NO_COL)\n"
+endef
+
 default: $(ROM)
 
 clean:
@@ -37,31 +60,36 @@ clean:
 
 $(BUILD_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS) -MMD -MF $(@:.o=.d) -o $@ $<
+	$(call print,Compiling:,$<,$@)
+	$(V)$(CC) -c $(CFLAGS) -MMD -MF $(@:.o=.d) -o $@ $<
 
 $(BUILD_DIR)/%.o: %.s
 	@mkdir -p $(dir $@)
-	$(CC) -c $(CFLAGS) $(foreach directory,$(INCLUDE_DIRS),-Wa,-I$(directory)) \
+	$(call print,Assembling:,$<,$@)
+	$(V)$(CC) -c $(CFLAGS) $(foreach directory,$(INCLUDE_DIRS),-Wa,-I$(directory)) \
 		-x assembler-with-cpp -MMD -MF $(@:.o=.d) -o $@ $<
 
 $(BUILD_DIR)/$(LD_SCRIPT): $(LD_SCRIPT_SOURCE)
 	@mkdir -p $(dir $@)
-	$(CPP) $(CPPFLAGS) -DBUILD_DIR=$(BUILD_DIR) -MMD -MP -MT $@ \
+	$(call print,Preprocessing linker script:,$<,$@)
+	$(V)$(CPP) $(CPPFLAGS) -DBUILD_DIR=$(BUILD_DIR) -MMD -MP -MT $@ \
 		-MF $@.d -o $@ $<
 
 $(BOOT_OBJ): $(BOOT)
 	@mkdir -p $(dir $@)
-	$(OBJCOPY) -I binary -B mips -O elf32-bigmips $< $@
+	$(V)$(OBJCOPY) -I binary -B mips -O elf32-bigmips $< $@
 
 $(ELF): $(O_FILES) $(BUILD_DIR)/$(LD_SCRIPT)
-	$(LD) -L $(BUILD_DIR) -T $(BUILD_DIR)/$(LD_SCRIPT) \
+	@$(PRINT) "$(GREEN)Linking ELF file: $(BLUE)$@$(NO_COL)\n"
+	$(V)$(LD) -L $(BUILD_DIR) -T $(BUILD_DIR)/$(LD_SCRIPT) \
 		-Map $(BUILD_DIR)/$(TARGET).map --no-check-sections -o $@ $(O_FILES) \
 		-L/usr/lib/n64/nusys -lnusys -L/usr/lib/n64 -lultra_rom -lnustd \
 		-L$(N64_LIBGCCDIR) -lgcc
 
 $(ROM): $(ELF)
-	$(OBJCOPY) --pad-to=0x100000 --gap-fill=0xFF $< $@ -O binary
-	makemask $@
+	$(call print,Building ROM:,$<,$@)
+	$(V)$(OBJCOPY) --pad-to=0x100000 --gap-fill=0xFF $< $@ -O binary
+	$(V)makemask $@
 
 .PHONY: clean default
 .SECONDARY:
