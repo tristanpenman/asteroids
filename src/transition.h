@@ -1,5 +1,5 @@
-#ifndef __TRANSITION_H
-#define __TRANSITION_H
+#ifndef ASTEROIDS_TRANSITION_H
+#define ASTEROIDS_TRANSITION_H
 
 #include "types.h"
 

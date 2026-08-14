@@ -1,5 +1,5 @@
-#ifndef __SHAPE_H
-#define __SHAPE_H
+#ifndef ASTEROIDS_SHAPE_H
+#define ASTEROIDS_SHAPE_H
 
 #include "types.h"
 
@@ -7,7 +7,8 @@
 
 #define NUM_VERTICES(vertices) (sizeof(vertices) / sizeof(float) / 2)
 
-struct shape {
+struct shape
+{
     const float *vertices;
     uint8_t num_vertices;
 

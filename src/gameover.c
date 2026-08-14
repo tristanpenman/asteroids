@@ -1,5 +1,6 @@
 #include "canvas.h"
 #include "defines.h"
+#include "gameover.h"
 #include "input.h"
 #include "level.h"
 #include "loop.h"

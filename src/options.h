@@ -1,5 +1,5 @@
-#ifndef __OPTIONS_H
-#define __OPTIONS_H
+#ifndef ASTEROIDS_OPTIONS_H
+#define ASTEROIDS_OPTIONS_H
 
 #define LOGICAL_WIDTH_PX 400
 #define LOGICAL_HEIGHT_PX 300

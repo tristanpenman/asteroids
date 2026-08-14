@@ -2,6 +2,7 @@
 
 #include "collision.h"
 #include "debug.h"
+#include "game.h"
 #include "highscores.h"
 #include "initials.h"
 #include "loop.h"

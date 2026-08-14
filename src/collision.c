@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include "collision.h"
 #include "mathdefs.h"
 #include "shape.h"
 #include "vec.h"
@@ -77,10 +78,8 @@ bool collision_test_shape_line_segment_full(
     const float sinr = sinf(b_rot);
     const float cosr = cosf(b_rot);
 
-    int i;
-
     if (b->num_line_segments > 0) {
-        for (i = 0; i < b->num_line_segments * 2; i += 2) {
+        for (int i = 0; i < b->num_line_segments * 2; i += 2) {
             const struct vec_2d *b1 = (struct vec_2d *) &b->vertices[2 * b->line_segments[i]];
             const struct vec_2d *b2 = (struct vec_2d *) &b->vertices[2 * b->line_segments[i + 1]];
             const struct vec_2d b_start = transform(b1, b_pos, sinr, cosr, b_scale);
@@ -91,7 +90,7 @@ bool collision_test_shape_line_segment_full(
         }
     } else {
         const int n = b->num_vertices * 2;
-        for (i = 0; i < n; i += 2) {
+        for (int i = 0; i < n; i += 2) {
             const struct vec_2d *b1 = (struct vec_2d *) &b->vertices[i];
             const struct vec_2d *b2 = (struct vec_2d *) &b->vertices[(i + 2) % n];
             const struct vec_2d b_start = transform(b1, b_pos, sinr, cosr, b_scale);
@@ -118,7 +117,6 @@ bool collision_test_shapes_full(
     const struct shape *b, const struct vec_2d *b_pos, float b_rot, float b_scale,
     struct vec_2d *intersection, float *t)
 {
-    int i;
     float sinr;
     float cosr;
 
@@ -126,7 +124,7 @@ bool collision_test_shapes_full(
     cosr = cosf(a_rot);
 
     if (a->num_line_segments > 0) {
-        for (i = 0; i < a->num_line_segments * 2; i += 2) {
+        for (int i = 0; i < a->num_line_segments * 2; i += 2) {
             const struct vec_2d *a1 = (struct vec_2d *) &a->vertices[2 * a->line_segments[i]];
             const struct vec_2d *a2 = (struct vec_2d *) &a->vertices[2 * a->line_segments[i + 1]];
             const struct vec_2d a_start = transform(a1, a_pos, sinr, cosr, a_scale);
@@ -138,7 +136,7 @@ bool collision_test_shapes_full(
         }
     } else {
         const int n = a->num_vertices * 2;
-        for (i = 0; i < n; i += 2) {
+        for (int i = 0; i < n; i += 2) {
             const struct vec_2d *a1 = (struct vec_2d *) &a->vertices[i];
             const struct vec_2d *a2 = (struct vec_2d *) &a->vertices[(i + 2) % n];
             const struct vec_2d a_start = transform(a1, a_pos, sinr, cosr, a_scale);

@@ -4,6 +4,7 @@
 #include "canvas.h"
 #include "defines.h"
 #include "highscores.h"
+#include "initials.h"
 #include "input.h"
 #include "loop.h"
 #include "timing.h"
@@ -42,8 +43,6 @@ static void draw_score(int score)
 
 static void handle_input()
 {
-    int i;
-
     bool done = false;
 
     if (input_triggered(input_escape)) {
@@ -53,7 +52,7 @@ static void handle_input()
     }
 
     if (current_initial < 3) {
-        for (i = 0; i < 26; i++) {
+        for (int i = 0; i < 26; i++) {
             if (!input_triggered(input_letters[i])) {
                 continue;
             }
@@ -98,7 +97,7 @@ static void handle_input()
     if (current_initial > 0 && input_triggered(input_backspace)) {
         initials[--current_initial] = '_';
         reset_simulation_time();
-        for (i = current_initial + 1; i < 3; ++i) {
+        for (int i = current_initial + 1; i < 3; ++i) {
             initials[i] = ' ';
         }
 
@@ -126,8 +125,6 @@ static void handle_input()
 
 void initials_init(unsigned int new_score)
 {
-    int i;
-
     canvas_reset();
 
     input_reset();
@@ -144,7 +141,7 @@ void initials_init(unsigned int new_score)
     input_escape = input_register();
     input_map(input_escape, INPUT_KEY_ESCAPE);
 
-    for (i = 0; i < 26; i++) {
+    for (int i = 0; i < 26; i++) {
         input_letters[i] = input_register();
         input_map(input_letters[i], INPUT_KEY_A + i);
     }

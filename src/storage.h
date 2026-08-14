@@ -1,5 +1,5 @@
-#ifndef __STORAGE_H
-#define __STORAGE_H
+#ifndef ASTEROIDS_STORAGE_H
+#define ASTEROIDS_STORAGE_H
 
 #include "types.h"
 

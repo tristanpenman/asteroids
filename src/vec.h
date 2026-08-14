@@ -1,5 +1,5 @@
-#ifndef __VEC_H
-#define __VEC_H
+#ifndef ASTEROIDS_VEC_H
+#define ASTEROIDS_VEC_H
 
 struct vec_2d
 {

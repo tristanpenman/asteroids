@@ -13,6 +13,7 @@
 #include "highscores.h"
 #include "initials.h"
 #include "input.h"
+#include "level.h"
 #include "loop.h"
 #include "mathdefs.h"
 #include "mixer.h"
@@ -72,7 +73,8 @@ static int collision_tests_per_frame;
  *
  *****************************************************************************/
 
-static int num_asteroids_for_level(int next_level) {
+static int num_asteroids_for_level(int next_level)
+{
     switch (next_level) {
         case 1:
             return 4;
@@ -91,7 +93,6 @@ static int num_asteroids_for_level(int next_level) {
 
 static void update_player(float factor)
 {
-    int i;
     float s, d, rot = player.rot;
     struct vec_2d *pos = &player.pos;
     struct vec_2d *vel = &player.vel;
@@ -168,7 +169,7 @@ static void update_player(float factor)
         }
 
     } else if (player.state == PS_EXPLODING) {
-        for (i = 0; i < SHIP_EXPLOSION_SHARDS; i++) {
+        for (int i = 0; i < SHIP_EXPLOSION_SHARDS; i++) {
             player.shards[i].rot = wrap_angle(
                 player.shards[i].rot +
                 SHIP_EXPLOSION_SHARD_ROT_SPEED * factor * (float) player.shards[i].dir);
@@ -194,7 +195,6 @@ static void update_player(float factor)
 
 static void check_fire_button(struct player *p, struct bullet *bb, unsigned int n, float f)
 {
-    unsigned int i;
     unsigned int num_player_bullets = 0;
 
     if (KS_UP == p->keys.fire) {
@@ -207,7 +207,7 @@ static void check_fire_button(struct player *p, struct bullet *bb, unsigned int 
         return;
     }
 
-    for (i = 0; i < n; i++) {
+    for (unsigned int i = 0; i < n; i++) {
         if (true == bb[i].visible) {
             num_player_bullets++;
         }
@@ -217,7 +217,7 @@ static void check_fire_button(struct player *p, struct bullet *bb, unsigned int 
         return;
     }
 
-    for (i = 0; i < n; i++, bb++) {
+    for (unsigned int i = 0; i < n; i++, bb++) {
         if (false == bb->visible) {
             bb->visible = true;
             bb->travelled = 0.0f;
@@ -249,9 +249,8 @@ static void check_fire_button(struct player *p, struct bullet *bb, unsigned int 
 static void update_bullets(struct bullet *bb, unsigned int n, float f)
 {
     static struct vec_2d t;
-    unsigned int i;
 
-    for (i = 0; i < n; i++, bb++) {
+    for (unsigned int i = 0; i < n; i++, bb++) {
         if (true == bb->visible) {
             t.x = bb->vel.x * f;
             t.y = bb->vel.y * f;
@@ -297,11 +296,9 @@ static void init_explosion(struct explosion *e, const struct vec_2d *pos)
 
 static void explode_player()
 {
-    unsigned int i;
-
     player.state = PS_EXPLODING;
 
-    for (i = 0; i < SHIP_EXPLOSION_SHARDS; i++) {
+    for (unsigned int i = 0; i < SHIP_EXPLOSION_SHARDS; i++) {
         player.shards[i].angle = ((2 * M_PI) / (float) SHIP_EXPLOSION_SHARDS) * (float) i;
         player.shards[i].rot = random_float(0 - (float) M_PI, (float) M_PI);
         if (player.shards[i].rot < 0.0f) {
@@ -319,9 +316,7 @@ static void explode_asteroid(
 {
     float vel_scale = 1.0f;
 
-    unsigned int i;
-
-    for (i = 0; i < MAX_EXPLOSIONS; i++, ea++) {
+    for (unsigned int i = 0; i < MAX_EXPLOSIONS; i++, ea++) {
         if (ea->visible == false) {
             init_explosion(ea, &a->pos);
             break;
@@ -347,7 +342,7 @@ static void explode_asteroid(
     randomise_asteroid_velocity(a, vel_scale);
     randomise_asteroid_rotation(a);
 
-    for (i = 0; i < MAX_ASTEROIDS; i++) {
+    for (unsigned int i = 0; i < MAX_ASTEROIDS; i++) {
         if (aa[i].visible == false) {
             aa[i].visible = true;
             aa[i].pos.x = a->pos.x;
@@ -366,9 +361,7 @@ static void explode_asteroid(
 
 static void update_explosions(struct explosion *ee, unsigned int n, float f)
 {
-    unsigned int i;
-
-    for (i = 0; i < n; i++, ee++) {
+    for (unsigned int i = 0; i < n; i++, ee++) {
         if (ee->visible == true) {
             ee->time += f;
             if (ee->time > EXPLOSION_LENGTH) {
@@ -397,20 +390,19 @@ static bool should_test_collisions(const struct vec_2d *a, const struct vec_2d *
 
 static void check_collisions()
 {
-    unsigned int i, j;
     bool asteroid_hit = false;
     bool collision = false;
     float asteroid_scale;
 
     // Check for asteroid collisions
-    for (j = 0; j < MAX_ASTEROIDS; j++) {
+    for (unsigned int j = 0; j < MAX_ASTEROIDS; j++) {
         struct asteroid *asteroid = &asteroids[j];
         if (asteroid->visible == false) {
             continue;
         }
 
         // Check for asteroid-bullet collisions
-        for (i = 0; i < MAX_BULLETS; i++) {
+        for (unsigned int i = 0; i < MAX_BULLETS; i++) {
             if (bullets[i].visible == false) {
                 continue;
             }
@@ -485,7 +477,6 @@ static void check_collisions()
 
 static void level_draw()
 {
-    int i;
     struct vec_2d position;
     struct vec_2d scale;
 
@@ -510,7 +501,7 @@ static void level_draw()
     }
 
     // draw asteroids
-    for (i = 0; i < MAX_ASTEROIDS; i++) {
+    for (int i = 0; i < MAX_ASTEROIDS; i++) {
         if (asteroids[i].visible == false) {
             continue;
         }
@@ -529,7 +520,7 @@ static void level_draw()
     }
 
     // draw bullets
-    for (i = 0; i < MAX_BULLETS; i++) {
+    for (int i = 0; i < MAX_BULLETS; i++) {
         if (bullets[i].visible) {
             canvas_draw_shape(bullet_shape, bullets[i].pos, bullets[i].rot, vec_2d_unit);
         }

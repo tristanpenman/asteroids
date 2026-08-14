@@ -29,8 +29,6 @@ static int input_up;
 
 bool sandbox_init()
 {
-    unsigned int i;
-
     input_reset();
 
     input_down = input_register();
@@ -55,7 +53,7 @@ bool sandbox_init()
 
     canvas_reset();
 
-    for (i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
+    for (unsigned int i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
         asteroid_shape_ids[i] = canvas_load_shape(&asteroid_shape_data[i]);
         if (asteroid_shape_ids[i] == CANVAS_INVALID_SHAPE) {
             return false;

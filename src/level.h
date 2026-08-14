@@ -1,5 +1,5 @@
-#ifndef __LEVEL_H
-#define __LEVEL_H
+#ifndef ASTEROIDS_LEVEL_H
+#define ASTEROIDS_LEVEL_H
 
 #include "types.h"
 

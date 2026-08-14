@@ -1,5 +1,5 @@
-#ifndef __DEFINES_H
-#define __DEFINES_H
+#ifndef ASTEROIDS_DEFINES_H
+#define ASTEROIDS_DEFINES_H
 
 // asteroids
 #define ASTEROID_SPEED_MIN 0.05f

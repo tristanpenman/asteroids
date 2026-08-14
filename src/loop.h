@@ -1,5 +1,5 @@
-#ifndef __LOOP_H
-#define __LOOP_H
+#ifndef ASTEROIDS_LOOP_H
+#define ASTEROIDS_LOOP_H
 
 #include "types.h"
 

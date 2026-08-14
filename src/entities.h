@@ -1,5 +1,5 @@
-#ifndef __ENTITIES_H
-#define __ENTITIES_H
+#ifndef ASTEROIDS_ENTITIES_H
+#define ASTEROIDS_ENTITIES_H
 
 #include "defines.h"
 #include "types.h"

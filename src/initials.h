@@ -1,5 +1,5 @@
-#ifndef __INITIALS_H
-#define __INITIALS_H
+#ifndef ASTEROIDS_INITIALS_H
+#define ASTEROIDS_INITIALS_H
 
 #include "types.h"
 

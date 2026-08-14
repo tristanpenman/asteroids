@@ -22,7 +22,7 @@
 
 extern struct vec_2d origin;
 
-static const struct shape* shapes[MAX_SHAPES];
+static const struct shape *shapes[MAX_SHAPES];
 
 static int num_shapes = 0;
 
@@ -30,9 +30,7 @@ static int font_shape_ids[MAX_GLYPHS];
 
 void canvas_reset()
 {
-    int i = 0;
-
-    for (i = 0; i < MAX_GLYPHS; i++) {
+    for (int i = 0; i < MAX_GLYPHS; i++) {
         font_shape_ids[i] = CANVAS_INVALID_SHAPE;
     }
 

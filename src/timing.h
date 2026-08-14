@@ -1,5 +1,5 @@
-#ifndef __TIMING_H
-#define __TIMING_H
+#ifndef ASTEROIDS_TIMING_H
+#define ASTEROIDS_TIMING_H
 
 #include "types.h"
 

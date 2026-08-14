@@ -1,5 +1,5 @@
-#ifndef __CANVAS_H
-#define __CANVAS_H
+#ifndef ASTEROIDS_CANVAS_H
+#define ASTEROIDS_CANVAS_H
 
 #include "types.h"
 

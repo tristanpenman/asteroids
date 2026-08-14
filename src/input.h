@@ -1,5 +1,5 @@
-#ifndef __INPUT_H
-#define __INPUT_H
+#ifndef ASTEROIDS_INPUT_H
+#define ASTEROIDS_INPUT_H
 
 #include "types.h"
 
@@ -87,6 +87,6 @@ bool input_active(int handle);
 
 bool input_triggered(int handle);
 
-void input_read_joystick(int8_t* x, int8_t* y);
+void input_read_joystick(int8_t *x, int8_t *y);
 
 #endif

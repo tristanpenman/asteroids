@@ -8,6 +8,7 @@
 #include "level.h"
 #include "loop.h"
 #include "timing.h"
+#include "transition.h"
 
 static int level = 1;
 static int lives = 3;

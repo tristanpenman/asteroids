@@ -10,7 +10,7 @@
         debug_printf("debug_init...\n");
     }
 
-    void debug_printf(const char* message, ...)
+    void debug_printf(const char *message, ...)
     {
         va_list args;
         va_start(args, message);

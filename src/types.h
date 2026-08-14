@@ -1,5 +1,5 @@
-#ifndef __TYPES_H
-#define __TYPES_H
+#ifndef ASTEROIDS_TYPES_H
+#define ASTEROIDS_TYPES_H
 
 #ifdef N64
 

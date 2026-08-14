@@ -20,10 +20,9 @@ float calculate_asteroid_radius(unsigned int shape)
 
     const float *vertices = asteroid_shape_data[shape].vertices;
 
-    unsigned int i;
     unsigned int n = asteroid_shape_data[shape].num_vertices;
 
-    for (i = 0; i < n * 2; i += 2) {
+    for (unsigned int i = 0; i < n * 2; i += 2) {
         r = sqrtf(vertices[i] * vertices[i] + vertices[i + 1] * vertices[i + 1]);
         if (r_max < r) {
             r_max = r;

@@ -1,5 +1,5 @@
-#ifndef __DRAW_H
-#define __DRAW_H
+#ifndef ASTEROIDS_DRAW_H
+#define ASTEROIDS_DRAW_H
 
 struct explosion;
 struct player;

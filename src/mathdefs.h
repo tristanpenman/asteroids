@@ -1,5 +1,5 @@
-#ifndef __MATHDEFS_H
-#define __MATHDEFS_H
+#ifndef ASTEROIDS_MATHDEFS_H
+#define ASTEROIDS_MATHDEFS_H
 
 #include <math.h>
 

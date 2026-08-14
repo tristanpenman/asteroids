@@ -1,5 +1,5 @@
-#ifndef __LEADERBOARD_H
-#define __LEADERBOARD_H
+#ifndef ASTEROIDS_LEADERBOARD_H
+#define ASTEROIDS_LEADERBOARD_H
 
 #include "types.h"
 

@@ -10,7 +10,7 @@
 #include <SDL_mixer.h>
 #endif
 
-#include "./mixer.h"
+#include "mixer.h"
 
 // Array of pointers to sample chunks managed by SDL_mixer
 static Mix_Chunk **samples = NULL;

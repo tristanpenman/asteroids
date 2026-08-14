@@ -107,9 +107,8 @@ bool input_map(int handle, enum input inp)
 void input_update()
 {
     SDL_Event event;
-    int i;
 
-    for (i = 0; i < num_handles; i++) {
+    for (int i = 0; i < num_handles; i++) {
         if (!last_active[i] && active[i]) {
             last_active[i] = true;
         }
@@ -139,7 +138,7 @@ bool input_triggered(int handle)
     return active[handle] && !last_active[handle];
 }
 
-void input_read_joystick(int8_t* x, int8_t* y)
+void input_read_joystick(int8_t *x, int8_t *y)
 {
     // TODO: not implemented
 }

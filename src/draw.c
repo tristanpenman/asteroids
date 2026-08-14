@@ -9,6 +9,7 @@
 
 #include "canvas.h"
 #include "defines.h"
+#include "draw.h"
 #include "entities.h"
 #include "highscores.h"
 #include "mathdefs.h"
@@ -26,7 +27,7 @@ const struct vec_2d origin = {
  *
  *****************************************************************************/
 
-void glVertex_2f(float x, float y)
+static void gl_vertex_2f(float x, float y)
 {
     glVertex3f(x, y, 0.f);
 }
@@ -40,14 +41,14 @@ static void draw_ship(float c)
     glTranslatef(0.0f, 0 - SHIP_PIVOT, 0.0f);
 
     glBegin(GL_LINE_STRIP);
-    glVertex_2f(-0.012f,  0.038f);
-    glVertex_2f( 0.000f,  0.000f);
-    glVertex_2f( 0.012f,  0.038f);
+    gl_vertex_2f(-0.012f,  0.038f);
+    gl_vertex_2f( 0.000f,  0.000f);
+    gl_vertex_2f( 0.012f,  0.038f);
     glEnd();
 
     glBegin(GL_LINES);
-    glVertex_2f(-0.0105f,  0.0325f);
-    glVertex_2f( 0.0105f,  0.0325f);
+    gl_vertex_2f(-0.0105f,  0.0325f);
+    gl_vertex_2f( 0.0105f,  0.0325f);
     glEnd();
 
     glPopMatrix();
@@ -57,14 +58,12 @@ static void draw_ship(float c)
 
 static void draw_ship_explosion(const struct player *p)
 {
-    unsigned int i;
-
     float d;
     float t = p->death_delay;
 
     GLfloat c = (GLfloat)(1.0f - (t / SHIP_DEATH_DELAY));
 
-    for (i = 0; i < SHIP_EXPLOSION_SHARDS; i++) {
+    for (unsigned int i = 0; i < SHIP_EXPLOSION_SHARDS; i++) {
         d = p->shards[i].angle;
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
@@ -75,8 +74,8 @@ static void draw_ship_explosion(const struct player *p)
 
         glColor3f(c, c, c);
         glBegin(GL_LINES);
-          glVertex_2f(-0.008f, 0.0f);
-          glVertex_2f(0.008f, 0.0f);
+        gl_vertex_2f(-0.008f, 0.0f);
+        gl_vertex_2f(0.008f, 0.0f);
         glEnd();
 
         glPopMatrix();
@@ -110,10 +109,9 @@ static void draw_text_centered(const char *s, GLfloat size, GLfloat y)
 
 void draw_explosions(const struct explosion *ee, unsigned int n)
 {
-    unsigned int i;
-    unsigned int p;
     float a;
-    for (i = 0; i < n; i++, ee++) {
+
+    for (unsigned int i = 0; i < n; i++, ee++) {
         if (ee->visible == true) {
             glMatrixMode(GL_MODELVIEW);
             glPushMatrix();
@@ -121,9 +119,11 @@ void draw_explosions(const struct explosion *ee, unsigned int n)
             glScalef(EXPLOSION_SPEED, EXPLOSION_SPEED, 1.0f);
             glColor3f(1.0f, 1.0f, 1.0f);
             glBegin(GL_POINTS);
-            for (p = 0; p < EXPLOSION_PARTICLES; p++) {
+            for (unsigned int p = 0; p < EXPLOSION_PARTICLES; p++) {
                 a = (float)(2 * M_PI) / (float) EXPLOSION_PARTICLES * (float) p;
-                glVertex_2f((GLfloat)(sinf(a) * ee->time), (GLfloat)(0 - cosf(a) * ee->time));
+                gl_vertex_2f(
+                    (GLfloat)(sinf(a) * ee->time),
+                    (GLfloat)(0 - cosf(a) * ee->time));
             }
             glEnd();
             glPopMatrix();
@@ -140,12 +140,11 @@ void draw_level_title(int level)
 
 void draw_lives(int lives)
 {
-    int i;
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glScalef(0.5f, 0.5f, 1.0f);
     glTranslatef(0.05f, 0.11f, 0.0f);
-    for (i = 0; i < lives; i++) {
+    for (int i = 0; i < lives; i++) {
         glTranslatef(0.04f, 0.0f, 0.0f);
         draw_ship(1.0f);
     }

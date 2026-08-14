@@ -1,6 +1,6 @@
 #include <assert.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "canvas.h"
 #include "data.h"
@@ -10,6 +10,7 @@
 #include "leaderboard.h"
 #include "loop.h"
 #include "timing.h"
+#include "titlescreen.h"
 #include "transition.h"
 #include "vec.h"
 
@@ -53,8 +54,6 @@ static void draw_instructions()
 
 bool titlescreen_init()
 {
-    unsigned int i;
-
     input_reset();
 
     // high scores action
@@ -84,14 +83,14 @@ bool titlescreen_init()
 
     canvas_reset();
 
-    for (i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
+    for (unsigned int i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
         asteroid_shape_ids[i] = canvas_load_shape(&asteroid_shape_data[i]);
         if (asteroid_shape_ids[i] == CANVAS_INVALID_SHAPE) {
             return false;
         }
     }
 
-    for (i = 0; i < NUM_ASTEROIDS; ++i) {
+    for (unsigned int i = 0; i < NUM_ASTEROIDS; ++i) {
         asteroid_init(&asteroids[i]);
     }
 

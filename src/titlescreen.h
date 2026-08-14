@@ -1,5 +1,5 @@
-#ifndef __TITLESCREEN_H
-#define __TITLESCREEN_H
+#ifndef ASTEROIDS_TITLESCREEN_H
+#define ASTEROIDS_TITLESCREEN_H
 
 #include "types.h"
 

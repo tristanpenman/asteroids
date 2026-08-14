@@ -1,5 +1,5 @@
-#ifndef __COLLISION_H
-#define __COLLISION_H
+#ifndef ASTEROIDS_COLLISION_H
+#define ASTEROIDS_COLLISION_H
 
 #include "types.h"
 

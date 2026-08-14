@@ -19,14 +19,13 @@ static int input_return;
 
 static void leaderboard_draw()
 {
-    int i;
     uint32_t score;
     char initials[4];
     char str[100];
 
     canvas_start_drawing(true);
 
-    for (i = 0; i < NUM_SCORES; i++) {
+    for (int i = 0; i < NUM_SCORES; i++) {
         if (highscores_read(i, &score, initials) && initials[0] >= 'A' && initials[0] <= 'Z') {
             sprintf(str, "%2d   %.3s %10d ", i + 1, initials, score);
         } else {

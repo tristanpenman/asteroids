@@ -1,5 +1,5 @@
-#ifndef __GAME_H
-#define __GAME_H
+#ifndef ASTEROIDS_GAME_H
+#define ASTEROIDS_GAME_H
 
 #include "types.h"
 

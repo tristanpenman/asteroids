@@ -37,12 +37,11 @@ static struct highscores scores;
 bool highscores_load()
 {
     char buffer[HIGHSCORES_BUFFER_SIZE];
-    int current_entry;
     int result;
 
     // clear highscores data structure
     memset(&scores, 0, sizeof(struct highscores));
-    for (current_entry = 0; current_entry < NUM_SCORES; ++current_entry) {
+    for (int current_entry = 0; current_entry < NUM_SCORES; ++current_entry) {
         memcpy(&scores.entries[current_entry].initials, "---", sizeof(char) * 4);
     }
 
@@ -80,9 +79,7 @@ bool highscores_save()
 
 bool highscores_check(uint32_t score)
 {
-    int i;
-
-    for (i = 0; i < NUM_SCORES; ++i) {
+    for (int i = 0; i < NUM_SCORES; ++i) {
         if (scores.entries[i].initials[0] == '-' || score > scores.entries[i].score) {
             return true;
         }
@@ -93,11 +90,9 @@ bool highscores_check(uint32_t score)
 
 bool highscores_insert(uint32_t score, const char initials[4])
 {
-    int i, j;
-
-    for (i = 0; i < NUM_SCORES; ++i) {
+    for (int i = 0; i < NUM_SCORES; ++i) {
         if (scores.entries[i].initials[0] == '-' || scores.entries[i].score <= score) {
-            for (j = NUM_SCORES - 1; j > i; --j) {
+            for (int j = NUM_SCORES - 1; j > i; --j) {
                 memcpy(&scores.entries[j], &scores.entries[j - 1], sizeof(struct score));
             }
             memcpy(&scores.entries[i].initials, initials, sizeof(char) * 4);

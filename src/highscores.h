@@ -1,5 +1,5 @@
-#ifndef __HIGHSCORES_H
-#define __HIGHSCORES_H
+#ifndef ASTEROIDS_HIGHSCORES_H
+#define ASTEROIDS_HIGHSCORES_H
 
 #include "types.h"
 

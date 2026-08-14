@@ -1,5 +1,5 @@
-#ifndef __UTIL_H
-#define __UTIL_H
+#ifndef ASTEROIDS_UTIL_H
+#define ASTEROIDS_UTIL_H
 
 #include "types.h"
 

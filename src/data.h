@@ -1,5 +1,5 @@
-#ifndef __DATA_H
-#define __DATA_H
+#ifndef ASTEROIDS_DATA_H
+#define ASTEROIDS_DATA_H
 
 #include "shape.h"
 

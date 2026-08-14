@@ -1,6 +1,6 @@
 #include <SDL.h>
 
-#include "types.h"
+#include "timing.h"
 
 static uint32_t simulation_time = 0;
 static uint32_t ticks;

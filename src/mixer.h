@@ -1,5 +1,5 @@
-#ifndef __MIXER_H
-#define __MIXER_H
+#ifndef ASTEROIDS_MIXER_H
+#define ASTEROIDS_MIXER_H
 
 #include "types.h"
 

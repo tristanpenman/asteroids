@@ -1,5 +1,5 @@
-#ifndef __SANDBOX_H
-#define __SANDBOX_H
+#ifndef ASTEROIDS_SANDBOX_H
+#define ASTEROIDS_SANDBOX_H
 
 #include "types.h"
 
