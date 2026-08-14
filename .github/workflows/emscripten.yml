@@ -1,0 +1,40 @@
+name: Emscripten build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.51
+          actions-cache-folder: emsdk-cache
+
+      - name: Configure
+        run: emcmake cmake -S . -B embuild -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build embuild --parallel
+
+      - name: Upload web build
+        uses: actions/upload-artifact@v4
+        with:
+          name: asteroids-emscripten
+          path: |
+            embuild/index.html
+            embuild/asteroids.js
+            embuild/asteroids.wasm
+            embuild/asteroids.data
+          if-no-files-found: error
