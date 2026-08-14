@@ -1,5 +1,5 @@
-#ifndef ASTEROIDS_INPUT_H
-#define ASTEROIDS_INPUT_H
+#ifndef ASTEROIDS_PLATFORM_INPUT_H
+#define ASTEROIDS_PLATFORM_INPUT_H
 
 #include "types.h"
 

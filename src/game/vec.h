@@ -1,5 +1,5 @@
-#ifndef ASTEROIDS_VEC_H
-#define ASTEROIDS_VEC_H
+#ifndef ASTEROIDS_GAME_VEC_H
+#define ASTEROIDS_GAME_VEC_H
 
 struct vec_2d
 {

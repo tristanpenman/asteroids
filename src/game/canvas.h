@@ -1,5 +1,5 @@
-#ifndef ASTEROIDS_CANVAS_H
-#define ASTEROIDS_CANVAS_H
+#ifndef ASTEROIDS_GAME_CANVAS_H
+#define ASTEROIDS_GAME_CANVAS_H
 
 #include "types.h"
 

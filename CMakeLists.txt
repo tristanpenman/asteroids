@@ -44,32 +44,37 @@ endif()
 
 find_package(OpenGL REQUIRED)
 
-set(SRCS
-    src/canvas.c
-    src/collision.c
-    src/data.c
-    src/debug.c
-    src/draw.c
-    src/entities.c
-    src/game.c
-    src/gameover.c
-    src/highscores.c
-    src/initials.c
-    src/input.c
-    src/leaderboard.c
-    src/level.c
-    src/loop.c
-    src/main.c
-    src/mixer.c
-    src/sandbox.c
-    src/storage.c
-    src/timing.c
-    src/titlescreen.c
-    src/transition.c
-    src/util.c
-    src/vec.c
-    src/video.c
+set(GAME_SRCS
+    src/game/collision.c
+    src/game/data.c
+    src/game/draw.c
+    src/game/entities.c
+    src/game/game.c
+    src/game/gameover.c
+    src/game/highscores.c
+    src/game/initials.c
+    src/game/leaderboard.c
+    src/game/level.c
+    src/game/sandbox.c
+    src/game/titlescreen.c
+    src/game/transition.c
+    src/game/util.c
+    src/game/vec.c
 )
+
+set(DESKTOP_PLATFORM_SRCS
+    src/platform/desktop/canvas.c
+    src/platform/desktop/debug.c
+    src/platform/desktop/input.c
+    src/platform/desktop/loop.c
+    src/platform/desktop/main.c
+    src/platform/desktop/mixer.c
+    src/platform/desktop/storage.c
+    src/platform/desktop/timing.c
+    src/platform/desktop/video.c
+)
+
+set(SRCS ${GAME_SRCS} ${DESKTOP_PLATFORM_SRCS})
 
 file(GLOB ASSETS ${CMAKE_CURRENT_SOURCE_DIR}/assets/*)
 
@@ -127,3 +132,10 @@ else()
         )
     endif()
 endif()
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/game
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/platform
+)
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE ASTEROIDS_PLATFORM_DESKTOP=1)

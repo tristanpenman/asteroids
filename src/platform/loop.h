@@ -1,5 +1,5 @@
-#ifndef ASTEROIDS_LOOP_H
-#define ASTEROIDS_LOOP_H
+#ifndef ASTEROIDS_PLATFORM_LOOP_H
+#define ASTEROIDS_PLATFORM_LOOP_H
 
 #include "types.h"
 

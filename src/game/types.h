@@ -1,5 +1,5 @@
-#ifndef ASTEROIDS_TYPES_H
-#define ASTEROIDS_TYPES_H
+#ifndef ASTEROIDS_GAME_TYPES_H
+#define ASTEROIDS_GAME_TYPES_H
 
 #ifdef N64
 

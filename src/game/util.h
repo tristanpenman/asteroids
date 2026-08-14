@@ -1,5 +1,5 @@
-#ifndef ASTEROIDS_UTIL_H
-#define ASTEROIDS_UTIL_H
+#ifndef ASTEROIDS_GAME_UTIL_H
+#define ASTEROIDS_GAME_UTIL_H
 
 #include "types.h"
 

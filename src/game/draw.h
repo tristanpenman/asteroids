@@ -1,5 +1,5 @@
-#ifndef ASTEROIDS_DRAW_H
-#define ASTEROIDS_DRAW_H
+#ifndef ASTEROIDS_GAME_DRAW_H
+#define ASTEROIDS_GAME_DRAW_H
 
 struct explosion;
 struct player;

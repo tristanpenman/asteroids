@@ -1,5 +1,5 @@
-#ifndef ASTEROIDS_DEBUG_H
-#define ASTEROIDS_DEBUG_H
+#ifndef ASTEROIDS_PLATFORM_DEBUG_H
+#define ASTEROIDS_PLATFORM_DEBUG_H
 
 #include <assert.h>
 

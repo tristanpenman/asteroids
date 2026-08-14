@@ -1,5 +1,5 @@
-#ifndef ASTEROIDS_TIMING_H
-#define ASTEROIDS_TIMING_H
+#ifndef ASTEROIDS_PLATFORM_TIMING_H
+#define ASTEROIDS_PLATFORM_TIMING_H
 
 #include "types.h"
 

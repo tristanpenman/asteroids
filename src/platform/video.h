@@ -1,5 +1,5 @@
-#ifndef ASTEROIDS_VIDEO_H
-#define ASTEROIDS_VIDEO_H
+#ifndef ASTEROIDS_PLATFORM_VIDEO_H
+#define ASTEROIDS_PLATFORM_VIDEO_H
 
 #include "types.h"
 
