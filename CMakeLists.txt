@@ -27,18 +27,24 @@ else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -Wall -Wno-long-long -pedantic -Wdeclaration-after-statement")
     if(EMSCRIPTEN)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s USE_SDL=2 -s USE_SDL_MIXER=2 -Wno-gnu-zero-variadic-macro-arguments")
+    elseif(NOT WIN32)
+        find_package(PkgConfig REQUIRED)
+        execute_process(
+            COMMAND ${PKG_CONFIG_EXECUTABLE} --exists sdl2 SDL2_mixer
+            RESULT_VARIABLE SDL_DEPENDENCIES_MISSING
+        )
+        if(SDL_DEPENDENCIES_MISSING)
+            message(FATAL_ERROR
+                "SDL2 development files and SDL2_mixer are required. "
+                "Install libsdl2-dev and libsdl2-mixer-dev on Debian/Ubuntu, "
+                "or sdl2 and sdl2_mixer with Homebrew."
+            )
+        endif()
+        pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2)
+        pkg_check_modules(SDL2MIXER REQUIRED IMPORTED_TARGET SDL2_mixer)
+        set(SDL_LIBRARIES PkgConfig::SDL2 PkgConfig::SDL2MIXER)
     else()
-        include(FindPkgConfig)
-        pkg_search_module(SDL2 REQUIRED sdl2)
-        pkg_search_module(SDL2MIXER REQUIRED SDL2_mixer)
-        include_directories(
-            ${SDL2_INCLUDE_DIRS}
-            ${SDL2MIXER_INCLUDE_DIRS}
-        )
-        link_directories(
-            ${SDL2_LIBRARY_DIRS}
-            ${SDL2MIXER_LIBRARY_DIRS}
-        )
+        set(SDL_LIBRARIES SDL2 SDL2_mixer)
     endif()
 endif()
 
@@ -126,8 +132,7 @@ else()
         target_link_libraries(${PROJECT_NAME}
             m
             ${OPENGL_LIBRARIES}
-            ${SDL2_LIBRARIES}
-            ${SDL2MIXER_LIBRARIES}
+            ${SDL_LIBRARIES}
             ${OS_LIBRARIES}
         )
     endif()
