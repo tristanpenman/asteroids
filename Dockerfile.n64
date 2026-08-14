@@ -1,0 +1,28 @@
+FROM debian:bookworm-slim
+
+RUN apt-get update \
+    && apt-get -y install ca-certificates \
+    && apt-get clean
+
+RUN echo "deb [trusted=yes] https://crashoveride95.github.io/apt/ ./" \
+    > /etc/apt/sources.list.d/n64sdk.list
+
+RUN apt-get update \
+    && apt-get -y upgrade \
+    && apt-get -y install \
+        binutils-mips-n64 \
+        build-essential \
+        gcc-mips-linux-gnu \
+        gcc-mips-n64 \
+        makemask \
+        n64sdk \
+        newlib-mips-n64 \
+        libnustd \
+        libnusys \
+    && apt-get clean
+
+ENV N64_LIBGCCDIR=/opt/crashsdk/lib/gcc/mips64-elf/12.2.0
+ENV PATH=/opt/crashsdk/bin:$PATH
+ENV ROOT=/etc/n64
+
+WORKDIR /source

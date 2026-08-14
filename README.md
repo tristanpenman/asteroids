@@ -70,6 +70,16 @@ The build artifacts (`index.html`, `asteroids.js`, `asteroids.wasm` and `asteroi
 
 > **Note:** the `emscripten/emsdk` image is only published for `linux/amd64`, so on Apple Silicon (arm64) it runs under emulation. This is fine for building the game, though the build will be a little slower.
 
+### Nintendo 64 (via Docker)
+
+The initial Nintendo 64 target can be built with the N64 SDK container:
+
+```bash
+./scripts/build-n64.sh
+```
+
+The resulting ROM is written to `build-n64/asteroids.z64` and owned by the current user.
+
 ## License
 
 This code has been released under the MIT License. See the [LICENSE](LICENSE) file for more information.

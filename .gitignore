@@ -1,4 +1,5 @@
 build
+build-n64
 embuild
 highscores.csv
 thirdparty/SDL2_mixer-2.0.4
@@ -6,5 +7,6 @@ thirdparty/SDL2-2.0.9
 CMakeFiles
 cmake-build-*
 *.n64
+!Dockerfile.n64
 *.o
 *.out

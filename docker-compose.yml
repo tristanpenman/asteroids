@@ -10,3 +10,11 @@ services:
     working_dir: ${PWD}
     volumes:
       - .:${PWD}
+
+  n64:
+    build:
+      context: .
+      dockerfile: Dockerfile.n64
+    platform: linux/amd64
+    volumes:
+      - .:/source

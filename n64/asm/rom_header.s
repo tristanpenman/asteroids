@@ -1,0 +1,14 @@
+.byte  0x80, 0x37, 0x12, 0x40
+.word  0x0000000F
+.word  __start
+.word  0x0000144C
+.word  0x00000000
+.word  0x00000000
+.word  0x00000000
+.word  0x00000000
+.ascii "ASTEROIDS           "
+.word  0x00000000
+.word  0x0000004E
+.ascii "AS"
+.ascii "E"
+.byte  0x00

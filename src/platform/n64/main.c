@@ -1,0 +1,5 @@
+void mainproc(void)
+{
+    for (;;) {
+    }
+}
