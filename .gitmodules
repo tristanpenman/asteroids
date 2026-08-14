@@ -1,0 +1,3 @@
+[submodule "thirdparty/unfloader"]
+	path = thirdparty/unfloader
+	url = git@github.com:buu342/N64-UNFLoader.git
