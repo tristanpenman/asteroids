@@ -15,22 +15,22 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ !github.event.release.prerelease }}
 
     steps:
-      - name: Verify latest public release
+      - name: Verify latest published release
         id: latest-release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          latest_tag="$(gh api "repos/${GITHUB_REPOSITORY}/releases/latest" --jq .tag_name)"
+          latest_tag="$(gh api "repos/${GITHUB_REPOSITORY}/releases" \
+            --jq '[.[] | select(.draft == false)] | first | .tag_name')"
 
           if [ "${latest_tag}" = "${RELEASE_TAG}" ]; then
             echo "deploy=true" >> "${GITHUB_OUTPUT}"
           else
             echo "deploy=false" >> "${GITHUB_OUTPUT}"
-            echo "::notice::Skipping deploy for ${RELEASE_TAG}; latest public release is ${latest_tag}."
+            echo "::notice::Skipping deploy for ${RELEASE_TAG}; latest published release is ${latest_tag}."
           fi
 
       - name: Check out release tag
