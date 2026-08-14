@@ -23,7 +23,8 @@ LD := mips-n64-ld
 OBJCOPY := mips-n64-objcopy
 
 INCLUDE_DIRS := . /usr/include/n64 /usr/include/n64/PR \
-	/usr/include/n64/nustd /usr/include/n64/nusys n64/include $(BUILD_DIR)
+	/usr/include/n64/nustd /usr/include/n64/nusys n64/include \
+	src/game src/platform $(BUILD_DIR)
 C_DEFINES := $(foreach definition,$(DEFINES),-D$(definition))
 INCLUDES := $(foreach directory,$(INCLUDE_DIRS),-I$(directory))
 CFLAGS := -G 0 -g -mabi=32 -ffreestanding -mfix4300 $(INCLUDES) $(C_DEFINES)
