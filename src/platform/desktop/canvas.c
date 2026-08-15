@@ -28,7 +28,7 @@ static int num_shapes = 0;
 
 static int font_shape_ids[MAX_GLYPHS];
 
-void canvas_reset()
+void canvas_reset(void)
 {
     for (int i = 0; i < MAX_GLYPHS; i++) {
         font_shape_ids[i] = CANVAS_INVALID_SHAPE;
@@ -56,7 +56,7 @@ void canvas_start_drawing(bool clear)
     glColor3f(1.0f, 1.0f, 1.0f);
 }
 
-void canvas_continue_drawing()
+void canvas_continue_drawing(void)
 {
     // nothing to do
 }

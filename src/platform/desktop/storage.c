@@ -4,7 +4,7 @@
 #include "debug.h"
 #include "storage.h"
 
-bool storage_available()
+bool storage_available(void)
 {
 #ifdef __EMSCRIPTEN__
     return false;

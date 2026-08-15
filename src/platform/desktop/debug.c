@@ -5,7 +5,7 @@
 
 #if DEBUG
 
-    void debug_init()
+    void debug_init(void)
     {
         debug_printf("debug_init...\n");
     }

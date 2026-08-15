@@ -73,13 +73,13 @@ enum input
     __INPUT__COUNT
 };
 
-void input_init();
+void input_init(void);
 
-void input_reset();
+void input_reset(void);
 
-void input_update();
+void input_update(void);
 
-int input_register();
+int input_register(void);
 
 bool input_map(int handle, enum input);
 

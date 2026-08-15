@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-void gameover_init();
+void gameover_init(void);
 
 void gameover_loop(bool draw);
 

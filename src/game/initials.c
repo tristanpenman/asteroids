@@ -41,7 +41,7 @@ static void draw_score(int score)
 #endif
 }
 
-static void handle_input()
+static void handle_input(void)
 {
     bool done = false;
 

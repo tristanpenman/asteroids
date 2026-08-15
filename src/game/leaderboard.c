@@ -17,7 +17,7 @@ static int input_return;
  *
  *****************************************************************************/
 
-static void leaderboard_draw()
+static void leaderboard_draw(void)
 {
     uint32_t score;
     char initials[4];
@@ -54,7 +54,7 @@ static void leaderboard_draw()
  *
  *****************************************************************************/
 
-void leaderboard_init()
+void leaderboard_init(void)
 {
     input_reset();
 

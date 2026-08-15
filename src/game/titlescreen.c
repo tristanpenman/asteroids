@@ -34,7 +34,7 @@ static int input_quit;
  *
  *****************************************************************************/
 
-static void draw_instructions()
+static void draw_instructions(void)
 {
     canvas_draw_text_centered("PRESS ENTER TO PLAY", -0.07f, 0.3f);
     canvas_draw_text_centered("SPACE - FIRE", 0.025f, 0.20f);
@@ -52,7 +52,7 @@ static void draw_instructions()
  *
  *****************************************************************************/
 
-bool titlescreen_init()
+bool titlescreen_init(void)
 {
     input_reset();
 

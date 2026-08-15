@@ -23,7 +23,7 @@ static void exit_loop(bool draw)
 }
 
 #ifdef __EMSCRIPTEN__
-static void enscripten_main_loop()
+static void enscripten_main_loop(void)
 {
     main_loop(true);
 }
@@ -42,7 +42,7 @@ void set_main_loop(main_loop_fn_t new_main_loop)
     main_loop = new_main_loop;
 }
 
-void run_main_loop()
+void run_main_loop(void)
 {
     assert(NULL != main_loop);
     assert(exit_loop != main_loop);

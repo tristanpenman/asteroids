@@ -6,7 +6,7 @@
 /**
  * Reset residual simulation time to zero
  */
-void reset_simulation_time();
+void reset_simulation_time(void);
 
 /**
  * Update the available / residual simulation time based on system ticks
@@ -15,7 +15,7 @@ void reset_simulation_time();
  * that have occurred since the last call to this function, or
  * \c reset_simulation_time(), whichever was most recent
  */
-void produce_simulation_time();
+void produce_simulation_time(void);
 
 /**
  * Consume a given amount of simulation time, if available
@@ -32,6 +32,6 @@ bool maybe_consume_simulation_time(uint32_t millis);
  *
  * @return residual simulation time, in milliseconds
  */
-uint32_t residual_simulation_time();
+uint32_t residual_simulation_time(void);
 
 #endif

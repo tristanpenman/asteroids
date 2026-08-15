@@ -22,17 +22,17 @@ bool video_init(int width, int height, const char *title, bool fullscreen);
 /**
  * Activate OpenGL context and clear the color buffer
  */
-void video_clear();
+void video_clear(void);
 
 /**
  * Swap the front buffer with the back buffer
  */
-void video_swap();
+void video_swap(void);
 
 /**
  * Delete the OpenGL context and window created by a call to \c video_init
  */
-void video_cleanup();
+void video_cleanup(void);
 
 /**
  * Update the window title

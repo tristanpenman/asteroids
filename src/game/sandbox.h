@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-bool sandbox_init();
+bool sandbox_init(void);
 void sandbox_loop(bool draw);
 
 #endif

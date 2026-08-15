@@ -11,7 +11,7 @@ struct vec_2d;
 /**
  * Unload all previously loaded shapes
  */
-void canvas_reset();
+void canvas_reset(void);
 
 /**
  * Load a shape so that it can be drawn using \c canvas_draw_lines or \c canvas_draw_triangles
@@ -26,7 +26,7 @@ void canvas_start_drawing(bool clear);
 /**
  * Continue drawing shapes, after finishing
  */
-void canvas_continue_drawing();
+void canvas_continue_drawing(void);
 
 /**
  * Change the colour that will be used when drawing lines

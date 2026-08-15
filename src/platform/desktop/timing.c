@@ -11,13 +11,13 @@ static uint32_t ticks;
  *
  *****************************************************************************/
 
-void reset_simulation_time()
+void reset_simulation_time(void)
 {
     ticks = SDL_GetTicks();
     simulation_time = 0;
 }
 
-void produce_simulation_time()
+void produce_simulation_time(void)
 {
     const uint32_t now = SDL_GetTicks();
     if (now < ticks) {
@@ -43,7 +43,7 @@ bool maybe_consume_simulation_time(uint32_t millis)
     return true;
 }
 
-uint32_t residual_simulation_time()
+uint32_t residual_simulation_time(void)
 {
     return simulation_time;
 }

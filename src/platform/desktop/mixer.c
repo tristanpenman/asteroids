@@ -159,7 +159,7 @@ bool mixer_stop_playing_on_channel(int channel)
     return true;
 }
 
-void mixer_cleanup()
+void mixer_cleanup(void)
 {
     static const int ALL_CHANNELS = -1;
     Mix_HaltChannel(ALL_CHANNELS);

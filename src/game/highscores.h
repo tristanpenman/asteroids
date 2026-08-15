@@ -3,8 +3,8 @@
 
 #include "types.h"
 
-bool highscores_load();
-bool highscores_save();
+bool highscores_load(void);
+bool highscores_save(void);
 
 bool highscores_check(uint32_t score);
 bool highscores_insert(uint32_t score, const char initials[4]);

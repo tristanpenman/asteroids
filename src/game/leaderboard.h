@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-void leaderboard_init();
+void leaderboard_init(void);
 
 void leaderboard_loop(bool draw);
 

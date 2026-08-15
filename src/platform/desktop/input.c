@@ -68,12 +68,12 @@ void input_handle_event(int sym, bool down)
  *
  *****************************************************************************/
 
-void input_init()
+void input_init(void)
 {
     input_reset();
 }
 
-void input_reset()
+void input_reset(void)
 {
     num_handles = 0;
 
@@ -85,7 +85,7 @@ void input_reset()
     }
 }
 
-int input_register()
+int input_register(void)
 {
     if (num_handles == INPUT_MAX_HANDLES) {
         return INPUT_INVALID_HANDLE;
@@ -104,7 +104,7 @@ bool input_map(int handle, enum input inp)
     return true;
 }
 
-void input_update()
+void input_update(void)
 {
     SDL_Event event;
 

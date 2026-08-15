@@ -47,7 +47,7 @@
             Should be called last during game initialization.
         ==============================*/
 
-        extern void debug_initialize();
+        extern void debug_initialize(void);
 
 
         /*==============================
@@ -78,7 +78,7 @@
             thread may lead to a screenshot with visible tearing
         ==============================*/
 
-        extern void debug_screenshot();
+        extern void debug_screenshot(void);
 
 
         /*==============================
@@ -105,7 +105,7 @@
             Check the USB for incoming commands.
         ==============================*/
 
-        extern void debug_pollcommands();
+        extern void debug_pollcommands(void);
 
 
         /*==============================
@@ -136,7 +136,7 @@
             @return The size of the data in bytes, or 0
         ==============================*/
 
-        extern int debug_sizecommand();
+        extern int debug_sizecommand(void);
 
 
         /*==============================
@@ -144,7 +144,7 @@
             Prints a list of commands to the developer's command prompt.
         ==============================*/
 
-        extern void debug_printcommands();
+        extern void debug_printcommands(void);
 
 
         // Ignore this, use the macro instead

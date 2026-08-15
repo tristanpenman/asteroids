@@ -42,7 +42,7 @@ static float pixel_density = 1.f;
 static int window_width;
 static int window_height;
 
-static bool reset_window_metrics()
+static bool reset_window_metrics(void)
 {
     const float old_pixel_density = pixel_density;
     SDL_GL_GetDrawableSize(sdl_window, &canvas_width, &canvas_height);
@@ -207,7 +207,7 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
     return true;
 }
 
-void video_clear()
+void video_clear(void)
 {
 #ifdef __EMSCRIPTEN__
     int swap_interval;
@@ -292,12 +292,12 @@ void video_clear()
     glLoadIdentity();
 }
 
-void video_swap()
+void video_swap(void)
 {
     SDL_GL_SwapWindow(sdl_window);
 }
 
-void video_cleanup()
+void video_cleanup(void)
 {
     if (NULL != sdl_glcontext) {
         SDL_GL_DeleteContext(sdl_glcontext);

@@ -34,7 +34,7 @@ static struct highscores scores;
  *
  *****************************************************************************/
 
-bool highscores_load()
+bool highscores_load(void)
 {
     char buffer[HIGHSCORES_BUFFER_SIZE];
     int result;
@@ -60,7 +60,7 @@ bool highscores_load()
     return true;
 }
 
-bool highscores_save()
+bool highscores_save(void)
 {
     char buffer[HIGHSCORES_BUFFER_SIZE];
     int result;

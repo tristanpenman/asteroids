@@ -5,6 +5,6 @@
 
 bool game_init(bool silent);
 void game_play(bool sandbox);
-void game_cleanup();
+void game_cleanup(void);
 
 #endif

@@ -27,7 +27,7 @@ static int input_left;
 static int input_right;
 static int input_up;
 
-bool sandbox_init()
+bool sandbox_init(void)
 {
     input_reset();
 

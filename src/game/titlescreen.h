@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-bool titlescreen_init();
+bool titlescreen_init(void);
 
 void titlescreen_loop(bool draw);
 

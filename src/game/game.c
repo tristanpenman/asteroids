@@ -28,7 +28,7 @@ int explosion_channel = -1;
 int phaser_channel = -1;
 int thruster_channel = -1;
 
-static bool load_samples()
+static bool load_samples(void)
 {
     memset(samples, 0, sizeof(int) * MAX_SAMPLES);
     for (int i = 0; i < NUM_SAMPLES; ++i) {
@@ -69,7 +69,7 @@ bool game_init(bool silent)
     return true;
 }
 
-void game_cleanup()
+void game_cleanup(void)
 {
     mixer_set_channel_completion_handler(NULL);
 }

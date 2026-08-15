@@ -294,7 +294,7 @@ static void init_explosion(struct explosion *e, const struct vec_2d *pos)
     e->visible = true;
 }
 
-static void explode_player()
+static void explode_player(void)
 {
     player.state = PS_EXPLODING;
 
@@ -388,7 +388,7 @@ static bool should_test_collisions(const struct vec_2d *a, const struct vec_2d *
     return dist_sq < threshold_sq;
 }
 
-static void check_collisions()
+static void check_collisions(void)
 {
     bool asteroid_hit = false;
     bool collision = false;
@@ -475,7 +475,7 @@ static void check_collisions()
  *
  *****************************************************************************/
 
-static void level_draw()
+static void level_draw(void)
 {
     struct vec_2d position;
     struct vec_2d scale;
@@ -537,7 +537,7 @@ static void level_draw()
     canvas_finish_drawing(true);
 }
 
-static void level_update()
+static void level_update(void)
 {
     int8_t joystick_x;
     unsigned int num_asteroids = 0;

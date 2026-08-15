@@ -18,7 +18,7 @@ void set_main_loop(main_loop_fn_t main_loop_fn);
  * Execution will continue until cancel_main_loop is called and the final
  * iteration is complete, at which point the program will terminate.
  */
-void run_main_loop();
+void run_main_loop(void);
 
 /**
  * Cancel next iteration of the event loop

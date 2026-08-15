@@ -15,7 +15,7 @@ static float elapsed;
  *
  *****************************************************************************/
 
-void gameover_init()
+void gameover_init(void)
 {
     canvas_reset();
     input_reset();

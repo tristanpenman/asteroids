@@ -64,6 +64,6 @@ bool mixer_stop_playing_on_channel(int channel);
 /**
  * Unload all samples and release the audio device acquired by \c mixer_init
   */
-void mixer_cleanup();
+void mixer_cleanup(void);
 
 #endif
