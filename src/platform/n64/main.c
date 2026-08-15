@@ -38,8 +38,10 @@ static void render_logo(int pending_gfx)
 
     guPerspective(&projection, &perspective_normalization, 45.0f,
         (float)SCREEN_WD / (float)SCREEN_HT, 10.0f, 1000.0f, 1.0f);
-    guLookAt(&modelview, 0.0f, 0.0f, 260.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f);
+    guLookAt(&modelview,
+        0.0f, 0.0f, 260.0f, // camera position
+        0.0f, 0.0f, 0.0f,   // look at position
+        0.0f, 1.0f, 0.0f);  // up vector
     guRotate(&rotation, logo_rotation, 0.0f, 1.0f, 0.0f);
 
     gSPPerspNormalize(glistp++, perspective_normalization);
