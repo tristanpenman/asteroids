@@ -54,6 +54,11 @@ bool mixer_init(int mixer_channels)
     return true;
 }
 
+void mixer_update(void)
+{
+    // SDL_mixer dispatches channel completion callbacks itself.
+}
+
 void mixer_set_channel_completion_handler(void (*callback)(int))
 {
     Mix_ChannelFinished(callback);

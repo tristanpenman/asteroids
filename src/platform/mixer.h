@@ -19,6 +19,13 @@
 bool mixer_init(int num_mixer_channels);
 
 /**
+ * Update mixer state and dispatch deferred completion callbacks.
+ *
+ * This must be called regularly from the main thread.
+ */
+void mixer_update(void);
+
+/**
  * Set a function to call when a channel finishes playing a sample
  *
  * This function will be called, with the ID of the channel that has completed,

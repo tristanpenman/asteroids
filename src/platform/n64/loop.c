@@ -2,11 +2,13 @@
 #include <nusys.h>
 
 #include "loop.h"
+#include "mixer.h"
 
 static main_loop_fn_t main_loop;
 
 static void nusys_loop(int pending_gfx)
 {
+    mixer_update();
     main_loop(pending_gfx < 1);
 }
 

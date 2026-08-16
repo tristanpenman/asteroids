@@ -7,6 +7,7 @@
 #endif
 
 #include "loop.h"
+#include "mixer.h"
 #include "types.h"
 
 static main_loop_fn_t main_loop = NULL;
@@ -25,6 +26,7 @@ static void exit_loop(bool draw)
 #ifdef __EMSCRIPTEN__
 static void enscripten_main_loop(void)
 {
+    mixer_update();
     main_loop(true);
 }
 #endif
@@ -50,6 +52,7 @@ void run_main_loop(void)
     emscripten_set_main_loop(enscripten_main_loop, 0, true);
 #else
     while (1) {
+        mixer_update();
         main_loop(true);
     }
 #endif

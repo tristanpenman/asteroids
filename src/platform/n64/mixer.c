@@ -6,6 +6,11 @@ bool mixer_init(int num_mixer_channels)
     return false;
 }
 
+void mixer_update(void)
+{
+    // Playback handle tracking will be added with sample playback support.
+}
+
 void mixer_set_channel_completion_handler(void (*callback)(int channel))
 {
     (void)callback;
