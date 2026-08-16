@@ -539,7 +539,7 @@ static void level_draw(void)
 
 static void level_update(void)
 {
-    int8_t joystick_x;
+    int8_t joystick_x = 0;
     unsigned int num_asteroids = 0;
 
     collision_tests_per_frame = 0;
@@ -560,10 +560,10 @@ static void level_update(void)
         update_player(factor);
 
         if (player.state == PS_NORMAL) {
-            if (input_active(input_left)) {
+            if (joystick_x < -20 || input_active(input_left)) {
                 player.keys.left = KS_DOWN;
                 player.keys.right = KS_UP;
-            } else if (input_active(input_right)) {
+            } else if (joystick_x > 20 || input_active(input_right)) {
                 player.keys.right = KS_DOWN;
                 player.keys.left = KS_UP;
             } else {

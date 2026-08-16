@@ -5,6 +5,7 @@
 #include "data.h"
 #include "defines.h"
 #include "gfx.h"
+#include "mathdefs.h"
 #include "shape.h"
 #include "vec.h"
 
@@ -143,7 +144,7 @@ bool canvas_draw_shape(int shape, struct vec_2d position, float rotation,
     transform = &transforms[num_transforms++];
     guTranslate(&transform->modeling,
         position.x * SCREEN_WD, position.y * SCREEN_WD, 0.0f);
-    guRotate(&transform->rotation, rotation, 0.0f, 0.0f, 1.0f);
+    guRotate(&transform->rotation, rotation * RAD_TO_DEG, 0.0f, 0.0f, 1.0f);
     guScale(&transform->scale, scale.x, scale.y, 1.0f);
 
     gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&transform->modeling),
