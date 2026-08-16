@@ -118,7 +118,6 @@ void titlescreen_loop(bool draw)
     }
 #endif
 
-#ifndef ASTEROIDS_PLATFORM_N64
     if (input_active(input_start)) {
         enter_down = true;
     } else if (enter_down) {
@@ -129,6 +128,7 @@ void titlescreen_loop(bool draw)
         enter_down = false;
     }
 
+#ifndef ASTEROIDS_PLATFORM_N64
     if (input_active(input_quit)) {
         exit(EXIT_SUCCESS);
     }
