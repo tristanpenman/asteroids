@@ -1,3 +1,4 @@
+#include "debug.h"
 #include "game.h"
 #include "gfx.h"
 #include "input.h"
@@ -79,6 +80,7 @@ static void render_logo(int pending_gfx)
 
 void mainproc(void)
 {
+    debug_initialize();
     gfx_init();
     input_init();
     reset_simulation_time();

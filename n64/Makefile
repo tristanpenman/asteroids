@@ -15,7 +15,7 @@ GFX_UCODE_FILES := /usr/lib/n64/PR/rspboot.o \
 	/usr/lib/n64/PR/gspS2DEX2.fifo.o
 
 DEFINES := _FINALROM=1 F3DEX_GBI_2=1 N64 ASTEROIDS_PLATFORM_N64=1
-SRC_DIRS := src/platform/n64 n64/asm
+SRC_DIRS := src/platform/n64 src/platform/n64/unfloader n64/asm
 GAME_C_FILES := \
 	src/game/collision.c \
 	src/game/data.c \
@@ -51,7 +51,7 @@ OBJCOPY := mips-n64-objcopy
 
 INCLUDE_DIRS := . /usr/include/n64 /usr/include/n64/PR \
 	/usr/include/n64/nustd /usr/include/n64/nusys n64/include \
-	src/game src/platform $(BUILD_DIR)
+	src/game src/platform/n64/unfloader src/platform $(BUILD_DIR)
 C_DEFINES := $(foreach definition,$(DEFINES),-D$(definition))
 INCLUDES := $(foreach directory,$(INCLUDE_DIRS),-I$(directory))
 CFLAGS := -G 0 -g -mabi=32 -ffreestanding -mfix4300 $(INCLUDES) $(C_DEFINES)
