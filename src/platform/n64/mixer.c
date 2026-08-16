@@ -1,9 +1,37 @@
+#include <nusys.h>
+#include <nualstl_n.h>
+
 #include "mixer.h"
+#include "segment.h"
+
+static bool initialized;
 
 bool mixer_init(int num_mixer_channels)
 {
-    (void)num_mixer_channels;
-    return false;
+    if (initialized) {
+        return true;
+    }
+
+    if (num_mixer_channels != MIXER_DEFAULT &&
+        num_mixer_channels != NU_AU_CHANNELS) {
+        return false;
+    }
+
+    if (nuAuStlInit() <= 0) {
+        return false;
+    }
+
+    nuAuStlPtrBankInit(AUDIO_POINTER_BANK_SIZE);
+    nuAuStlPtrBankSet(
+        AUDIO_POINTER_BANK_START,
+        AUDIO_POINTER_BANK_SIZE,
+        AUDIO_WAVE_BANK_START);
+    nuAuStlSndPlayerDataSet(
+        AUDIO_EFFECTS_BANK_START,
+        AUDIO_EFFECTS_BANK_SIZE);
+
+    initialized = true;
+    return true;
 }
 
 void mixer_update(void)
@@ -36,4 +64,7 @@ bool mixer_stop_playing_on_channel(int channel)
 
 void mixer_cleanup(void)
 {
+    if (initialized) {
+        nuAuStlSndPlayerStop(0);
+    }
 }

@@ -3,6 +3,7 @@
 #include "gfx.h"
 #include "input.h"
 #include "logo.h"
+#include "mixer.h"
 #include "storage.h"
 #include "timing.h"
 
@@ -93,6 +94,9 @@ void mainproc(void)
 {
     debug_initialize();
     gfx_init();
+    if (!mixer_init(MIXER_DEFAULT)) {
+        debug_printf("mixer_init failed\n");
+    }
     input_init();
     reset_simulation_time();
     storage_available();

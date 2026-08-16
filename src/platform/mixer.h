@@ -8,7 +8,7 @@
 #define MIXER_INVALID_SAMPLE -1
 
 /**
- * Initialise SDL's audio subsystem and acquire an audio device
+ * Initialise the platform audio mixer
  *
  * @param  num_mixer_channels  number of (virtual) mixer channels to create,
  *                             or \c MIXER_DEFAULT (-1) for the default number
