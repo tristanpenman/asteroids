@@ -96,6 +96,12 @@ SECTIONS
     }
     END_NOLOAD(code)
 
+    BEGIN_SEG(rawdata, __romPos)
+    {
+        BUILD_DIR/n64/assets/rawdata.o(.data*);
+    }
+    END_SEG(rawdata)
+
     /DISCARD/ :
     {
         *(*);
