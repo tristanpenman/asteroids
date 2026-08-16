@@ -9,6 +9,22 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 #define EM_TARGET "#canvas"
+
+EM_JS(int, browser_inner_width, (void), {
+    return window.innerWidth;
+})
+
+EM_JS(int, browser_inner_height, (void), {
+    return window.innerHeight;
+})
+
+EM_JS(int, browser_canvas_width, (void), {
+    return canvas.width;
+})
+
+EM_JS(int, browser_canvas_height, (void), {
+    return canvas.height;
+})
 #endif
 
 #include "debug.h"
@@ -97,12 +113,8 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
 
 #ifdef __EMSCRIPTEN__
     // canvas size may be wrong here, just use window instead
-    inner_width = EM_ASM_INT({
-        return window.innerWidth;
-    });
-    inner_height = EM_ASM_INT({
-        return window.innerHeight;
-    });
+    inner_width = browser_inner_width();
+    inner_height = browser_inner_height();
 
     debug_printf("inner area = (%d, %d)\n", inner_width, inner_height);
 
@@ -230,13 +242,8 @@ void video_clear(void)
         SDL_GL_SetSwapInterval(0);
     }
 
-    canvas_width = EM_ASM_INT({
-        return canvas.width;
-    });
-
-    canvas_height = EM_ASM_INT({
-        return canvas.height;
-    });
+    canvas_width = browser_canvas_width();
+    canvas_height = browser_canvas_height();
 
     glViewport(0, 0, canvas_width, canvas_height);
 #else
