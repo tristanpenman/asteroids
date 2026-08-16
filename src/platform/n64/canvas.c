@@ -2,14 +2,13 @@
 #include <string.h>
 
 #include "canvas.h"
-#include "data.h"
 #include "defines.h"
 #include "gfx.h"
 #include "mathdefs.h"
 #include "shape.h"
+#include "text.h"
 #include "vec.h"
 
-#define MAX_GLYPHS 128
 #define MAX_SHAPES 64
 #define MAX_TRANSFORMS 128
 #define MAX_VERTICES 256
@@ -38,7 +37,6 @@ static Vtx vertices[MAX_VERTICES];
 static struct geometry shapes[MAX_SHAPES];
 static struct gfx_transform transforms[MAX_TRANSFORMS];
 static struct colour primitive_colour;
-static int font_shape_ids[MAX_GLYPHS];
 static int num_shapes;
 static int num_vertices;
 static int num_transforms;
@@ -47,14 +45,9 @@ static Mtx frame_projection;
 
 void canvas_reset(void)
 {
-    int i;
-
-    for (i = 0; i < MAX_GLYPHS; ++i) {
-        font_shape_ids[i] = CANVAS_INVALID_SHAPE;
-    }
-
     num_shapes = 0;
     num_vertices = 0;
+    text_reset();
     primitive_colour.r = 255;
     primitive_colour.g = 255;
     primitive_colour.b = 255;
@@ -173,37 +166,6 @@ bool canvas_draw_shape(int shape, struct vec_2d position, float rotation,
     }
 
     return true;
-}
-
-void canvas_draw_text(const char *text, float x, float y, float scale_factor)
-{
-    struct vec_2d position = {x, y};
-    const struct vec_2d scale = {scale_factor, scale_factor};
-
-    while (*text != '\0') {
-        int c = (unsigned char)*text;
-
-        if (c < MAX_GLYPHS && ascii_to_font_mapping[c] >= 0) {
-            if (font_shape_ids[c] == CANVAS_INVALID_SHAPE) {
-                font_shape_ids[c] =
-                    canvas_load_shape(&font_shape_data[ascii_to_font_mapping[c]]);
-            }
-            if (font_shape_ids[c] != CANVAS_INVALID_SHAPE) {
-                canvas_draw_shape(font_shape_ids[c], position, 0.0f, scale);
-            }
-        }
-
-        position.x += (FONT_WIDTH + FONT_SPACE) * scale_factor;
-        ++text;
-    }
-}
-
-void canvas_draw_text_centered(const char *text, float y, float scale_factor)
-{
-    const float width =
-        ((float)strlen(text) * (FONT_WIDTH + FONT_SPACE)) - FONT_SPACE;
-
-    canvas_draw_text(text, -(width * scale_factor / 2.0f), y, scale_factor);
 }
 
 void canvas_finish_drawing(bool swap)

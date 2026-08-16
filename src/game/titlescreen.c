@@ -8,6 +8,7 @@
 #include "input.h"
 #include "leaderboard.h"
 #include "loop.h"
+#include "text.h"
 #include "timing.h"
 #include "titlescreen.h"
 #include "transition.h"
@@ -36,15 +37,15 @@ static int input_quit;
 static void draw_instructions(void)
 {
 #ifdef ASTEROIDS_PLATFORM_N64
-    canvas_draw_text_centered("PRESS START TO PLAY", -0.07f, 0.3f);
+    text_draw_centered("PRESS START TO PLAY", -0.07f, 0.3f);
 #else
-    canvas_draw_text_centered("PRESS ENTER TO PLAY", -0.07f, 0.3f);
-    canvas_draw_text_centered("SPACE - FIRE", 0.025f, 0.20f);
-    canvas_draw_text_centered("ARROWS - DIRECTION", 0.055f, 0.20f);
-    canvas_draw_text_centered("UP - THRUSTER", 0.085f, 0.20f);
+    text_draw_centered("PRESS ENTER TO PLAY", -0.07f, 0.3f);
+    text_draw_centered("SPACE - FIRE", 0.025f, 0.20f);
+    text_draw_centered("ARROWS - DIRECTION", 0.055f, 0.20f);
+    text_draw_centered("UP - THRUSTER", 0.085f, 0.20f);
 #ifndef __EMSCRIPTEN__
-    canvas_draw_text_centered("ESC - EXIT", 0.115f, 0.20f);
-    canvas_draw_text_centered("PRESS H FOR HIGH SCORES", 0.20f, 0.3f);
+    text_draw_centered("ESC - EXIT", 0.115f, 0.20f);
+    text_draw_centered("PRESS H FOR HIGH SCORES", 0.20f, 0.3f);
 #endif
 #endif
 }
@@ -163,7 +164,7 @@ void titlescreen_loop(bool draw)
             vec_2d_unit);
     }
 
-    canvas_draw_text_centered("ASTEROIDS", -0.20f, 0.8f);
+    text_draw_centered("ASTEROIDS", -0.20f, 0.8f);
 
     draw_instructions();
 

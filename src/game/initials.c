@@ -7,6 +7,7 @@
 #include "initials.h"
 #include "input.h"
 #include "loop.h"
+#include "text.h"
 #include "timing.h"
 #include "titlescreen.h"
 
@@ -35,9 +36,9 @@ static void draw_score(int score)
     sprintf(buffer, "%u", score);
 
 #ifdef N64
-    canvas_draw_text(buffer, -0.45f, -0.33f, 0.65f);
+    text_draw(buffer, -0.45f, -0.33f, 0.65f);
 #else
-    canvas_draw_text(buffer, -0.45f, -0.33f, 0.35f);
+    text_draw(buffer, -0.45f, -0.33f, 0.35f);
 #endif
 }
 
@@ -184,15 +185,15 @@ void initials_loop(bool draw)
     draw_score(score);
 
 #ifdef N64
-    canvas_draw_text_centered("YOUR SCORE IS ONE OF THE TEN BEST", -0.19f, 0.6f);
-    canvas_draw_text_centered("PLEASE ENTER YOUR INITIALS", -0.1f, 0.6f);
-    canvas_draw_text_centered(initials, 0, 0.65f);
+    text_draw_centered("YOUR SCORE IS ONE OF THE TEN BEST", -0.19f, 0.6f);
+    text_draw_centered("PLEASE ENTER YOUR INITIALS", -0.1f, 0.6f);
+    text_draw_centered(initials, 0, 0.65f);
 #else
-    canvas_draw_text_centered("YOUR SCORE IS ONE OF THE TEN BEST", -0.13f, 0.25f);
-    canvas_draw_text_centered("PLEASE ENTER YOUR INITIALS", -0.095f, 0.25f);
-    canvas_draw_text_centered(initials, 0, 0.38f);
-    canvas_draw_text_centered("PRESS ENTER TO CONTINUE", 0.12f, 0.25f);
-    canvas_draw_text_centered("OR BACKSPACE TO MAKE CHANGES", 0.155f, 0.25f);
+    text_draw_centered("YOUR SCORE IS ONE OF THE TEN BEST", -0.13f, 0.25f);
+    text_draw_centered("PLEASE ENTER YOUR INITIALS", -0.095f, 0.25f);
+    text_draw_centered(initials, 0, 0.38f);
+    text_draw_centered("PRESS ENTER TO CONTINUE", 0.12f, 0.25f);
+    text_draw_centered("OR BACKSPACE TO MAKE CHANGES", 0.155f, 0.25f);
 #endif
 
     canvas_finish_drawing(true);

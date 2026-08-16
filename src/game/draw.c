@@ -45,6 +45,7 @@ void draw_score(int score)
 #include "highscores.h"
 #include "mathdefs.h"
 #include "options.h"
+#include "text.h"
 #include "vec.h"
 
 const struct vec_2d origin = {
@@ -115,16 +116,11 @@ static void draw_ship_explosion(const struct player *p)
     glColor3f(1.f, 1.f, 1.f);
 }
 
-static void draw_text_ex(const char *s, GLfloat size, GLfloat x, GLfloat y)
-{
-    canvas_draw_text(s, x, y, size);
-}
-
 static void draw_text_centered_ex(const char *s, GLfloat size, GLfloat y, GLfloat spacing)
 {
     const GLfloat width = ((GLfloat) strlen(s) * (FONT_WIDTH + spacing)) - spacing;
 
-    draw_text_ex(s, size, 0 - (width * size / 2.0f), y);
+    text_draw(s, 0 - (width * size / 2.0f), y, size);
 }
 
 static void draw_text_centered(const char *s, GLfloat size, GLfloat y)
@@ -200,7 +196,7 @@ void draw_score(int score)
     static char buffer[SCORE_BUFFER_SIZE];
 
     sprintf(buffer, "%u", score);
-    canvas_draw_text(buffer, -0.475f, -0.365f, 0.35f);
+    text_draw(buffer, -0.475f, -0.365f, 0.35f);
 }
 
 #endif

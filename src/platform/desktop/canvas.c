@@ -4,21 +4,17 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-
 #include <SDL_opengl.h>
 
 #include "canvas.h"
-#include "data.h"
 #include "debug.h"
-#include "defines.h"
 #include "mathdefs.h"
 #include "shape.h"
+#include "text.h"
 #include "vec.h"
 #include "video.h"
 
 #define MAX_SHAPES 64
-#define MAX_GLYPHS 128
 
 extern struct vec_2d origin;
 
@@ -26,15 +22,10 @@ static const struct shape *shapes[MAX_SHAPES];
 
 static int num_shapes = 0;
 
-static int font_shape_ids[MAX_GLYPHS];
-
 void canvas_reset(void)
 {
-    for (int i = 0; i < MAX_GLYPHS; i++) {
-        font_shape_ids[i] = CANVAS_INVALID_SHAPE;
-    }
-
     num_shapes = 0;
+    text_reset();
 }
 
 int canvas_load_shape(const struct shape *shape)
@@ -94,54 +85,6 @@ bool canvas_draw_shape(int shape, struct vec_2d position, float rotation, struct
     glDisableClientState(GL_VERTEX_ARRAY);
 
     return true;
-}
-
-void canvas_draw_text(const char *text, float x, float y, float scale_factor)
-{
-    struct vec_2d position = {
-        x,
-        y
-    };
-
-    struct vec_2d scale = {
-        scale_factor,
-        scale_factor
-    };
-
-    const char *s = text;
-
-    while (*s) {
-        int shape_index;
-        int c = *s;
-        if (c >= MAX_GLYPHS) {
-            goto next;
-        }
-
-        if (font_shape_ids[c] == CANVAS_INVALID_SHAPE) {
-            shape_index = ascii_to_font_mapping[c];
-            if (shape_index < 0) {
-                goto next;
-            }
-
-            font_shape_ids[c] = canvas_load_shape(&font_shape_data[shape_index]);
-            if (font_shape_ids[c] == CANVAS_INVALID_SHAPE) {
-                goto next;
-            }
-        }
-
-        canvas_draw_shape(font_shape_ids[c], position, 0, scale);
-next:
-        position.x += FONT_WIDTH * scale_factor;
-        position.x += FONT_SPACE * scale_factor;
-        s++;
-    }
-}
-
-void canvas_draw_text_centered(const char *text, float y, float scale_factor)
-{
-    const float width = ((float)strlen(text) * (FONT_WIDTH + FONT_SPACE)) - FONT_SPACE;
-
-    canvas_draw_text(text, 0 - (width * scale_factor / 2.0f), y, scale_factor);
 }
 
 void canvas_finish_drawing(bool swap)

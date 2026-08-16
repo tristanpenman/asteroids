@@ -66,6 +66,7 @@ set(GAME_SRCS
     src/game/leaderboard.c
     src/game/level.c
     src/game/sandbox.c
+    src/game/text.c
     src/game/titlescreen.c
     src/game/transition.c
     src/game/util.c

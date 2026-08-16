@@ -6,6 +6,7 @@
 #include "input.h"
 #include "leaderboard.h"
 #include "loop.h"
+#include "text.h"
 #include "timing.h"
 #include "titlescreen.h"
 
@@ -32,7 +33,7 @@ static void leaderboard_draw(void)
             sprintf(str, "%2d   ---          - ", i + 1);
         }
 
-        canvas_draw_text_centered(str, -0.3f + 0.054f * (float) i, 0.45f);
+        text_draw_centered(str, -0.3f + 0.054f * (float) i, 0.45f);
 
         // start a new display list
         canvas_finish_drawing(false);
@@ -40,9 +41,9 @@ static void leaderboard_draw(void)
     }
 
 #ifdef N64
-    canvas_draw_text_centered("PRESS START FOR MAIN MENU", 0.27f, 0.45f);
+    text_draw_centered("PRESS START FOR MAIN MENU", 0.27f, 0.45f);
 #else
-    canvas_draw_text_centered("PRESS ENTER FOR MAIN MENU", 0.27f, 0.35f);
+    text_draw_centered("PRESS ENTER FOR MAIN MENU", 0.27f, 0.35f);
 #endif
 
     canvas_finish_drawing(true);

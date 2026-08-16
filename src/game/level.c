@@ -18,6 +18,7 @@
 #include "mathdefs.h"
 #include "mixer.h"
 #include "options.h"
+#include "text.h"
 #include "timing.h"
 #include "titlescreen.h"
 #include "transition.h"
@@ -531,7 +532,7 @@ static void level_draw(void)
     draw_lives(player.lives);
 
 #ifdef DEBUG
-    canvas_draw_text_centered(debug, -0.35f, 0.3f);
+    text_draw_centered(debug, -0.35f, 0.3f);
 #endif
 
     canvas_finish_drawing(true);

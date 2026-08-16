@@ -4,6 +4,7 @@
 #include "input.h"
 #include "level.h"
 #include "loop.h"
+#include "text.h"
 #include "timing.h"
 #include "titlescreen.h"
 
@@ -46,6 +47,6 @@ void gameover_loop(bool draw)
     }
 
     canvas_start_drawing(true);
-    canvas_draw_text_centered("GAME OVER", -0.05f, 0.65f);
+    text_draw_centered("GAME OVER", -0.05f, 0.65f);
     canvas_finish_drawing(true);
 }
