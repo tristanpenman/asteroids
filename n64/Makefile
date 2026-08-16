@@ -17,8 +17,11 @@ GFX_UCODE_FILES := /usr/lib/n64/PR/rspboot.o \
 DEFINES := _FINALROM=1 F3DEX_GBI_2=1 N64 ASTEROIDS_PLATFORM_N64=1
 SRC_DIRS := src/platform/n64 n64/asm
 GAME_C_FILES := \
+	src/game/collision.c \
 	src/game/data.c \
 	src/game/entities.c \
+	src/game/game.c \
+	src/game/sandbox.c \
 	src/game/titlescreen.c \
 	src/game/util.c \
 	src/game/vec.c

@@ -1,24 +1,15 @@
+#include "game.h"
 #include "gfx.h"
 #include "input.h"
 #include "logo.h"
-#include "loop.h"
 #include "storage.h"
 #include "timing.h"
-#include "titlescreen.h"
 
 static Mtx projection;
 static Mtx modelview;
 static Mtx rotation;
 static float logo_rotation;
 static int gfx_glist_index;
-
-static void game_init(void)
-{
-    reset_simulation_time();
-    titlescreen_init();
-    set_main_loop(titlescreen_loop);
-    run_main_loop();
-}
 
 static void draw_logo(void)
 {
@@ -41,7 +32,9 @@ static void render_logo(int pending_gfx)
 
     nuContDataGetEx(&controller_data, 0);
     if (controller_data.button & (A_BUTTON | START_BUTTON)) {
-        game_init();
+        if (game_init(true)) {
+            game_play(false);
+        }
         return;
     }
 
