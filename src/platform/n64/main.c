@@ -11,6 +11,7 @@ static Mtx modelview;
 static Mtx rotation;
 static float logo_rotation;
 static int gfx_glist_index;
+static u16 logo_previous_buttons;
 
 static void draw_logo(void)
 {
@@ -30,12 +31,22 @@ static void render_logo(int pending_gfx)
 {
     NUContData controller_data;
     u16 perspective_normalization;
+    u16 released;
 
+    /* Start on button release, so that the press is not picked up again by
+       the next screen. */
     nuContDataGetEx(&controller_data, 0);
-    if (controller_data.button & (A_BUTTON | START_BUTTON)) {
+    released = logo_previous_buttons & ~controller_data.button;
+    logo_previous_buttons = controller_data.button;
+
+    if (released & (A_BUTTON | START_BUTTON)) {
         if (game_init(true)) {
             game_play(false);
         }
+
+        /* Ignore any button that is still held when the game returns. */
+        nuContDataGetEx(&controller_data, 0);
+        logo_previous_buttons = controller_data.button;
         return;
     }
 
