@@ -13,8 +13,9 @@ GFX_UCODE_FILES := /usr/lib/n64/PR/rspboot.o \
 	/usr/lib/n64/PR/gspF3DEX2.NoN.fifo.o \
 	/usr/lib/n64/PR/gspF3DLX2.Rej.fifo.o \
 	/usr/lib/n64/PR/gspS2DEX2.fifo.o
+AUDIO_UCODE_FILES := /usr/lib/n64/PR/n_aspMain.o
 
-DEFINES := _FINALROM=1 F3DEX_GBI_2=1 N64 ASTEROIDS_PLATFORM_N64=1
+DEFINES := _FINALROM=1 F3DEX_GBI_2=1 NAUDIO N64 ASTEROIDS_PLATFORM_N64=1
 SRC_DIRS := src/platform/n64 src/platform/n64/unfloader n64/asm n64/assets
 GAME_C_FILES := \
 	src/game/collision.c \
@@ -48,6 +49,7 @@ O_FILES := /usr/lib/n64/nusys/nusys_rom.o \
 	$(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=.o)) \
 	$(foreach file,$(S_FILES),$(BUILD_DIR)/$(file:.s=.o)) \
 	$(GFX_UCODE_FILES) \
+	$(AUDIO_UCODE_FILES) \
 	$(BOOT_OBJ)
 DEP_FILES := $(O_FILES:.o=.d)
 
@@ -107,7 +109,8 @@ $(ELF): $(O_FILES) $(BUILD_DIR)/$(LD_SCRIPT)
 	@$(PRINT) "$(GREEN)Linking ELF file: $(BLUE)$@$(NO_COL)\n"
 	$(V)$(LD) -L $(BUILD_DIR) -T $(BUILD_DIR)/$(LD_SCRIPT) \
 		-Map $(BUILD_DIR)/$(TARGET).map --no-check-sections -o $@ $(O_FILES) \
-		-L/usr/lib/n64/nusys -lnusys -L/usr/lib/n64 -lultra_rom -lnustd \
+		-L/usr/lib/n64/nusys -lnualstl_n -ln_mus -ln_audio_sc -lnusys \
+		-L/usr/lib/n64 -ln_audio -lultra_rom -lnustd \
 		-L$(N64_LIBGCCDIR) -lgcc
 
 $(ROM): $(ELF)

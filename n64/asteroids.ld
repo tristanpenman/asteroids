@@ -40,8 +40,12 @@ SECTIONS
         */libultra_rom.a:*.o(.text);
         */libnustd.a:*.o(.text);
         */libnusys.a:*.o(.text);
+        */libnualstl_n.a:*.o(.text);
+        */libn_mus.a:*.o(.text);
+        */libn_audio_sc.a:*.o(.text);
         */libgcc.a:*.o(.text);
         /usr/lib/n64/PR/rspboot.o(.text);
+        /usr/lib/n64/PR/n_aspMain.o(.text);
         /usr/lib/n64/PR/gspF3DEX2.fifo.o(.text);
         /usr/lib/n64/PR/gspL3DEX2.fifo.o(.text);
         /usr/lib/n64/PR/gspF3DEX2.Rej.fifo.o(.text);
@@ -55,7 +59,11 @@ SECTIONS
         */libultra_rom.a:*.o(.data*);
         */libnustd.a:*.o(.data*);
         */libnusys.a:*.o(.data*);
+        */libnualstl_n.a:*.o(.data*);
+        */libn_mus.a:*.o(.data*);
+        */libn_audio_sc.a:*.o(.data*);
         /usr/lib/n64/PR/rspboot.o(.data*);
+        /usr/lib/n64/PR/n_aspMain.o(.data*);
         /usr/lib/n64/PR/gspF3DEX2.fifo.o(.data*);
         /usr/lib/n64/PR/gspL3DEX2.fifo.o(.data*);
         /usr/lib/n64/PR/gspF3DEX2.Rej.fifo.o(.data*);
@@ -69,6 +77,9 @@ SECTIONS
         */libultra_rom.a:*.o(.*rodata*);
         */libnustd.a:*.o(.*rodata*);
         */libnusys.a:*.o(.*rodata*);
+        */libnualstl_n.a:*.o(.*rodata*);
+        */libn_mus.a:*.o(.*rodata*);
+        */libn_audio_sc.a:*.o(.*rodata*);
         */libgcc.a:*.o(.*rodata*);
     }
     END_SEG(code)
@@ -93,6 +104,15 @@ SECTIONS
         */libnusys.a:*.o(COMMON);
         */libnusys.a:*.o(.scommon);
         */libnusys.a:*.o(.*bss*);
+        */libnualstl_n.a:*.o(COMMON);
+        */libnualstl_n.a:*.o(.scommon);
+        */libnualstl_n.a:*.o(.*bss*);
+        */libn_mus.a:*.o(COMMON);
+        */libn_mus.a:*.o(.scommon);
+        */libn_mus.a:*.o(.*bss*);
+        */libn_audio_sc.a:*.o(COMMON);
+        */libn_audio_sc.a:*.o(.scommon);
+        */libn_audio_sc.a:*.o(.*bss*);
     }
     END_NOLOAD(code)
 

@@ -17,6 +17,8 @@ RUN apt-get update \
         makemask \
         n64sdk \
         newlib-mips-n64 \
+        libmus \
+        libnaudio \
         libnustd \
         libnusys \
     && apt-get clean
