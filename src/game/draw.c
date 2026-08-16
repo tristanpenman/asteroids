@@ -1,3 +1,35 @@
+#include "draw.h"
+
+#if defined(ASTEROIDS_PLATFORM_N64)
+
+void draw_explosions(const struct explosion *ee, unsigned int n)
+{
+    (void)ee;
+    (void)n;
+}
+
+void draw_level_title(int level)
+{
+    (void)level;
+}
+
+void draw_lives(int lives)
+{
+    (void)lives;
+}
+
+void draw_player_exploding(const struct player *p)
+{
+    (void)p;
+}
+
+void draw_score(int score)
+{
+    (void)score;
+}
+
+#else
+
 #include <stdio.h>
 #include <string.h>
 
@@ -9,7 +41,6 @@
 
 #include "canvas.h"
 #include "defines.h"
-#include "draw.h"
 #include "entities.h"
 #include "highscores.h"
 #include "mathdefs.h"
@@ -169,10 +200,7 @@ void draw_score(int score)
     static char buffer[SCORE_BUFFER_SIZE];
 
     sprintf(buffer, "%u", score);
-
-#ifdef N64
-    canvas_draw_text(buffer, -0.45f, -0.33f, 0.65f);
-#else
     canvas_draw_text(buffer, -0.475f, -0.365f, 0.35f);
-#endif
 }
+
+#endif

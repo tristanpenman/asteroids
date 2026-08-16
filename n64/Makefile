@@ -19,10 +19,16 @@ SRC_DIRS := src/platform/n64 src/platform/n64/unfloader n64/asm
 GAME_C_FILES := \
 	src/game/collision.c \
 	src/game/data.c \
+	src/game/draw.c \
 	src/game/entities.c \
 	src/game/game.c \
+	src/game/gameover.c \
+	src/game/highscores.c \
+	src/game/initials.c \
+	src/game/level.c \
 	src/game/sandbox.c \
 	src/game/titlescreen.c \
+	src/game/transition.c \
 	src/game/util.c \
 	src/game/vec.c
 
