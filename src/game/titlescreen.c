@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "canvas.h"
@@ -36,6 +35,9 @@ static int input_quit;
 
 static void draw_instructions(void)
 {
+#ifdef ASTEROIDS_PLATFORM_N64
+    canvas_draw_text_centered("PRESS START TO PLAY", -0.07f, 0.3f);
+#else
     canvas_draw_text_centered("PRESS ENTER TO PLAY", -0.07f, 0.3f);
     canvas_draw_text_centered("SPACE - FIRE", 0.025f, 0.20f);
     canvas_draw_text_centered("ARROWS - DIRECTION", 0.055f, 0.20f);
@@ -43,6 +45,7 @@ static void draw_instructions(void)
 #ifndef __EMSCRIPTEN__
     canvas_draw_text_centered("ESC - EXIT", 0.115f, 0.20f);
     canvas_draw_text_centered("PRESS H FOR HIGH SCORES", 0.20f, 0.3f);
+#endif
 #endif
 }
 
@@ -103,6 +106,7 @@ void titlescreen_loop(bool draw)
 
     input_update();
 
+#ifndef ASTEROIDS_PLATFORM_N64
     if (input_active(input_leaderboard)) {
         h_down = true;
     } else if (h_down) {
@@ -112,7 +116,9 @@ void titlescreen_loop(bool draw)
     } else {
         h_down = false;
     }
+#endif
 
+#ifndef ASTEROIDS_PLATFORM_N64
     if (input_active(input_start)) {
         enter_down = true;
     } else if (enter_down) {
@@ -126,6 +132,7 @@ void titlescreen_loop(bool draw)
     if (input_active(input_quit)) {
         exit(EXIT_SUCCESS);
     }
+#endif
 
     // Update and consume unused simulation time
     produce_simulation_time();
@@ -141,10 +148,6 @@ void titlescreen_loop(bool draw)
 
     // Unused simulation time, used to smooth animation
     residual = (float) residual_simulation_time() / 1000.f;
-    if (residual < 0.f) {
-        printf("%f\n", residual);
-    }
-
     canvas_start_drawing(true);
 
     for (int i = 0; i < NUM_ASTEROIDS; i++) {

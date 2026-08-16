@@ -14,8 +14,14 @@ GFX_UCODE_FILES := /usr/lib/n64/PR/rspboot.o \
 	/usr/lib/n64/PR/gspF3DLX2.Rej.fifo.o \
 	/usr/lib/n64/PR/gspS2DEX2.fifo.o
 
-DEFINES := _FINALROM=1 F3DEX_GBI_2=1 N64
+DEFINES := _FINALROM=1 F3DEX_GBI_2=1 N64 ASTEROIDS_PLATFORM_N64=1
 SRC_DIRS := src/platform/n64 n64/asm
+GAME_C_FILES := \
+	src/game/data.c \
+	src/game/entities.c \
+	src/game/titlescreen.c \
+	src/game/util.c \
+	src/game/vec.c
 
 # Hide tool commands by default; use VERBOSE=1 to show them.
 VERBOSE ?= 0
@@ -26,7 +32,7 @@ endif
 # Colorize build status messages by default; use COLOR=0 to disable colors.
 COLOR ?= 1
 
-C_FILES := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
+C_FILES := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c)) $(GAME_C_FILES)
 S_FILES := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.s))
 O_FILES := /usr/lib/n64/nusys/nusys_rom.o \
 	$(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=.o)) \
