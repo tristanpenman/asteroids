@@ -1,4 +1,24 @@
+#include <stdio.h>
+
 #include "draw.h"
+#include "defines.h"
+#include "text.h"
+
+void draw_level_title(int level)
+{
+    char titlecard[100];
+
+    sprintf(titlecard, "LEVEL %u", level);
+    text_draw_centered(titlecard, -0.05f, 0.35f);
+}
+
+void draw_score(int score)
+{
+    static char buffer[SCORE_BUFFER_SIZE];
+
+    sprintf(buffer, "%u", score);
+    text_draw(buffer, -0.475f, -0.365f, 0.35f);
+}
 
 #if defined(ASTEROIDS_PLATFORM_N64)
 
@@ -6,11 +26,6 @@ void draw_explosions(const struct explosion *ee, unsigned int n)
 {
     (void)ee;
     (void)n;
-}
-
-void draw_level_title(int level)
-{
-    (void)level;
 }
 
 void draw_lives(int lives)
@@ -23,15 +38,7 @@ void draw_player_exploding(const struct player *p)
     (void)p;
 }
 
-void draw_score(int score)
-{
-    (void)score;
-}
-
 #else
-
-#include <stdio.h>
-#include <string.h>
 
 #ifdef _MSC_VER
 #include <SDL.h>
@@ -40,12 +47,10 @@ void draw_score(int score)
 #include <SDL_opengl.h>
 
 #include "canvas.h"
-#include "defines.h"
 #include "entities.h"
 #include "highscores.h"
 #include "mathdefs.h"
 #include "options.h"
-#include "text.h"
 #include "vec.h"
 
 const struct vec_2d origin = {
@@ -116,18 +121,6 @@ static void draw_ship_explosion(const struct player *p)
     glColor3f(1.f, 1.f, 1.f);
 }
 
-static void draw_text_centered_ex(const char *s, GLfloat size, GLfloat y, GLfloat spacing)
-{
-    const GLfloat width = ((GLfloat) strlen(s) * (FONT_WIDTH + spacing)) - spacing;
-
-    text_draw(s, 0 - (width * size / 2.0f), y, size);
-}
-
-static void draw_text_centered(const char *s, GLfloat size, GLfloat y)
-{
-    draw_text_centered_ex(s, size, y, FONT_SPACE);
-}
-
 /******************************************************************************
  *
  * Public interface
@@ -158,13 +151,6 @@ void draw_explosions(const struct explosion *ee, unsigned int n)
     }
 }
 
-void draw_level_title(int level)
-{
-    char titlecard[100];
-    snprintf(titlecard, 100, "LEVEL %u", level);
-    draw_text_centered(titlecard, 0.35f, -0.05f);
-}
-
 void draw_lives(int lives)
 {
     glMatrixMode(GL_MODELVIEW);
@@ -189,14 +175,6 @@ void draw_player_exploding(const struct player *p)
     draw_ship(c > 1.f ? 1.f : c);
     draw_ship_explosion(p);
     glPopMatrix();
-}
-
-void draw_score(int score)
-{
-    static char buffer[SCORE_BUFFER_SIZE];
-
-    sprintf(buffer, "%u", score);
-    text_draw(buffer, -0.475f, -0.365f, 0.35f);
 }
 
 #endif
