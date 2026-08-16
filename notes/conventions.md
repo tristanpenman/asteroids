@@ -9,6 +9,7 @@ These conventions apply to the project-owned C code in `src`. When modifying old
 - Use C and keep implementations in `.c` files with public declarations in `.h` files.
 - Indent with four spaces. Do not use tabs.
 - Put a function's opening brace on the next line.
+- Declare and define functions that take no arguments with an explicit `void` parameter list, such as `void module_reset(void)`.
 - Put the opening brace on the same line for `if`, `else`, `for`, `while`, and `switch` statements.
 - Put the opening brace for a multi-line `struct` or `enum` definition on the next line. Follow the surrounding file for compact definitions that already use a same-line brace.
 - Always use braces around control-flow bodies, including single-statement bodies.
