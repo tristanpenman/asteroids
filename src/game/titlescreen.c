@@ -8,6 +8,7 @@
 #include "input.h"
 #include "leaderboard.h"
 #include "loop.h"
+#include "shape.h"
 #include "text.h"
 #include "timing.h"
 #include "titlescreen.h"
@@ -85,11 +86,12 @@ bool titlescreen_init(void)
     enter_down = false;
     h_down = false;
 
-    canvas_reset();
+    shape_canvas_destroy_all();
+    text_reset();
 
     for (unsigned int i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
-        asteroid_shape_ids[i] = canvas_load_shape(&asteroid_shape_data[i]);
-        if (asteroid_shape_ids[i] == CANVAS_INVALID_SHAPE) {
+        asteroid_shape_ids[i] = shape_canvas_create(&asteroid_shape_data[i]);
+        if (asteroid_shape_ids[i] == CANVAS_INVALID_SHAPE_ID) {
             return false;
         }
     }
@@ -149,7 +151,9 @@ void titlescreen_loop(bool draw)
 
     // Unused simulation time, used to smooth animation
     residual = (float) residual_simulation_time() / 1000.f;
-    canvas_start_drawing(true);
+    if (!shape_canvas_begin_frame()) {
+        return;
+    }
 
     for (int i = 0; i < NUM_ASTEROIDS; i++) {
         const struct vec_2d position = {
@@ -157,7 +161,7 @@ void titlescreen_loop(bool draw)
             asteroids[i].pos.y + asteroids[i].vel.y * residual
         };
 
-        canvas_draw_shape(
+        shape_canvas_draw(
             asteroid_shape_ids[asteroids[i].shape],
             position,
             asteroids[i].rot,
@@ -168,5 +172,5 @@ void titlescreen_loop(bool draw)
 
     draw_instructions();
 
-    canvas_finish_drawing(true);
+    shape_canvas_end_frame();
 }

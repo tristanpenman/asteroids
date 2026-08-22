@@ -2,6 +2,7 @@
 #include <nusys.h>
 
 #include "loop.h"
+#include "graphics.h"
 #include "mixer.h"
 
 static main_loop_fn_t main_loop;
@@ -9,6 +10,9 @@ static main_loop_fn_t main_loop;
 static void nusys_loop(int pending_gfx)
 {
     mixer_update();
+    if (pending_gfx < 1) {
+        graphics_notify_tasks_completed();
+    }
     main_loop(pending_gfx < 1);
 }
 

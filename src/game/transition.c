@@ -7,6 +7,7 @@
 #include "input.h"
 #include "level.h"
 #include "loop.h"
+#include "shape.h"
 #include "timing.h"
 #include "transition.h"
 
@@ -52,9 +53,11 @@ void transition_loop(bool draw)
         return;
     }
 
-    canvas_start_drawing(true);
+    if (!shape_canvas_begin_frame()) {
+        return;
+    }
     draw_score(score);
     draw_lives(lives);
     draw_level_title(level);
-    canvas_finish_drawing(true);
+    shape_canvas_end_frame();
 }

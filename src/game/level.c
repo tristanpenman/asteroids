@@ -18,6 +18,7 @@
 #include "mathdefs.h"
 #include "mixer.h"
 #include "options.h"
+#include "shape.h"
 #include "text.h"
 #include "timing.h"
 #include "titlescreen.h"
@@ -488,11 +489,13 @@ static void level_draw(void)
     sprintf(debug, "collision tests: %d\n", collision_tests_per_frame);
 #endif
 
-    canvas_start_drawing(true);
+    if (!shape_canvas_begin_frame()) {
+        return;
+    }
 
     // draw player ship
     if (player.state == PS_NORMAL) {
-        canvas_draw_shape(
+        shape_canvas_draw(
                 player.keys.up == KS_DOWN && player.phase > SHIP_THRUSTER_BLINK ? player_shapes[1] : player_shapes[0],
                 player.pos,
                 player.rot,
@@ -513,7 +516,7 @@ static void level_draw(void)
         scale.x = asteroids[i].scale;
         scale.y = asteroids[i].scale;
 
-        canvas_draw_shape(
+        shape_canvas_draw(
                 asteroid_shapes[asteroids[i].shape],
                 position,
                 asteroids[i].rot,
@@ -523,7 +526,7 @@ static void level_draw(void)
     // draw bullets
     for (int i = 0; i < MAX_BULLETS; i++) {
         if (bullets[i].visible) {
-            canvas_draw_shape(bullet_shape, bullets[i].pos, bullets[i].rot, vec_2d_unit);
+            shape_canvas_draw(bullet_shape, bullets[i].pos, bullets[i].rot, vec_2d_unit);
         }
     }
 
@@ -535,7 +538,7 @@ static void level_draw(void)
     text_draw_centered(debug, -0.35f, 0.3f);
 #endif
 
-    canvas_finish_drawing(true);
+    shape_canvas_end_frame();
 }
 
 static void level_update(void)
@@ -665,24 +668,25 @@ void level_init(int new_level, int new_lives, int new_score)
     input_pause = input_register();
     input_map(input_pause, INPUT_BUTTON_START);
 
-    canvas_reset();
+    shape_canvas_destroy_all();
+    text_reset();
 
     for (int i = 0; i < NUM_PLAYER_FRAMES; i++) {
-        player_shapes[i] = canvas_load_shape(&player_shape_data[i]);
-        if (player_shapes[i] == CANVAS_INVALID_SHAPE) {
+        player_shapes[i] = shape_canvas_create(&player_shape_data[i]);
+        if (player_shapes[i] == CANVAS_INVALID_SHAPE_ID) {
             debug_printf("failed to load player shape %d\n", i);
         }
     }
 
     for (int i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
-        asteroid_shapes[i] = canvas_load_shape(&asteroid_shape_data[i]);
-        if (asteroid_shapes[i] == CANVAS_INVALID_SHAPE) {
+        asteroid_shapes[i] = shape_canvas_create(&asteroid_shape_data[i]);
+        if (asteroid_shapes[i] == CANVAS_INVALID_SHAPE_ID) {
             debug_printf("failed to load asteroid shape %d\n", i);
         }
     }
 
-    bullet_shape = canvas_load_shape(&bullet_shape_data);
-    if (bullet_shape == CANVAS_INVALID_SHAPE) {
+    bullet_shape = shape_canvas_create(&bullet_shape_data);
+    if (bullet_shape == CANVAS_INVALID_SHAPE_ID) {
         debug_printf("failed to load bullet shape\n");
     }
 

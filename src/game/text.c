@@ -3,6 +3,7 @@
 #include "canvas.h"
 #include "data.h"
 #include "defines.h"
+#include "shape.h"
 #include "text.h"
 #include "vec.h"
 
@@ -13,7 +14,7 @@ static int font_shape_ids[MAX_GLYPHS];
 void text_reset(void)
 {
     for (int i = 0; i < MAX_GLYPHS; ++i) {
-        font_shape_ids[i] = CANVAS_INVALID_SHAPE;
+        font_shape_ids[i] = CANVAS_INVALID_SHAPE_ID;
     }
 }
 
@@ -26,12 +27,12 @@ void text_draw(const char *text, float x, float y, float scale_factor)
         int c = (unsigned char)*text;
 
         if (c < MAX_GLYPHS && ascii_to_font_mapping[c] >= 0) {
-            if (font_shape_ids[c] == CANVAS_INVALID_SHAPE) {
+            if (font_shape_ids[c] == CANVAS_INVALID_SHAPE_ID) {
                 font_shape_ids[c] =
-                    canvas_load_shape(&font_shape_data[ascii_to_font_mapping[c]]);
+                    shape_canvas_create(&font_shape_data[ascii_to_font_mapping[c]]);
             }
-            if (font_shape_ids[c] != CANVAS_INVALID_SHAPE) {
-                canvas_draw_shape(font_shape_ids[c], position, 0.0f, scale);
+            if (font_shape_ids[c] != CANVAS_INVALID_SHAPE_ID) {
+                shape_canvas_draw(font_shape_ids[c], position, 0.0f, scale);
             }
         }
 

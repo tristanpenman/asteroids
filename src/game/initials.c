@@ -7,6 +7,7 @@
 #include "initials.h"
 #include "input.h"
 #include "loop.h"
+#include "shape.h"
 #include "text.h"
 #include "timing.h"
 #include "titlescreen.h"
@@ -126,7 +127,8 @@ static void handle_input(void)
 
 void initials_init(unsigned int new_score)
 {
-    canvas_reset();
+    shape_canvas_destroy_all();
+    text_reset();
 
     input_reset();
 
@@ -181,7 +183,9 @@ void initials_loop(bool draw)
         return;
     }
 
-    canvas_start_drawing(true);
+    if (!shape_canvas_begin_frame()) {
+        return;
+    }
     draw_score(score);
 
 #ifdef N64
@@ -196,5 +200,5 @@ void initials_loop(bool draw)
     text_draw_centered("OR BACKSPACE TO MAKE CHANGES", 0.155f, 0.25f);
 #endif
 
-    canvas_finish_drawing(true);
+    shape_canvas_end_frame();
 }

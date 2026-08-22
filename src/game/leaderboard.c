@@ -6,6 +6,7 @@
 #include "input.h"
 #include "leaderboard.h"
 #include "loop.h"
+#include "shape.h"
 #include "text.h"
 #include "timing.h"
 #include "titlescreen.h"
@@ -24,7 +25,9 @@ static void leaderboard_draw(void)
     char initials[4];
     char str[100];
 
-    canvas_start_drawing(true);
+    if (!shape_canvas_begin_frame()) {
+        return;
+    }
 
     for (int i = 0; i < NUM_SCORES; i++) {
         if (highscores_read(i, &score, initials) && initials[0] >= 'A' && initials[0] <= 'Z') {
@@ -35,9 +38,6 @@ static void leaderboard_draw(void)
 
         text_draw_centered(str, -0.3f + 0.054f * (float) i, 0.45f);
 
-        // start a new display list
-        canvas_finish_drawing(false);
-        canvas_continue_drawing();
     }
 
 #ifdef N64
@@ -46,7 +46,7 @@ static void leaderboard_draw(void)
     text_draw_centered("PRESS ENTER FOR MAIN MENU", 0.27f, 0.35f);
 #endif
 
-    canvas_finish_drawing(true);
+    shape_canvas_end_frame();
 }
 
 /******************************************************************************

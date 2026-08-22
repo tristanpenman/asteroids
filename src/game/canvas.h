@@ -1,46 +1,85 @@
 #ifndef ASTEROIDS_GAME_CANVAS_H
 #define ASTEROIDS_GAME_CANVAS_H
 
+#include <stddef.h>
+
 #include "types.h"
 
-#define CANVAS_INVALID_SHAPE -1
+typedef int canvas_shape_id;
 
-struct shape;
-struct vec_2d;
+#define CANVAS_INVALID_SHAPE_ID (-1)
 
-/**
- * Unload all previously loaded shapes
- */
-void canvas_reset(void);
+#define CANVAS_MAX_SHAPES 64
+#define CANVAS_MAX_RETAINED_POINTS 256
+#define CANVAS_MAX_TRANSFORMS 512
+#define CANVAS_MAX_DYNAMIC_POINTS 256
+#define CANVAS_MAX_SEGMENTS 512
+#define CANVAS_MIN_LINE_WIDTH 1.0f
+#define CANVAS_MAX_LINE_WIDTH 8.0f
 
-/**
- * Load a shape so that it can be drawn using \c canvas_draw_lines or \c canvas_draw_triangles
- */
-int canvas_load_shape(const struct shape *);
+struct canvas_color
+{
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+    uint8_t alpha;
+};
 
-/**
- * Start drawing shapes onto the canvas
- */
-void canvas_start_drawing(bool clear);
+struct canvas_point
+{
+    float x;
+    float y;
+};
 
-/**
- * Continue drawing shapes, after finishing
- */
-void canvas_continue_drawing(void);
+struct canvas_transform
+{
+    struct canvas_point position;
+    float rotation;
+    struct canvas_point scale;
+};
 
-/**
- * Change the colour that will be used when drawing lines
- */
-void canvas_set_colour(float r, float g, float b);
+struct canvas_rect
+{
+    int x;
+    int y;
+    int width;
+    int height;
+};
 
-/**
- * Draw a shape
- */
-bool canvas_draw_shape(int shape, struct vec_2d position, float rotation, struct vec_2d scale);
+enum canvas_space
+{
+    CANVAS_SPACE_NORMALIZED,
+    CANVAS_SPACE_PIXELS
+};
 
-/**
- * Finish drawing shapes to the canvas
- */
-void canvas_finish_drawing(bool swap);
+struct canvas_shape_data
+{
+    const struct canvas_point *points;
+    size_t point_count;
+    const uint16_t *segments;
+    size_t segment_count;
+    bool closed;
+};
+
+canvas_shape_id canvas_shape_create(const struct canvas_shape_data *data);
+void canvas_shape_destroy(canvas_shape_id shape);
+
+bool canvas_begin(const struct canvas_rect *viewport, enum canvas_space space);
+bool canvas_set_space(enum canvas_space space);
+void canvas_end(void);
+
+void canvas_set_color(struct canvas_color color);
+bool canvas_set_line_width(float width);
+
+bool canvas_draw_shape(canvas_shape_id shape,
+    const struct canvas_transform *transform);
+bool canvas_draw_line(struct canvas_point a, struct canvas_point b,
+    const struct canvas_transform *transform);
+bool canvas_draw_line_strip(const struct canvas_point *points,
+    size_t point_count, bool closed,
+    const struct canvas_transform *transform);
+bool canvas_draw_lines(const struct canvas_point *points, size_t point_count,
+    const uint16_t *segments, size_t segment_count,
+    const struct canvas_transform *transform);
 
 #endif

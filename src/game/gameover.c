@@ -4,6 +4,7 @@
 #include "input.h"
 #include "level.h"
 #include "loop.h"
+#include "shape.h"
 #include "text.h"
 #include "timing.h"
 #include "titlescreen.h"
@@ -18,7 +19,8 @@ static float elapsed;
 
 void gameover_init(void)
 {
-    canvas_reset();
+    shape_canvas_destroy_all();
+    text_reset();
     input_reset();
 
     elapsed = 0.f;
@@ -46,7 +48,9 @@ void gameover_loop(bool draw)
         return;
     }
 
-    canvas_start_drawing(true);
+    if (!shape_canvas_begin_frame()) {
+        return;
+    }
     text_draw_centered("GAME OVER", -0.05f, 0.65f);
-    canvas_finish_drawing(true);
+    shape_canvas_end_frame();
 }

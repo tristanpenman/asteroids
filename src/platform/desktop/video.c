@@ -46,6 +46,10 @@ static int canvas_height = 0;
 
 // Pixel density of the monitor on which the window is being displayed
 static float pixel_density = 1.f;
+static int active_viewport_x;
+static int active_viewport_y;
+static int active_viewport_width;
+static int active_viewport_height;
 
 /******************************************************************************
  *
@@ -219,7 +223,7 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
     return true;
 }
 
-void video_clear(void)
+void video_clear_color(float red, float green, float blue, float alpha)
 {
 #ifdef __EMSCRIPTEN__
     int swap_interval;
@@ -285,11 +289,15 @@ void video_clear(void)
     // Playable area
     x = (canvas_width - viewport_width) / 2.f;
     y = (canvas_height - viewport_height) / 2.f;
+    active_viewport_x = (int)x;
+    active_viewport_y = (int)y;
+    active_viewport_width = (int)viewport_width;
+    active_viewport_height = (int)viewport_height;
     glScissor((GLint) x, (GLint) y, (GLsizei) viewport_width, (GLsizei) viewport_height);
     glViewport((GLint) x, (GLint) y, (GLsizei) viewport_width, (GLsizei) viewport_height);
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(red, green, blue, alpha);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -297,6 +305,27 @@ void video_clear(void)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+}
+
+void video_clear(void)
+{
+    video_clear_color(0.0f, 0.0f, 0.0f, 0.0f);
+}
+
+void video_get_viewport(int *x, int *y, int *width, int *height)
+{
+    if (x != NULL) {
+        *x = active_viewport_x;
+    }
+    if (y != NULL) {
+        *y = active_viewport_y;
+    }
+    if (width != NULL) {
+        *width = active_viewport_width;
+    }
+    if (height != NULL) {
+        *height = active_viewport_height;
+    }
 }
 
 void video_swap(void)

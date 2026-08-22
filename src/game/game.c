@@ -8,6 +8,8 @@
 #include "loop.h"
 #include "mixer.h"
 #include "sandbox.h"
+#include "shape.h"
+#include "text.h"
 #include "titlescreen.h"
 
 #define MAX_SAMPLES 20
@@ -71,6 +73,8 @@ bool game_init(bool silent)
 
 void game_cleanup(void)
 {
+    shape_canvas_destroy_all();
+    text_reset();
     mixer_set_channel_completion_handler(NULL);
 }
 

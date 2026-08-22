@@ -66,6 +66,7 @@ set(GAME_SRCS
     src/game/leaderboard.c
     src/game/level.c
     src/game/sandbox.c
+    src/game/shape.c
     src/game/text.c
     src/game/titlescreen.c
     src/game/transition.c
@@ -76,6 +77,7 @@ set(GAME_SRCS
 set(DESKTOP_PLATFORM_SRCS
     src/platform/desktop/canvas.c
     src/platform/desktop/debug.c
+    src/platform/desktop/graphics.c
     src/platform/desktop/input.c
     src/platform/desktop/loop.c
     src/platform/desktop/main.c

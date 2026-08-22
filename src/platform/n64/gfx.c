@@ -1,11 +1,28 @@
 #include "gfx.h"
 
+#include <string.h>
+#include <malloc.h>
+
 #ifndef GFX_FRAMEBUFFER_COUNT
 #define GFX_FRAMEBUFFER_COUNT 3
 #endif
 
 Gfx gfx_glist[GFX_GLIST_COUNT][GFX_GLIST_LEN];
 Gfx *glistp;
+static struct gfx_frame frames[GFX_FRAME_COUNT] __attribute__((aligned(16)));
+static struct gfx_frame *current_frame;
+static int current_frame_index;
+
+enum graphics_phase
+{
+    GRAPHICS_PHASE_IDLE,
+    GRAPHICS_PHASE_FRAME,
+    GRAPHICS_PHASE_CANVAS
+};
+
+static enum graphics_phase phase;
+static struct graphics_color frame_clear_color;
+static unsigned char graphics_heap[512 * 1024] __attribute__((aligned(16)));
 
 static u16 framebuffers[GFX_FRAMEBUFFER_COUNT][SCREEN_HT * SCREEN_WD]
     __attribute__((aligned(64)));
@@ -50,6 +67,7 @@ void gfx_init(void)
 {
     int i;
 
+    InitHeap(graphics_heap, sizeof(graphics_heap));
     nuGfxInit();
 
     for (i = 0; i < GFX_FRAMEBUFFER_COUNT; ++i) {
@@ -78,7 +96,19 @@ void gfx_rcp_init(void)
     gDPSetScissor(glistp++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WD, SCREEN_HT);
 }
 
+void gfx_set_cfb(void)
+{
+    gDPSetColorImage(glistp++, G_IM_FMT_RGBA, G_IM_SIZ_16b, SCREEN_WD,
+        osVirtualToPhysical(nuGfxCfb_ptr));
+}
+
 void gfx_clear_cfb(void)
+{
+    const struct graphics_color black = {0, 0, 0, 255};
+    gfx_clear_cfb_color(black);
+}
+
+void gfx_clear_cfb_color(struct graphics_color color)
 {
     gDPSetDepthImage(glistp++, OS_K0_TO_PHYSICAL(nuGfxZBuffer));
     gDPSetCycleType(glistp++, G_CYC_FILL);
@@ -91,8 +121,186 @@ void gfx_clear_cfb(void)
 
     gDPSetColorImage(glistp++, G_IM_FMT_RGBA, G_IM_SIZ_16b, SCREEN_WD,
         osVirtualToPhysical(nuGfxCfb_ptr));
-    gDPSetFillColor(glistp++,
-        (GPACK_RGBA5551(0, 0, 0, 1) << 16) | GPACK_RGBA5551(0, 0, 0, 1));
+    {
+        const u16 packed = GPACK_RGBA5551(color.red, color.green, color.blue,
+            color.alpha != 0);
+        gDPSetFillColor(glistp++, (packed << 16) | packed);
+    }
     gDPFillRectangle(glistp++, 0, 0, SCREEN_WD - 1, SCREEN_HT - 1);
     gDPPipeSync(glistp++);
+    gDPSetCycleType(glistp++, G_CYC_1CYCLE);
+}
+
+static void release_frame(struct gfx_frame *frame)
+{
+    if (frame->num_shape_refs != 0) {
+        canvas_n64_release_shapes(frame->shape_refs, frame->num_shape_refs);
+        frame->num_shape_refs = 0;
+    }
+    frame->busy = false;
+}
+
+void graphics_notify_tasks_completed(void)
+{
+    int i;
+    for (i = 0; i < GFX_FRAME_COUNT; ++i) {
+        release_frame(&frames[i]);
+    }
+}
+
+bool graphics_begin_frame(struct graphics_color clear_color)
+{
+    if (phase != GRAPHICS_PHASE_IDLE) {
+        return false;
+    }
+    current_frame = &frames[current_frame_index];
+    if (current_frame->busy) {
+        current_frame = NULL;
+        return false;
+    }
+    release_frame(current_frame);
+    current_frame->line_ptr = current_frame->lines;
+    current_frame->num_line_transforms = 0;
+    current_frame->num_line_projections = 0;
+    current_frame->num_dynamic_vertices = 0;
+    current_frame->lines_used = false;
+    frame_clear_color = clear_color;
+    phase = GRAPHICS_PHASE_FRAME;
+    return true;
+}
+
+static void begin_line_task(void)
+{
+    if (current_frame->lines_used) {
+        glistp = current_frame->line_ptr;
+        return;
+    }
+    glistp = current_frame->lines;
+    gfx_rcp_init();
+    gfx_set_cfb();
+    gfx_clear_cfb_color(frame_clear_color);
+    current_frame->lines_used = true;
+    current_frame->line_ptr = glistp;
+}
+
+bool graphics_canvas_begin_phase(void)
+{
+    if (phase != GRAPHICS_PHASE_FRAME || current_frame->lines_used) {
+        return false;
+    }
+    begin_line_task();
+    phase = GRAPHICS_PHASE_CANVAS;
+    return true;
+}
+
+void graphics_canvas_end_phase(void)
+{
+    if (phase == GRAPHICS_PHASE_CANVAS) {
+        current_frame->line_ptr = glistp;
+        phase = GRAPHICS_PHASE_FRAME;
+    }
+}
+
+bool graphics_canvas_phase_active(void)
+{
+    return phase == GRAPHICS_PHASE_CANVAS;
+}
+
+bool graphics_end_frame(void)
+{
+    size_t size;
+    if (phase != GRAPHICS_PHASE_FRAME) {
+        return false;
+    }
+    if (!current_frame->lines_used) {
+        begin_line_task();
+    }
+    glistp = current_frame->line_ptr;
+    gDPFullSync(glistp++);
+    gSPEndDisplayList(glistp++);
+    current_frame->line_ptr = glistp;
+    size = (size_t)(glistp - current_frame->lines) * sizeof(Gfx);
+    nuGfxTaskStart(current_frame->lines, (s32)size,
+        NU_GFX_UCODE_L3DEX2, NU_SC_SWAPBUFFER);
+    current_frame->busy = true;
+    current_frame_index = (current_frame_index + 1) % GFX_FRAME_COUNT;
+    current_frame = NULL;
+    phase = GRAPHICS_PHASE_IDLE;
+    return true;
+}
+
+struct gfx_frame *gfx_active_frame(void)
+{
+    return current_frame;
+}
+
+bool gfx_line_commands_available(size_t count)
+{
+    return current_frame != NULL && current_frame->lines_used &&
+        glistp + count + 2 < current_frame->lines + GFX_LINE_GLIST_LEN;
+}
+
+struct gfx_transform *gfx_alloc_line_transform(void)
+{
+    if (current_frame == NULL ||
+        current_frame->num_line_transforms >= CANVAS_MAX_TRANSFORMS) {
+        return NULL;
+    }
+    return &current_frame->line_transforms[current_frame->num_line_transforms++];
+}
+
+Mtx *gfx_alloc_line_projection(void)
+{
+    if (current_frame == NULL ||
+        current_frame->num_line_projections >= GFX_MAX_PROJECTIONS) {
+        return NULL;
+    }
+    return &current_frame->line_projections[current_frame->num_line_projections++];
+}
+
+Vtx *gfx_alloc_dynamic_vertices(size_t count)
+{
+    Vtx *result;
+    if (current_frame == NULL || count > GFX_MAX_DYNAMIC_VERTICES ||
+        current_frame->num_dynamic_vertices + (int)count >
+            GFX_MAX_DYNAMIC_VERTICES) {
+        return NULL;
+    }
+    result = &current_frame->dynamic_vertices[current_frame->num_dynamic_vertices];
+    current_frame->num_dynamic_vertices += (int)count;
+    return result;
+}
+
+int gfx_reference_shape(canvas_shape_id shape)
+{
+    int i;
+    if (current_frame == NULL) {
+        return -1;
+    }
+    for (i = 0; i < current_frame->num_shape_refs; ++i) {
+        if (current_frame->shape_refs[i] == shape) {
+            return 0;
+        }
+    }
+    if (current_frame->num_shape_refs >= CANVAS_MAX_SHAPES) {
+        return -1;
+    }
+    current_frame->shape_refs[current_frame->num_shape_refs++] = shape;
+    return 1;
+}
+
+void gfx_apply_viewport(const struct canvas_rect *rect)
+{
+    Vp *viewport = &current_frame->viewport;
+    viewport->vp.vscale[0] = rect->width * 2;
+    viewport->vp.vscale[1] = rect->height * 2;
+    viewport->vp.vscale[2] = G_MAXZ / 2;
+    viewport->vp.vscale[3] = 0;
+    viewport->vp.vtrans[0] = (rect->x * 4) + rect->width * 2;
+    viewport->vp.vtrans[1] = (rect->y * 4) + rect->height * 2;
+    viewport->vp.vtrans[2] = G_MAXZ / 2;
+    viewport->vp.vtrans[3] = 0;
+    gSPViewport(glistp++, OS_K0_TO_PHYSICAL(viewport));
+    gDPSetScissor(glistp++, G_SC_NON_INTERLACE, rect->x, rect->y,
+        rect->x + rect->width, rect->y + rect->height);
 }

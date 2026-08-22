@@ -3,6 +3,8 @@
 #include "data.h"
 #include "input.h"
 #include "sandbox.h"
+#include "shape.h"
+#include "text.h"
 #include "timing.h"
 #include "vec.h"
 
@@ -51,17 +53,18 @@ bool sandbox_init(void)
     input_map(input_up, INPUT_KEY_UP);
     input_map(input_up, INPUT_JOYSTICK_UP);
 
-    canvas_reset();
+    shape_canvas_destroy_all();
+    text_reset();
 
     for (unsigned int i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
-        asteroid_shape_ids[i] = canvas_load_shape(&asteroid_shape_data[i]);
-        if (asteroid_shape_ids[i] == CANVAS_INVALID_SHAPE) {
+        asteroid_shape_ids[i] = shape_canvas_create(&asteroid_shape_data[i]);
+        if (asteroid_shape_ids[i] == CANVAS_INVALID_SHAPE_ID) {
             return false;
         }
     }
 
-    box_shape_id = canvas_load_shape(&box_shape_data);
-    if (box_shape_id == CANVAS_INVALID_SHAPE) {
+    box_shape_id = shape_canvas_create(&box_shape_data);
+    if (box_shape_id == CANVAS_INVALID_SHAPE_ID) {
         return false;
     }
 
@@ -134,9 +137,11 @@ void sandbox_loop(bool draw)
     }
 
     if (draw) {
-        canvas_start_drawing(true);
+        if (!shape_canvas_begin_frame()) {
+            return;
+        }
 
-        canvas_draw_shape(
+        shape_canvas_draw(
                 asteroid_shape_ids[0],
                 pos1,
                 0,
@@ -144,16 +149,17 @@ void sandbox_loop(bool draw)
         );
 
         if (collision) {
-            canvas_set_colour(1.0f, 0.0f, 0.0f);
+            const struct canvas_color red = {255, 0, 0, 255};
+            canvas_set_color(red);
         }
 
-        canvas_draw_shape(
+        shape_canvas_draw(
                 box_shape_id,
                 pos2,
                 0,
                 vec_2d_unit
         );
 
-        canvas_finish_drawing(true);
+        shape_canvas_end_frame();
     }
 }

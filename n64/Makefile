@@ -28,6 +28,7 @@ GAME_C_FILES := \
 	src/game/initials.c \
 	src/game/level.c \
 	src/game/sandbox.c \
+	src/game/shape.c \
 	src/game/text.c \
 	src/game/titlescreen.c \
 	src/game/transition.c \

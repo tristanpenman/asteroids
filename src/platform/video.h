@@ -24,6 +24,10 @@ bool video_init(int width, int height, const char *title, bool fullscreen);
  */
 void video_clear(void);
 
+void video_clear_color(float red, float green, float blue, float alpha);
+
+void video_get_viewport(int *x, int *y, int *width, int *height);
+
 /**
  * Swap the front buffer with the back buffer
  */
