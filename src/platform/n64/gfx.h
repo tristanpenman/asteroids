@@ -21,6 +21,7 @@
 #define GFX_FRAME_COUNT 3
 #define GFX_LINE_GLIST_LEN 16384
 #define GFX_MAX_PROJECTIONS 16
+#define GFX_MAX_VIEW3D 4
 #define GFX_MAX_DYNAMIC_VERTICES 2048
 
 struct gfx_transform {
@@ -30,18 +31,25 @@ struct gfx_transform {
 };
 
 struct gfx_frame {
+    Gfx triangles[GFX_GLIST_LEN];
     Gfx lines[GFX_LINE_GLIST_LEN];
     struct gfx_transform line_transforms[CANVAS_MAX_TRANSFORMS];
     Mtx line_projections[GFX_MAX_PROJECTIONS];
     Vtx dynamic_vertices[GFX_MAX_DYNAMIC_VERTICES];
-    Vp viewport;
+    Mtx view_projections[GFX_MAX_VIEW3D];
+    Mtx view_modelviews[GFX_MAX_VIEW3D];
+    Vp viewports[GFX_MAX_VIEW3D + 1];
     canvas_shape_id shape_refs[CANVAS_MAX_SHAPES];
+    Gfx *triangle_ptr;
     Gfx *line_ptr;
     int num_line_transforms;
     int num_line_projections;
     int num_dynamic_vertices;
+    int num_views;
     int num_shape_refs;
+    bool triangles_used;
     bool lines_used;
+    bool clear_emitted;
     bool busy;
 };
 
