@@ -15,6 +15,7 @@ These conventions apply to the project-owned C code in `src`. When modifying old
 - Always use braces around control-flow bodies, including single-statement bodies.
 - Put one space after control-flow keywords and around binary operators.
 - Bind pointer stars to the variable or parameter name: `struct item *item` and `const char *text`.
+- Variable declaration and initialization may be combined on a single line.
 - Separate logical sections within a function with blank lines. Keep related module-level declarations together.
 - For a declaration or call that does not fit comfortably on one line, break at parameter boundaries and indent continuation lines by four spaces. Keep a group of closely related parameters together when that makes the signature easier to scan.
 - Follow the existing file's line length and line endings. Wrap long calls and diagnostics rather than reformatting unrelated code.
