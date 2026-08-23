@@ -666,6 +666,7 @@ void level_init(int new_level, int new_lives, int new_score)
     input_map(input_pause, INPUT_BUTTON_START);
 
     canvas_reset();
+    draw_load_shapes();
 
     for (int i = 0; i < NUM_PLAYER_FRAMES; i++) {
         player_shapes[i] = canvas_load_shape(&player_shape_data[i]);

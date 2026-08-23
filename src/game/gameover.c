@@ -1,5 +1,6 @@
 #include "canvas.h"
 #include "defines.h"
+#include "draw.h"
 #include "gameover.h"
 #include "input.h"
 #include "level.h"
@@ -19,6 +20,7 @@ static float elapsed;
 void gameover_init(void)
 {
     canvas_reset();
+    draw_load_shapes();
     input_reset();
 
     elapsed = 0.f;

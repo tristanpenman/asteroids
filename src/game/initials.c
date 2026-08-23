@@ -3,6 +3,7 @@
 
 #include "canvas.h"
 #include "defines.h"
+#include "draw.h"
 #include "highscores.h"
 #include "initials.h"
 #include "input.h"
@@ -29,7 +30,7 @@ static int input_next;
  *
  *****************************************************************************/
 
-static void draw_score(int score)
+static void draw_initials_score(int score)
 {
     static char buffer[SCORE_BUFFER_SIZE];
 
@@ -127,6 +128,7 @@ static void handle_input(void)
 void initials_init(unsigned int new_score)
 {
     canvas_reset();
+    draw_load_shapes();
 
     input_reset();
 
@@ -182,7 +184,7 @@ void initials_loop(bool draw)
     }
 
     canvas_start_drawing(true);
-    draw_score(score);
+    draw_initials_score(score);
 
 #ifdef N64
     text_draw_centered("YOUR SCORE IS ONE OF THE TEN BEST", -0.19f, 0.6f);

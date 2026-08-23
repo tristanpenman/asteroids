@@ -1,13 +1,13 @@
 #include <stdlib.h>
 
-#include "collision.h"
 #include "canvas.h"
+#include "collision.h"
 #include "mathdefs.h"
 #include "vec.h"
 
 /******************************************************************************
  *
- * Helper functions (new)
+ * Helper functions
  *
  *****************************************************************************/
 
@@ -64,6 +64,35 @@ static struct vec_2d transform(
     return result;
 }
 
+static int shape_num_line_segments(const struct shape *shape)
+{
+    if (shape->primitive == CANVAS_LINES) {
+        return shape->indices != NULL ? shape->num_indices / 2 : shape->num_vertices / 2;
+    }
+    if (shape->primitive == CANVAS_LINE_STRIP) {
+        return shape->num_vertices;
+    }
+    return 0;
+}
+
+static void shape_line_segment(const struct shape *shape, int segment,
+    const struct vec_2d **start, const struct vec_2d **end)
+{
+    int start_index;
+    int end_index;
+
+    if (shape->primitive == CANVAS_LINES) {
+        start_index = shape->indices != NULL ? shape->indices[segment * 2] : segment * 2;
+        end_index = shape->indices != NULL ? shape->indices[segment * 2 + 1] : segment * 2 + 1;
+    } else {
+        start_index = segment;
+        end_index = (segment + 1) % shape->num_vertices;
+    }
+
+    *start = (const struct vec_2d *)&shape->vertices[start_index * 2];
+    *end = (const struct vec_2d *)&shape->vertices[end_index * 2];
+}
+
 /******************************************************************************
  *
  * Public interface
@@ -77,27 +106,18 @@ bool collision_test_shape_line_segment_full(
 {
     const float sinr = sinf(b_rot);
     const float cosr = cosf(b_rot);
+    const int num_segments = shape_num_line_segments(b);
 
-    if (b->num_line_segments > 0) {
-        for (int i = 0; i < b->num_line_segments * 2; i += 2) {
-            const struct vec_2d *b1 = (struct vec_2d *) &b->vertices[2 * b->line_segments[i]];
-            const struct vec_2d *b2 = (struct vec_2d *) &b->vertices[2 * b->line_segments[i + 1]];
-            const struct vec_2d b_start = transform(b1, b_pos, sinr, cosr, b_scale);
-            const struct vec_2d b_end = transform(b2, b_pos, sinr, cosr, b_scale);
-            if (lines_intersect_full(a_start, a_end, &b_start, &b_end, intersection, t)) {
-                return true;
-            }
-        }
-    } else {
-        const int n = b->num_vertices * 2;
-        for (int i = 0; i < n; i += 2) {
-            const struct vec_2d *b1 = (struct vec_2d *) &b->vertices[i];
-            const struct vec_2d *b2 = (struct vec_2d *) &b->vertices[(i + 2) % n];
-            const struct vec_2d b_start = transform(b1, b_pos, sinr, cosr, b_scale);
-            const struct vec_2d b_end = transform(b2, b_pos, sinr, cosr, b_scale);
-            if (lines_intersect_full(a_start, a_end, &b_start, &b_end, intersection, t)) {
-                return true;
-            }
+    for (int i = 0; i < num_segments; ++i) {
+        const struct vec_2d *b1;
+        const struct vec_2d *b2;
+
+        shape_line_segment(b, i, &b1, &b2);
+
+        const struct vec_2d b_start = transform(b1, b_pos, sinr, cosr, b_scale);
+        const struct vec_2d b_end = transform(b2, b_pos, sinr, cosr, b_scale);
+        if (lines_intersect_full(a_start, a_end, &b_start, &b_end, intersection, t)) {
+            return true;
         }
     }
 
@@ -117,34 +137,21 @@ bool collision_test_shapes_full(
     const struct shape *b, const struct vec_2d *b_pos, float b_rot, float b_scale,
     struct vec_2d *intersection, float *t)
 {
-    float sinr;
-    float cosr;
+    const float sinr = sinf(a_rot);
+    const float cosr = cosf(a_rot);
+    const int num_segments = shape_num_line_segments(a);
 
-    sinr = sinf(a_rot);
-    cosr = cosf(a_rot);
+    for (int i = 0; i < num_segments; ++i) {
+        const struct vec_2d *a1;
+        const struct vec_2d *a2;
 
-    if (a->num_line_segments > 0) {
-        for (int i = 0; i < a->num_line_segments * 2; i += 2) {
-            const struct vec_2d *a1 = (struct vec_2d *) &a->vertices[2 * a->line_segments[i]];
-            const struct vec_2d *a2 = (struct vec_2d *) &a->vertices[2 * a->line_segments[i + 1]];
-            const struct vec_2d a_start = transform(a1, a_pos, sinr, cosr, a_scale);
-            const struct vec_2d a_end = transform(a2, a_pos, sinr, cosr, a_scale);
-            if (collision_test_shape_line_segment_full(
-                    b, b_pos, b_rot, b_scale, &a_start, &a_end, intersection, t)) {
-                return true;
-            }
-        }
-    } else {
-        const int n = a->num_vertices * 2;
-        for (int i = 0; i < n; i += 2) {
-            const struct vec_2d *a1 = (struct vec_2d *) &a->vertices[i];
-            const struct vec_2d *a2 = (struct vec_2d *) &a->vertices[(i + 2) % n];
-            const struct vec_2d a_start = transform(a1, a_pos, sinr, cosr, a_scale);
-            const struct vec_2d a_end = transform(a2, a_pos, sinr, cosr, a_scale);
-            if (collision_test_shape_line_segment_full(
-                    b, b_pos, b_rot, b_scale, &a_start, &a_end, intersection, t)) {
-                return true;
-            }
+        shape_line_segment(a, i, &a1, &a2);
+
+        const struct vec_2d a_start = transform(a1, a_pos, sinr, cosr, a_scale);
+        const struct vec_2d a_end = transform(a2, a_pos, sinr, cosr, a_scale);
+        if (collision_test_shape_line_segment_full(
+                b, b_pos, b_rot, b_scale, &a_start, &a_end, intersection, t)) {
+            return true;
         }
     }
 

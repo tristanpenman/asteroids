@@ -86,6 +86,7 @@ bool titlescreen_init(void)
     h_down = false;
 
     canvas_reset();
+    draw_load_shapes();
 
     for (unsigned int i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
         asteroid_shape_ids[i] = canvas_load_shape(&asteroid_shape_data[i]);

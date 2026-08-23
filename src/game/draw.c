@@ -1,8 +1,91 @@
 #include <stdio.h>
 
-#include "draw.h"
+#include "canvas.h"
+#include "debug.h"
 #include "defines.h"
+#include "draw.h"
+#include "entities.h"
+#include "mathdefs.h"
+#include "options.h"
 #include "text.h"
+#include "vec.h"
+
+static const float ship_vertices[] = {
+    -0.012f,  0.038f - SHIP_PIVOT,
+     0.000f,  0.000f - SHIP_PIVOT,
+     0.012f,  0.038f - SHIP_PIVOT,
+    -0.0105f, 0.0325f - SHIP_PIVOT,
+     0.0105f, 0.0325f - SHIP_PIVOT
+};
+
+static const uint16_t ship_indices[] = {
+    0, 1,
+    1, 2,
+    3, 4
+};
+
+static const struct shape ship_shape = {
+    ship_vertices,
+    NUM_VERTICES(ship_vertices),
+    ship_indices,
+    NUM_INDICES(ship_indices),
+    CANVAS_LINES
+};
+
+static const float shard_vertices[] = {
+    -0.008f, 0.0f,
+     0.008f, 0.0f
+};
+
+static const struct shape shard_shape = {
+    shard_vertices,
+    NUM_VERTICES(shard_vertices),
+    NULL,
+    0,
+    CANVAS_LINES
+};
+
+static float particle_vertices[EXPLOSION_PARTICLES * 2];
+
+static const struct shape particle_shape = {
+    particle_vertices,
+    NUM_VERTICES(particle_vertices),
+    NULL,
+    0,
+    CANVAS_POINTS
+};
+
+static int particle_shape_id = CANVAS_INVALID_SHAPE;
+static int shard_shape_id = CANVAS_INVALID_SHAPE;
+static int ship_shape_id = CANVAS_INVALID_SHAPE;
+
+static float clamp_colour(float colour)
+{
+    if (colour < 0.0f) {
+        return 0.0f;
+    }
+    if (colour > 1.0f) {
+        return 1.0f;
+    }
+    return colour;
+}
+
+void draw_load_shapes(void)
+{
+    for (unsigned int i = 0; i < EXPLOSION_PARTICLES; ++i) {
+        const float angle = 2.0f * (float)M_PI / (float)EXPLOSION_PARTICLES * (float)i;
+        particle_vertices[i * 2] = sinf(angle);
+        particle_vertices[i * 2 + 1] = -cosf(angle);
+    }
+
+    particle_shape_id = canvas_load_shape(&particle_shape);
+    shard_shape_id = canvas_load_shape(&shard_shape);
+    ship_shape_id = canvas_load_shape(&ship_shape);
+
+    debug_assert(particle_shape_id != CANVAS_INVALID_SHAPE);
+    debug_assert(shard_shape_id != CANVAS_INVALID_SHAPE);
+    debug_assert(ship_shape_id != CANVAS_INVALID_SHAPE);
+}
 
 void draw_level_title(int level)
 {
@@ -20,161 +103,58 @@ void draw_score(int score)
     text_draw(buffer, -0.475f, -0.365f, 0.35f);
 }
 
-#if defined(ASTEROIDS_PLATFORM_N64)
-
 void draw_explosions(const struct explosion *ee, unsigned int n)
 {
-    (void)ee;
-    (void)n;
-}
-
-void draw_lives(int lives)
-{
-    (void)lives;
-}
-
-void draw_player_exploding(const struct player *p)
-{
-    (void)p;
-}
-
-#else
-
-#ifdef _MSC_VER
-#include <SDL.h>
-#endif
-
-#include <SDL_opengl.h>
-
-#include "canvas.h"
-#include "entities.h"
-#include "highscores.h"
-#include "mathdefs.h"
-#include "options.h"
-#include "vec.h"
-
-const struct vec_2d origin = {
-    1.0f / 2.0f,
-    ((GLfloat)LOGICAL_HEIGHT_PX / (GLfloat)LOGICAL_WIDTH_PX) / 2.0f
-};
-
-/******************************************************************************
- *
- * Helper functions
- *
- *****************************************************************************/
-
-static void gl_vertex_2f(float x, float y)
-{
-    glVertex3f(x, y, 0.f);
-}
-
-static void draw_ship(float c)
-{
-    glColor3f((GLfloat) c, (GLfloat) c, (GLfloat) c);
-
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glTranslatef(0.0f, 0 - SHIP_PIVOT, 0.0f);
-
-    glBegin(GL_LINE_STRIP);
-    gl_vertex_2f(-0.012f,  0.038f);
-    gl_vertex_2f( 0.000f,  0.000f);
-    gl_vertex_2f( 0.012f,  0.038f);
-    glEnd();
-
-    glBegin(GL_LINES);
-    gl_vertex_2f(-0.0105f,  0.0325f);
-    gl_vertex_2f( 0.0105f,  0.0325f);
-    glEnd();
-
-    glPopMatrix();
-
-    glColor3f(1.f, 1.f, 1.f);
-}
-
-static void draw_ship_explosion(const struct player *p)
-{
-    float d;
-    float t = p->death_delay;
-
-    GLfloat c = (GLfloat)(1.0f - (t / SHIP_DEATH_DELAY));
-
-    for (unsigned int i = 0; i < SHIP_EXPLOSION_SHARDS; i++) {
-        d = p->shards[i].angle;
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glTranslatef(
-            (GLfloat)(sinf(d) * t * SHIP_EXPLOSION_SPEED),
-            (GLfloat)(0 - cosf(d) * t * SHIP_EXPLOSION_SPEED), 0.0f);
-        glRotatef((GLfloat)(p->shards[i].rot * RAD_TO_DEG), 0.0f, 0.0f, 1.0f);
-
-        glColor3f(c, c, c);
-        glBegin(GL_LINES);
-        gl_vertex_2f(-0.008f, 0.0f);
-        gl_vertex_2f(0.008f, 0.0f);
-        glEnd();
-
-        glPopMatrix();
-    }
-
-    glColor3f(1.f, 1.f, 1.f);
-}
-
-/******************************************************************************
- *
- * Public interface
- *
- *****************************************************************************/
-
-void draw_explosions(const struct explosion *ee, unsigned int n)
-{
-    float a;
-
-    for (unsigned int i = 0; i < n; i++, ee++) {
-        if (ee->visible == true) {
-            glMatrixMode(GL_MODELVIEW);
-            glPushMatrix();
-            glTranslatef((GLfloat)(origin.x + ee->pos.x), (GLfloat)(origin.y + ee->pos.y), 0.0f);
-            glScalef(EXPLOSION_SPEED, EXPLOSION_SPEED, 1.0f);
-            glColor3f(1.0f, 1.0f, 1.0f);
-            glBegin(GL_POINTS);
-            for (unsigned int p = 0; p < EXPLOSION_PARTICLES; p++) {
-                a = (float)(2 * M_PI) / (float) EXPLOSION_PARTICLES * (float) p;
-                gl_vertex_2f(
-                    (GLfloat)(sinf(a) * ee->time),
-                    (GLfloat)(0 - cosf(a) * ee->time));
-            }
-            glEnd();
-            glPopMatrix();
+    for (unsigned int i = 0; i < n; ++i, ++ee) {
+        if (ee->visible) {
+            const struct vec_2d scale = {
+                EXPLOSION_SPEED * ee->time,
+                EXPLOSION_SPEED * ee->time
+            };
+            canvas_set_colour(1.0f, 1.0f, 1.0f);
+            canvas_draw_shape(particle_shape_id, ee->pos, 0.0f, scale);
         }
     }
 }
 
 void draw_lives(int lives)
 {
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glScalef(0.5f, 0.5f, 1.0f);
-    glTranslatef(0.05f, 0.11f, 0.0f);
-    for (int i = 0; i < lives; i++) {
-        glTranslatef(0.04f, 0.0f, 0.0f);
-        draw_ship(1.0f);
-    }
+    const float canvas_height = (float)LOGICAL_HEIGHT_PX / (float)LOGICAL_WIDTH_PX;
+    const struct vec_2d scale = {0.5f, 0.5f};
+    struct vec_2d position = {-0.455f, 0.055f - canvas_height / 2.0f};
 
-    glPopMatrix();
+    canvas_set_colour(1.0f, 1.0f, 1.0f);
+    for (int i = 0; i < lives; ++i) {
+        canvas_draw_shape(ship_shape_id, position, 0.0f, scale);
+        position.x += 0.02f;
+    }
 }
 
 void draw_player_exploding(const struct player *p)
 {
-    const float c = 1.0f - (p->death_delay / SHIP_EXPLOSION_LENGTH);
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glTranslatef((GLfloat)(origin.x + p->pos.x), (GLfloat)(origin.y + p->pos.y), 0.f);
-    glRotatef((GLfloat)(p->rot * RAD_TO_DEG), 0.f, 0.f, 1.f);
-    draw_ship(c > 1.f ? 1.f : c);
-    draw_ship_explosion(p);
-    glPopMatrix();
-}
+    const float ship_colour = 1.0f - (p->death_delay / SHIP_EXPLOSION_LENGTH);
+    const float shard_colour = 1.0f - (p->death_delay / SHIP_DEATH_DELAY);
+    const float clamped_ship_colour = clamp_colour(ship_colour);
+    const float clamped_shard_colour = clamp_colour(shard_colour);
+    const float sinr = sinf(p->rot);
+    const float cosr = cosf(p->rot);
 
-#endif
+    canvas_set_colour(clamped_ship_colour, clamped_ship_colour, clamped_ship_colour);
+    canvas_draw_shape(ship_shape_id, p->pos, p->rot, vec_2d_unit);
+
+    canvas_set_colour(clamped_shard_colour, clamped_shard_colour, clamped_shard_colour);
+    for (unsigned int i = 0; i < SHIP_EXPLOSION_SHARDS; ++i) {
+        const float angle = p->shards[i].angle;
+        const float distance = p->death_delay * SHIP_EXPLOSION_SPEED;
+        const float x = sinf(angle) * distance;
+        const float y = -cosf(angle) * distance;
+        const struct vec_2d position = {
+            p->pos.x + cosr * x - sinr * y,
+            p->pos.y + sinr * x + cosr * y
+        };
+
+        canvas_draw_shape(shard_shape_id, position, p->rot + p->shards[i].rot, vec_2d_unit);
+    }
+
+    canvas_set_colour(1.0f, 1.0f, 1.0f);
+}

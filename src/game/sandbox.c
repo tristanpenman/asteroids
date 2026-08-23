@@ -1,6 +1,7 @@
 #include "canvas.h"
 #include "collision.h"
 #include "data.h"
+#include "draw.h"
 #include "input.h"
 #include "sandbox.h"
 #include "timing.h"
@@ -52,6 +53,7 @@ bool sandbox_init(void)
     input_map(input_up, INPUT_JOYSTICK_UP);
 
     canvas_reset();
+    draw_load_shapes();
 
     for (unsigned int i = 0; i < NUM_ASTEROID_SHAPES; ++i) {
         asteroid_shape_ids[i] = canvas_load_shape(&asteroid_shape_data[i]);

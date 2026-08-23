@@ -4,11 +4,10 @@
 #include <SDL.h>
 #endif
 
+#include "canvas.h"
 #include "mathdefs.h"
 #include "util.h"
 #include "vec.h"
-
-extern const struct vec_2d origin;
 
 /******************************************************************************
  *
@@ -39,19 +38,19 @@ bool wrap_position(struct vec_2d *pos, float radius)
     float *x = &pos->x;
     float *y = &pos->y;
 
-    if (*x < 0 - origin.x - radius) {      /* Wrap horizontally */
-        *x = origin.x + radius;
+    if (*x < -canvas_origin.x - radius) { // Wrap horizontally
+        *x = canvas_origin.x + radius;
         wrapped = true;
-    } else if (*x > origin.x + radius) {
-        *x = 0 - origin.x - radius;
+    } else if (*x > canvas_origin.x + radius) {
+        *x = -canvas_origin.x - radius;
         wrapped = true;
     }
 
-    if (*y < 0 - origin.y - radius) {      /* Wrap vertically */
-        *y = origin.y + radius;
+    if (*y < -canvas_origin.y - radius) { // Wrap vertically
+        *y = canvas_origin.y + radius;
         wrapped = true;
-    } else if (*y > origin.y + radius) {
-        *y = 0 - origin.y - radius;
+    } else if (*y > canvas_origin.y + radius) {
+        *y = -canvas_origin.y - radius;
         wrapped = true;
     }
 

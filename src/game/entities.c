@@ -5,13 +5,12 @@
 #include <SDL.h>
 #endif
 
+#include "canvas.h"
 #include "data.h"
 #include "defines.h"
 #include "entities.h"
 #include "mathdefs.h"
 #include "util.h"
-
-extern const struct vec_2d origin;
 
 float calculate_asteroid_radius(unsigned int shape)
 {
@@ -39,8 +38,8 @@ void randomise_asteroid_position(struct asteroid *a)
     float dist;
 
     do {
-        x = random_float(0 - origin.x, origin.x);
-        y = random_float(0 - origin.y, origin.y);
+        x = random_float(-canvas_origin.x, canvas_origin.x);
+        y = random_float(-canvas_origin.y, canvas_origin.y);
         dist = sqrtf(x * x + y * y);
     } while (dist < NO_ASTEROID_RADIUS);
 

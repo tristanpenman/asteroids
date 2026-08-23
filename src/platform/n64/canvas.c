@@ -16,8 +16,9 @@ struct geometry
 {
     const Vtx *vertices;
     uint8_t num_vertices;
-    const uint16_t *line_segments;
-    uint8_t num_line_segments;
+    const uint16_t *indices;
+    uint8_t num_indices;
+    enum canvas_primitive primitive;
 };
 
 struct colour
@@ -27,7 +28,7 @@ struct colour
     uint8_t b;
 };
 
-const struct vec_2d origin = {
+const struct vec_2d canvas_origin = {
     0.5f,
     SCREEN_RATIO / 2.0f
 };
@@ -42,6 +43,17 @@ static int num_transforms;
 static int current_gfx_list;
 static Mtx frame_projection;
 
+static uint8_t colour_component(float component)
+{
+    if (component <= 0.0f) {
+        return 0;
+    }
+    if (component >= 1.0f) {
+        return 255;
+    }
+    return (uint8_t)(component * 255.0f);
+}
+
 void canvas_reset(void)
 {
     num_shapes = 0;
@@ -55,14 +67,12 @@ void canvas_reset(void)
 
 int canvas_load_shape(const struct shape *shape)
 {
-    int i;
-
     if (num_shapes >= MAX_SHAPES ||
         num_vertices + shape->num_vertices > MAX_VERTICES) {
         return CANVAS_INVALID_SHAPE;
     }
 
-    for (i = 0; i < shape->num_vertices; ++i) {
+    for (int i = 0; i < shape->num_vertices; ++i) {
         Vtx *vertex = &vertices[num_vertices + i];
 
         memset(vertex, 0, sizeof(*vertex));
@@ -77,15 +87,23 @@ int canvas_load_shape(const struct shape *shape)
 
     shapes[num_shapes].vertices = &vertices[num_vertices];
     shapes[num_shapes].num_vertices = shape->num_vertices;
-    shapes[num_shapes].line_segments = shape->line_segments;
-    shapes[num_shapes].num_line_segments = shape->num_line_segments;
+    shapes[num_shapes].indices = shape->indices;
+    shapes[num_shapes].num_indices = shape->num_indices;
+    shapes[num_shapes].primitive = shape->primitive;
     num_vertices += shape->num_vertices;
 
     return num_shapes++;
 }
 
-static void canvas_prepare_drawing(void)
+static void canvas_prepare_drawing(bool clear)
 {
+    glistp = gfx_glist[current_gfx_list];
+    gfx_rcp_init();
+
+    if (clear) {
+        gfx_clear_cfb();
+    }
+
     gDPPipeSync(glistp++);
     gDPSetCycleType(glistp++, G_CYC_1CYCLE);
     gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&frame_projection),
@@ -101,67 +119,60 @@ void canvas_start_drawing(bool clear)
         SCREEN_HT / 2.0f, -SCREEN_HT / 2.0f,
         1.0f, 10.0f, 1.0f);
 
-    glistp = gfx_glist[current_gfx_list];
-    gfx_rcp_init();
-    if (clear) {
-        gfx_clear_cfb();
-    }
-    canvas_prepare_drawing();
-}
-
-void canvas_continue_drawing(void)
-{
-    glistp = gfx_glist[current_gfx_list];
-    gfx_rcp_init();
-    canvas_prepare_drawing();
+    canvas_prepare_drawing(clear);
 }
 
 void canvas_set_colour(float r, float g, float b)
 {
-    primitive_colour.r = (uint8_t)r;
-    primitive_colour.g = (uint8_t)g;
-    primitive_colour.b = (uint8_t)b;
+    primitive_colour.r = colour_component(r);
+    primitive_colour.g = colour_component(g);
+    primitive_colour.b = colour_component(b);
 }
 
-bool canvas_draw_shape(int shape, struct vec_2d position, float rotation,
-    struct vec_2d scale)
+bool canvas_draw_shape(int shape, struct vec_2d position, float rotation, struct vec_2d scale)
 {
-    struct gfx_transform *transform;
-    int i;
-
     if (shape < 0 || shape >= num_shapes || num_transforms >= MAX_TRANSFORMS) {
         return false;
     }
 
-    transform = &transforms[num_transforms++];
-    guTranslate(&transform->modeling,
-        position.x * SCREEN_WD, position.y * SCREEN_WD, 0.0f);
+    struct gfx_transform *transform = &transforms[num_transforms++];
+    guTranslate(&transform->modeling, position.x * SCREEN_WD, position.y * SCREEN_WD, 0.0f);
     guRotate(&transform->rotation, rotation * RAD_TO_DEG, 0.0f, 0.0f, 1.0f);
     guScale(&transform->scale, scale.x, scale.y, 1.0f);
 
-    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&transform->modeling),
-        G_MTX_LOAD | G_MTX_NOPUSH | G_MTX_MODELVIEW);
-    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&transform->rotation),
-        G_MTX_MUL | G_MTX_NOPUSH | G_MTX_MODELVIEW);
-    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&transform->scale),
-        G_MTX_MUL | G_MTX_NOPUSH | G_MTX_MODELVIEW);
+    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&transform->modeling), G_MTX_LOAD | G_MTX_NOPUSH | G_MTX_MODELVIEW);
+    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&transform->rotation), G_MTX_MUL | G_MTX_NOPUSH | G_MTX_MODELVIEW);
+    gSPMatrix(glistp++, OS_K0_TO_PHYSICAL(&transform->scale), G_MTX_MUL | G_MTX_NOPUSH | G_MTX_MODELVIEW);
     gSPVertex(glistp++, shapes[shape].vertices, shapes[shape].num_vertices, 0);
     gDPSetRenderMode(glistp++, G_RM_AA_XLU_LINE, G_RM_AA_XLU_LINE2);
     gDPSetCombineMode(glistp++, G_CC_PRIMITIVE, G_CC_PRIMITIVE);
-    gDPSetPrimColor(glistp++, 0, 0, primitive_colour.r,
-        primitive_colour.g, primitive_colour.b, 255);
+    gDPSetPrimColor(glistp++, 0, 0, primitive_colour.r, primitive_colour.g, primitive_colour.b, 255);
     gSPClearGeometryMode(glistp++, 0xffffffff);
     gSPSetGeometryMode(glistp++, G_SHADE | G_SHADING_SMOOTH);
 
-    if (shapes[shape].line_segments != NULL) {
-        for (i = 0; i < shapes[shape].num_line_segments * 2; i += 2) {
-            gSPLineW3D(glistp++, shapes[shape].line_segments[i],
-                shapes[shape].line_segments[i + 1], 0.5, 0);
+    switch (shapes[shape].primitive) {
+    case CANVAS_LINES:
+        if (shapes[shape].indices != NULL) {
+            for (int i = 0; i < shapes[shape].num_indices; i += 2) {
+                gSPLineW3D(glistp++, shapes[shape].indices[i],
+                    shapes[shape].indices[i + 1], 0.5, 0);
+            }
+        } else {
+            for (int i = 0; i < shapes[shape].num_vertices - 1; i += 2) {
+                gSPLineW3D(glistp++, i, i + 1, 0.5, 0);
+            }
         }
-    } else {
-        for (i = 0; i < shapes[shape].num_vertices - 1; ++i) {
+        break;
+    case CANVAS_POINTS:
+        for (int i = 0; i < shapes[shape].num_vertices; ++i) {
+            gSPLineW3D(glistp++, i, i, 0.5, 0);
+        }
+        break;
+    case CANVAS_LINE_STRIP:
+        for (int i = 0; i < shapes[shape].num_vertices - 1; ++i) {
             gSPLineW3D(glistp++, i, i + 1, 0.5, 0);
         }
+        break;
     }
 
     return true;
@@ -169,17 +180,19 @@ bool canvas_draw_shape(int shape, struct vec_2d position, float rotation,
 
 void canvas_finish_drawing(bool swap)
 {
-    size_t glist_size;
-
     gDPFullSync(glistp++);
     gSPEndDisplayList(glistp++);
-    glist_size = (size_t)(glistp - gfx_glist[current_gfx_list]);
+    size_t glist_size = (size_t)(glistp - gfx_glist[current_gfx_list]);
     if (glist_size >= GFX_GLIST_LEN) {
         return;
     }
+
     nuGfxTaskStart(gfx_glist[current_gfx_list],
         (s32)(glist_size * sizeof(Gfx)), NU_GFX_UCODE_L3DEX2,
         swap ? NU_SC_SWAPBUFFER : NU_SC_NOSWAPBUFFER);
-
     current_gfx_list = (current_gfx_list + 1) % GFX_GLIST_COUNT;
+
+    if (!swap) {
+        canvas_prepare_drawing(false);
+    }
 }

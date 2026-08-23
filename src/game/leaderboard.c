@@ -35,9 +35,8 @@ static void leaderboard_draw(void)
 
         text_draw_centered(str, -0.3f + 0.054f * (float) i, 0.45f);
 
-        // start a new display list
+        // Start a new display list.
         canvas_finish_drawing(false);
-        canvas_continue_drawing();
     }
 
 #ifdef N64

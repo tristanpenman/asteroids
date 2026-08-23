@@ -143,15 +143,16 @@ static const float bullet_vertices[] = {
     0.0f, 0.02f
 };
 
-static const uint16_t bullet_line_segments[] = {
+static const uint16_t bullet_indices[] = {
     0, 1
 };
 
 const struct shape bullet_shape_data = {
     bullet_vertices,
     NUM_VERTICES(bullet_vertices),
-    bullet_line_segments,
-    NUM_LINE_SEGMENTS(bullet_line_segments)
+    bullet_indices,
+    NUM_INDICES(bullet_indices),
+    CANVAS_LINES
 };
 
 // ----------------------------------------------------------------------------
@@ -168,13 +169,13 @@ static const float player_vertices[] = {
     0.000f,  0.02f
 };
 
-static const uint16_t player_frame_1_line_segments[] = {
+static const uint16_t player_frame_1_indices[] = {
     0, 1,
     0, 2,
     3, 4
 };
 
-static const uint16_t player_frame_2_line_segments[] = {
+static const uint16_t player_frame_2_indices[] = {
     0, 1,
     0, 2,
     3, 4,
@@ -186,13 +187,15 @@ const struct shape player_shape_data[] = {
     {
         player_vertices,
         NUM_VERTICES(player_vertices),
-        player_frame_1_line_segments,
-        NUM_LINE_SEGMENTS(player_frame_1_line_segments)
+        player_frame_1_indices,
+        NUM_INDICES(player_frame_1_indices),
+        CANVAS_LINES
     }, {
         player_vertices,
         NUM_VERTICES(player_vertices),
-        player_frame_2_line_segments,
-        NUM_LINE_SEGMENTS(player_frame_2_line_segments)
+        player_frame_2_indices,
+        NUM_INDICES(player_frame_2_indices),
+        CANVAS_LINES
     }
 };
 

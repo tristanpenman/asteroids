@@ -4,25 +4,33 @@
 #include "types.h"
 
 #define CANVAS_INVALID_SHAPE -1
-#define NUM_LINE_SEGMENTS(line_segments) (sizeof(line_segments) / sizeof(uint16_t) / 2)
+
+#define NUM_INDICES(indices) (sizeof(indices) / sizeof(uint16_t))
 #define NUM_VERTICES(vertices) (sizeof(vertices) / sizeof(float) / 2)
 
 struct vec_2d;
+
+/** Half-extents of the drawable area in centered game coordinates. */
+extern const struct vec_2d canvas_origin;
+
+enum canvas_primitive
+{
+    CANVAS_LINE_STRIP,
+    CANVAS_LINES,
+    CANVAS_POINTS
+};
 
 struct shape
 {
     const float *vertices;
     uint8_t num_vertices;
 
-    //
-    // Line segments are optional. If omitted, vertices will be used to draw a
-    // line loop.
-    //
-    // uint16_t is used (even though it's bigger than we need) because of a bug
-    // in Emscripten's legacy GL implemenetation
-    //
-    const uint16_t *line_segments;
-    uint8_t num_line_segments;
+    // Indices are optional. uint16_t is used because of a bug in Emscripten's
+    // legacy GL implementation.
+    const uint16_t *indices;
+    uint8_t num_indices;
+
+    enum canvas_primitive primitive;
 };
 
 /**
@@ -31,9 +39,9 @@ struct shape
 void canvas_reset(void);
 
 /**
- * Load a shape so that it can be drawn using \c canvas_draw_lines or \c canvas_draw_triangles
+ * Load a shape so that it can be drawn using \c canvas_draw_shape
  */
-int canvas_load_shape(const struct shape *);
+int canvas_load_shape(const struct shape *shape);
 
 /**
  * Start drawing shapes onto the canvas
@@ -41,22 +49,18 @@ int canvas_load_shape(const struct shape *);
 void canvas_start_drawing(bool clear);
 
 /**
- * Continue drawing shapes, after finishing
- */
-void canvas_continue_drawing(void);
-
-/**
- * Change the colour that will be used when drawing lines
+ * Change the drawing colour. Components are normalized to the range 0 to 1.
  */
 void canvas_set_colour(float r, float g, float b);
 
 /**
- * Draw a shape
+ * Draw a shape in centered game coordinates
  */
 bool canvas_draw_shape(int shape, struct vec_2d position, float rotation, struct vec_2d scale);
 
 /**
- * Finish drawing shapes to the canvas
+ * Finish drawing shapes to the canvas. When swap is false, drawing can
+ * continue in a new batch without swapping the display buffer.
  */
 void canvas_finish_drawing(bool swap);
 
