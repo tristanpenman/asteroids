@@ -1,8 +1,8 @@
 #include <stdlib.h>
 
 #include "collision.h"
+#include "canvas.h"
 #include "mathdefs.h"
-#include "shape.h"
 #include "vec.h"
 
 /******************************************************************************

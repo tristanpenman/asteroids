@@ -9,7 +9,6 @@
 #include "canvas.h"
 #include "debug.h"
 #include "mathdefs.h"
-#include "shape.h"
 #include "text.h"
 #include "vec.h"
 #include "video.h"

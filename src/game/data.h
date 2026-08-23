@@ -1,7 +1,7 @@
 #ifndef ASTEROIDS_GAME_DATA_H
 #define ASTEROIDS_GAME_DATA_H
 
-#include "shape.h"
+#include "canvas.h"
 
 extern const struct shape asteroid_shape_data[];
 extern const struct shape box_shape_data;

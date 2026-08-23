@@ -5,7 +5,6 @@
 #include "defines.h"
 #include "gfx.h"
 #include "mathdefs.h"
-#include "shape.h"
 #include "text.h"
 #include "vec.h"
 
