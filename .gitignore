@@ -1,5 +1,5 @@
 build
-build-n64
+build-*
 embuild
 highscores.csv
 thirdparty/SDL2_mixer-2.0.4

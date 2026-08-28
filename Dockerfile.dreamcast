@@ -1,0 +1,24 @@
+FROM debian:bookworm-slim
+
+ARG KOS_VERSION=v2.1.0
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        automake build-essential ca-certificates git libelf-dev libjpeg-dev libpng-dev \
+        python3 subversion texinfo wget \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /opt/toolchains/dc \
+    && git clone --branch "${KOS_VERSION}" --depth 1 \
+        https://github.com/KallistiOS/KallistiOS.git /opt/toolchains/dc/kos \
+    && cp /usr/share/misc/config.guess /opt/toolchains/dc/kos/utils/dc-chain/config.guess \
+    && cp /usr/share/misc/config.sub /opt/toolchains/dc/kos/utils/dc-chain/config.sub \
+    && make -C /opt/toolchains/dc/kos/utils/dc-chain build-sh4 \
+    && cp /opt/toolchains/dc/kos/doc/environ.sh.sample /opt/toolchains/dc/kos/environ.sh \
+    && /bin/bash -lc 'source /opt/toolchains/dc/kos/environ.sh && make -C /opt/toolchains/dc/kos'
+
+ENV KOS_BASE=/opt/toolchains/dc/kos
+ENV KOS_CC_BASE=/opt/toolchains/dc/sh-elf
+ENV PATH=/opt/toolchains/dc/sh-elf/bin:/opt/toolchains/dc/kos/utils/build_wrappers:${PATH}
+
+WORKDIR /source

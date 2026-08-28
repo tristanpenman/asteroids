@@ -18,3 +18,10 @@ services:
     platform: linux/amd64
     volumes:
       - .:/source
+
+  dreamcast:
+    build:
+      context: .
+      dockerfile: Dockerfile.dreamcast
+    volumes:
+      - .:/source
