@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include <nusys.h>
 #include <nualstl_n.h>
 
@@ -5,6 +7,9 @@
 #include "segment.h"
 
 static bool initialized;
+static int active_channels[NU_AU_CHANNELS];
+static void (*channel_completion_handler)(int channel);
+static int num_samples = 0;
 
 bool mixer_init(int num_mixer_channels)
 {
@@ -30,35 +35,82 @@ bool mixer_init(int num_mixer_channels)
         AUDIO_EFFECTS_BANK_START,
         AUDIO_EFFECTS_BANK_SIZE);
 
+    for (int i = 0; i < NU_AU_CHANNELS; ++i) {
+        active_channels[i] = MIXER_INVALID_CHANNEL;
+    }
+
     initialized = true;
     return true;
 }
 
 void mixer_update(void)
 {
-    // Playback handle tracking will be added with sample playback support.
+    if (!initialized) {
+        return;
+    }
+
+    for (int i = 0; i < NU_AU_CHANNELS; ++i) {
+        int channel = active_channels[i];
+
+        if (channel != MIXER_INVALID_CHANNEL &&
+            nuAuStlSndPlayerGetSndState(channel) == 0) {
+            active_channels[i] = MIXER_INVALID_CHANNEL;
+
+            if (channel_completion_handler != NULL) {
+                channel_completion_handler(channel);
+            }
+        }
+    }
 }
 
 void mixer_set_channel_completion_handler(void (*callback)(int channel))
 {
-    (void)callback;
+    channel_completion_handler = callback;
 }
 
 int mixer_load_sample_from_file(const char *path)
 {
-    (void)path;
-    return MIXER_INVALID_SAMPLE;
+    return num_samples++;
 }
 
 int mixer_play_sample(int sample)
 {
-    (void)sample;
+    int channel;
+
+    if (!initialized || sample < 0) {
+        return MIXER_INVALID_CHANNEL;
+    }
+
+    /* Retire completed handles before NuSystem has a chance to reuse one. */
+    mixer_update();
+
+    channel = nuAuStlSndPlayerPlay(sample);
+    if (channel == 0) {
+        return MIXER_INVALID_CHANNEL;
+    }
+
+    for (int i = 0; i < NU_AU_CHANNELS; ++i) {
+        if (active_channels[i] == MIXER_INVALID_CHANNEL) {
+            active_channels[i] = channel;
+            return channel;
+        }
+    }
+
+    /* Every playing handle must remain trackable for completion callbacks. */
+    nuAuStlSndPlayerSndStop(channel, 0);
     return MIXER_INVALID_CHANNEL;
 }
 
 bool mixer_stop_playing_on_channel(int channel)
 {
-    (void)channel;
+    for (int i = 0; i < NU_AU_CHANNELS; ++i) {
+        if (active_channels[i] == channel) {
+            active_channels[i] = MIXER_INVALID_CHANNEL;
+            nuAuStlSndPlayerSndStop(channel, 0);
+            return true;
+        }
+    }
+
     return false;
 }
 
