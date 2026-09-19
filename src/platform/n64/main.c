@@ -98,7 +98,7 @@ void mainproc(void)
         debug_printf("mixer_init failed\n");
     }
     input_init();
-    reset_simulation_time();
+    timing_reset();
     storage_available();
 
     nuGfxFuncSet((NUGfxFunc)render_logo);

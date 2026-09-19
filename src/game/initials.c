@@ -60,7 +60,7 @@ static void handle_input(void)
             }
 
             initials[current_initial] = (char)(i + 'A');
-            reset_simulation_time();
+            timing_reset();
             current_initial++;
             if (current_initial < 3) {
                 initials[current_initial] = '_';
@@ -98,7 +98,7 @@ static void handle_input(void)
 
     if (current_initial > 0 && input_triggered(input_backspace)) {
         initials[--current_initial] = '_';
-        reset_simulation_time();
+        timing_reset();
         for (int i = current_initial + 1; i < 3; ++i) {
             initials[i] = ' ';
         }
@@ -169,9 +169,8 @@ void initials_loop(bool draw)
 
     handle_input();
 
-    produce_simulation_time();
-    if (maybe_consume_simulation_time(500)) {
-        reset_simulation_time();
+    if (timing_advance(500u)) {
+        timing_reset();
         if (initials[current_initial] == ' ') {
             initials[current_initial] = '_';
         } else if (initials[current_initial] == '_') {

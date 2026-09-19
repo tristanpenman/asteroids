@@ -16,8 +16,6 @@
 
 #define NUM_ASTEROID_SHAPES 4
 #define NUM_ASTEROIDS 5
-#define TIME_STEP_MILLIS 10
-
 static bool enter_down;
 static bool h_down;
 static struct asteroid asteroids[NUM_ASTEROIDS];
@@ -137,10 +135,10 @@ void titlescreen_loop(bool draw)
 #endif
 
     // Update and consume unused simulation time
-    produce_simulation_time();
-    while (maybe_consume_simulation_time(TIME_STEP_MILLIS)) {
+    timing_advance(TIMING_STEP_MILLIS);
+    while (timing_consume(TIMING_STEP_MILLIS)) {
         for (int i = 0; i < NUM_ASTEROIDS; i++) {
-            asteroid_update(&asteroids[i], TIME_STEP_MILLIS / 1000.f);
+            asteroid_update(&asteroids[i], TIMING_STEP_MILLIS / 1000.f);
         }
     }
 
@@ -149,7 +147,7 @@ void titlescreen_loop(bool draw)
     }
 
     // Unused simulation time, used to smooth animation
-    residual = (float) residual_simulation_time() / 1000.f;
+    residual = (float)timing_residual() / 1000.f;
     canvas_start_drawing(true);
 
     for (int i = 0; i < NUM_ASTEROIDS; i++) {

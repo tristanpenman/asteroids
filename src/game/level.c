@@ -28,9 +28,6 @@
 // how close objects need to be before performing collision detection
 #define COLLISION_THRESHOLD 0.1f
 
-// number of milliseconds that should be simulated in each timestep
-#define TIME_STEP_MILLIS 10
-
 extern int explosion_channel;
 extern int phaser_channel;
 extern int thruster_channel;
@@ -481,7 +478,7 @@ static void level_draw(void)
     struct vec_2d position;
     struct vec_2d scale;
 
-    const float residual = (float)residual_simulation_time() / 1000.f;
+    const float residual = (float)timing_residual() / 1000.f;
 
 #ifdef DEBUG
     char debug[100];
@@ -554,9 +551,9 @@ static void level_update(void)
         return;
     }
 
-    produce_simulation_time();
-    while (maybe_consume_simulation_time(TIME_STEP_MILLIS)) {
-        const float factor = (float)(TIME_STEP_MILLIS) / 1000.f;
+    timing_advance(TIMING_STEP_MILLIS);
+    while (timing_consume(TIMING_STEP_MILLIS)) {
+        const float factor = (float)TIMING_STEP_MILLIS / 1000.f;
 
         update_player(factor);
 

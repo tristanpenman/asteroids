@@ -36,9 +36,9 @@ void transition_loop(bool draw)
 
     input_update();
 
-    produce_simulation_time();
-    residual = residual_simulation_time();
-    while (maybe_consume_simulation_time(residual)) {
+    timing_advance(1u);
+    residual = timing_residual();
+    if (timing_consume(residual)) {
         elapsed += (float) residual;
     }
 

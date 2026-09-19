@@ -2,17 +2,18 @@
 
 static uint32_t simulation_time;
 
-void reset_simulation_time(void)
+void timing_reset(void)
 {
     simulation_time = 0;
 }
 
-void produce_simulation_time(void)
+bool timing_advance(uint32_t millis)
 {
-    simulation_time += 1000 / 60;
+    simulation_time += 1000u / 60u;
+    return millis > 0 && millis <= simulation_time;
 }
 
-bool maybe_consume_simulation_time(uint32_t millis)
+bool timing_consume(uint32_t millis)
 {
     if (millis == 0 || millis > simulation_time) {
         return false;
@@ -22,7 +23,7 @@ bool maybe_consume_simulation_time(uint32_t millis)
     return true;
 }
 
-uint32_t residual_simulation_time(void)
+uint32_t timing_residual(void)
 {
     return simulation_time;
 }

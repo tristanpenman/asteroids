@@ -23,7 +23,7 @@ int main(int argc, char **argv)
     }
 
     input_init();
-    reset_simulation_time();
+    timing_reset();
     mixer_init(MIXER_DEFAULT);
 
     /* Audio and storage remain disabled until their platform backends exist. */

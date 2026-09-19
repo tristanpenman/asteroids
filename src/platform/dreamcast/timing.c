@@ -2,18 +2,18 @@
 
 #include "timing.h"
 
-#define MAX_FRAME_MILLIS 100
+#define MAX_FRAME_MILLIS 16u
 
 static uint32_t simulation_time;
 static uint64_t previous_millis;
 
-void reset_simulation_time(void)
+void timing_reset(void)
 {
     simulation_time = 0;
     previous_millis = timer_ms_gettime64();
 }
 
-void produce_simulation_time(void)
+bool timing_advance(uint32_t millis)
 {
     uint64_t now = timer_ms_gettime64();
     uint64_t elapsed = now - previous_millis;
@@ -23,9 +23,10 @@ void produce_simulation_time(void)
         elapsed = MAX_FRAME_MILLIS;
     }
     simulation_time += (uint32_t)elapsed;
+    return millis > 0 && millis <= simulation_time;
 }
 
-bool maybe_consume_simulation_time(uint32_t millis)
+bool timing_consume(uint32_t millis)
 {
     if (millis == 0 || millis > simulation_time) {
         return false;
@@ -35,7 +36,7 @@ bool maybe_consume_simulation_time(uint32_t millis)
     return true;
 }
 
-uint32_t residual_simulation_time(void)
+uint32_t timing_residual(void)
 {
     return simulation_time;
 }

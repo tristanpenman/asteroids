@@ -7,9 +7,8 @@
 #include "timing.h"
 #include "vec.h"
 
+#define MOVE_SPEED 0.1f
 #define NUM_ASTEROID_SHAPES 4
-#define TIME_STEP_MILLIS 10
-
 static int asteroid_shape_ids[NUM_ASTEROID_SHAPES];
 static int box_shape_id;
 
@@ -111,22 +110,24 @@ void sandbox_loop(bool draw)
     }
 
     // Update and consume unused simulation time
-    produce_simulation_time();
-    while (maybe_consume_simulation_time(TIME_STEP_MILLIS)) {
+    timing_advance(TIMING_STEP_MILLIS);
+    while (timing_consume(TIMING_STEP_MILLIS)) {
+        const float movement = MOVE_SPEED * (float)TIMING_STEP_MILLIS / 1000.f;
+
         if (move_left) {
-            pos1.x -= 0.001f;
+            pos1.x -= movement;
         }
 
         if (move_right) {
-            pos1.x += 0.001f;
+            pos1.x += movement;
         }
 
         if (move_up) {
-            pos1.y -= 0.001f;
+            pos1.y -= movement;
         }
 
         if (move_down) {
-            pos1.y += 0.001f;
+            pos1.y += movement;
         }
 
         collision = collision_test_shapes(
