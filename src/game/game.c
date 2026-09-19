@@ -78,11 +78,11 @@ void game_play(bool sandbox)
 {
     if (sandbox) {
         sandbox_init();
-        set_main_loop(sandbox_loop);
+        loop_set_main(sandbox_loop);
     } else {
         titlescreen_init();
-        set_main_loop(titlescreen_loop);
+        loop_set_main(titlescreen_loop);
     }
 
-    run_main_loop();
+    loop_run();
 }

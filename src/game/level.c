@@ -184,11 +184,11 @@ static void update_player(float factor)
 #ifndef __EMSCRIPTEN__
             } else if (highscores_check(player.score)) {
                 initials_init(player.score);
-                set_main_loop(initials_loop);
+                loop_set_main(initials_loop);
 #endif
             } else {
                 gameover_init();
-                set_main_loop(gameover_loop);
+                loop_set_main(gameover_loop);
             }
         }
     }
@@ -550,7 +550,7 @@ static void level_update(void)
 
     if (input_active(input_escape)) {
         titlescreen_init();
-        set_main_loop(titlescreen_loop);
+        loop_set_main(titlescreen_loop);
         return;
     }
 
@@ -616,7 +616,7 @@ static void level_update(void)
 
         if (next_level_countdown <= 0.f) {
             transition_init(level + 1, player.lives, player.score);
-            set_main_loop(transition_loop);
+            loop_set_main(transition_loop);
         }
 
         update_explosions(explosions, MAX_EXPLOSIONS, factor);

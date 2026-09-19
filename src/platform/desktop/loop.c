@@ -37,14 +37,14 @@ static void enscripten_main_loop(void)
  *
  *****************************************************************************/
 
-void set_main_loop(main_loop_fn_t new_main_loop)
+void loop_set_main(main_loop_fn_t new_main_loop)
 {
     assert(exit_loop != main_loop);
     assert(NULL != new_main_loop);
     main_loop = new_main_loop;
 }
 
-void run_main_loop(void)
+void loop_run(void)
 {
     assert(NULL != main_loop);
     assert(exit_loop != main_loop);
@@ -58,7 +58,7 @@ void run_main_loop(void)
 #endif
 }
 
-void cancel_main_loop(int new_exit_code)
+void loop_cancel(int new_exit_code)
 {
     assert(exit_loop != main_loop);
     main_loop = exit_loop;

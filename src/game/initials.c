@@ -49,7 +49,7 @@ static void handle_input(void)
 
     if (input_triggered(input_escape)) {
         titlescreen_init();
-        set_main_loop(titlescreen_loop);
+        loop_set_main(titlescreen_loop);
         return;
     }
 
@@ -114,7 +114,7 @@ static void handle_input(void)
         highscores_insert(score, initials);
         highscores_save();
         titlescreen_init();
-        set_main_loop(titlescreen_loop);
+        loop_set_main(titlescreen_loop);
         return;
     }
 }

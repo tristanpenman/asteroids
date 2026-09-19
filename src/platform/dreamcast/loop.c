@@ -9,13 +9,13 @@ static main_loop_fn_t main_loop;
 static bool running;
 static int requested_exit_code;
 
-void set_main_loop(main_loop_fn_t new_main_loop)
+void loop_set_main(main_loop_fn_t new_main_loop)
 {
     assert(new_main_loop != NULL);
     main_loop = new_main_loop;
 }
 
-void run_main_loop(void)
+void loop_run(void)
 {
     assert(main_loop != NULL);
     running = true;
@@ -27,7 +27,7 @@ void run_main_loop(void)
     }
 }
 
-void cancel_main_loop(int exit_code)
+void loop_cancel(int exit_code)
 {
     requested_exit_code = exit_code;
     running = false;

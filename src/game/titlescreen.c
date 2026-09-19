@@ -113,7 +113,7 @@ void titlescreen_loop(bool draw)
         h_down = true;
     } else if (h_down) {
         leaderboard_init();
-        set_main_loop(leaderboard_loop);
+        loop_set_main(leaderboard_loop);
         return;
     } else {
         h_down = false;
@@ -124,7 +124,7 @@ void titlescreen_loop(bool draw)
         enter_down = true;
     } else if (enter_down) {
         transition_init(1, 3, 0);
-        set_main_loop(transition_loop);
+        loop_set_main(transition_loop);
         return;
     } else {
         enter_down = false;

@@ -10,15 +10,15 @@ typedef void (*main_loop_fn_t)(bool draw);
  *
  * @param  main_loop_fn  pointer to the function to be called
  */
-void set_main_loop(main_loop_fn_t main_loop_fn);
+void loop_set_main(main_loop_fn_t main_loop_fn);
 
 /**
  * Start running the main event loop
  *
- * Execution will continue until cancel_main_loop is called and the final
+ * Execution will continue until loop_cancel is called and the final
  * iteration is complete, at which point the program will terminate.
  */
-void run_main_loop(void);
+void loop_run(void);
 
 /**
  * Cancel next iteration of the event loop
@@ -28,6 +28,6 @@ void run_main_loop(void);
  *
  * @param exit_code exit code that be returned to OS when progrma terminates
  */
-void cancel_main_loop(int exit_code);
+void loop_cancel(int exit_code);
 
 #endif

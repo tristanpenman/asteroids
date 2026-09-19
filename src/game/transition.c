@@ -44,7 +44,7 @@ void transition_loop(bool draw)
 
     if (elapsed >= START_LEVEL_DELAY_MS) {
         level_init(level, lives, score);
-        set_main_loop(level_loop);
+        loop_set_main(level_loop);
         return;
     }
 

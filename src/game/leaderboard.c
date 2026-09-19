@@ -73,7 +73,7 @@ void leaderboard_loop(bool draw)
 
     if (input_active(input_return)) {
         titlescreen_init();
-        set_main_loop(titlescreen_loop);
+        loop_set_main(titlescreen_loop);
         return;
     }
 

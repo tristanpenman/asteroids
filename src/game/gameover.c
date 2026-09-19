@@ -40,7 +40,7 @@ void gameover_loop(bool draw)
 
     if (elapsed >= GAME_OVER_DELAY_MS) {
         titlescreen_init();
-        set_main_loop(titlescreen_loop);
+        loop_set_main(titlescreen_loop);
         return;
     }
 
