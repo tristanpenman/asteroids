@@ -539,16 +539,16 @@ static void level_update(void)
 
     collision_tests_per_frame = 0;
 
-    input_update();
-    input_read_joystick(&joystick_x, NULL);
-
-    if (input_active(input_escape)) {
-        titlescreen_init();
-        loop_set_main(titlescreen_loop);
-        return;
+    if (timing_advance(TIMING_STEP_MILLIS)) {
+        input_update();
+        input_read_joystick(&joystick_x, NULL);
+        if (input_active(input_escape)) {
+            titlescreen_init();
+            loop_set_main(titlescreen_loop);
+            return;
+        }
     }
 
-    timing_advance(TIMING_STEP_MILLIS);
     while (timing_consume(TIMING_STEP_MILLIS)) {
         const float factor = (float)TIMING_STEP_MILLIS / 1000.f;
 
