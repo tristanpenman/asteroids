@@ -9,6 +9,7 @@
 #include "defines.h"
 #include "draw.h"
 #include "entities.h"
+#include "game.h"
 #include "gameover.h"
 #include "highscores.h"
 #include "initials.h"
@@ -27,10 +28,6 @@
 
 // how close objects need to be before performing collision detection
 #define COLLISION_THRESHOLD 0.1f
-
-extern int explosion_channel;
-extern int phaser_channel;
-extern int thruster_channel;
 
 // level state
 static int asteroids_hit;
@@ -91,7 +88,8 @@ static int num_asteroids_for_level(int next_level)
 
 static void update_player(float factor)
 {
-    float s, d, rot = player.rot;
+    const float rot = player.rot;
+    float d;
     struct vec_2d *pos = &player.pos;
     struct vec_2d *vel = &player.vel;
     int spin = 0;
@@ -108,16 +106,16 @@ static void update_player(float factor)
         if (KS_DOWN == player.keys.up) {
             vel->x += sinf(rot) * SHIP_ACCELERATION * factor;
             vel->y -= cosf(rot) * SHIP_ACCELERATION * factor;
-            if (thruster_channel == -1) {
+            if (thruster_channel == MIXER_INVALID_CHANNEL) {
                 thruster_channel = mixer_play_sample(SOUND_THRUSTER);
             }
-        } else if (thruster_channel != -1) {
+        } else if (thruster_channel != MIXER_INVALID_CHANNEL) {
             mixer_stop_playing_on_channel(thruster_channel);
             thruster_channel = MIXER_INVALID_CHANNEL;
         }
     }
 
-    s = vec_2d_magnitude(vel);                    /* Calculate speed */
+    float s = vec_2d_magnitude(vel);
 
     if (s > MAX_SPEED) {                          /* Limit speed */
         s = MAX_SPEED;
@@ -231,7 +229,7 @@ static void check_fire_button(struct player *p, struct bullet *bb, unsigned int 
             vec_2d_normalise(&bb->vel);
             vec_2d_scale(&bb->vel, BULLET_SPEED);
 
-            if (phaser_channel > -1) {
+            if (phaser_channel > MIXER_INVALID_CHANNEL) {
                 mixer_stop_playing_on_channel(phaser_channel);
             }
 
@@ -390,7 +388,6 @@ static void check_collisions(void)
 {
     bool asteroid_hit = false;
     bool collision = false;
-    float asteroid_scale;
 
     // Check for asteroid collisions
     for (unsigned int j = 0; j < MAX_ASTEROIDS; j++) {
@@ -450,12 +447,12 @@ static void check_collisions(void)
             asteroids_hit++;
             explode_asteroid(asteroid, asteroids, explosions);
 
-            if (explosion_channel > -1) {
+            if (explosion_channel > MIXER_INVALID_CHANNEL) {
                 mixer_stop_playing_on_channel(explosion_channel);
             }
             explosion_channel = mixer_play_sample(SOUND_EXPLOSION);
 
-            asteroid_scale = asteroid->scale;
+            float asteroid_scale = asteroid->scale;
             if (asteroid_scale < 0.49f) {
                 update_score(100);
             } else if (asteroid_scale < 0.99f) {

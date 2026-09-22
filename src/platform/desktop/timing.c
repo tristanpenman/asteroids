@@ -16,14 +16,13 @@ void timing_reset(void)
 bool timing_advance(uint32_t millis)
 {
     const uint32_t now = SDL_GetTicks();
-    uint32_t elapsed;
 
     if (now < ticks) {
         simulation_time += UINT32_MAX - ticks;
         ticks = 0;
     }
 
-    elapsed = now - ticks;
+    uint32_t elapsed = now - ticks;
     if (elapsed > MAX_FRAME_MILLIS) {
         elapsed = MAX_FRAME_MILLIS;
     }

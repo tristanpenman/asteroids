@@ -48,11 +48,9 @@ static void gfx_update_viewport(void)
 
 void gfx_init(void)
 {
-    int i;
-
     nuGfxInit();
 
-    for (i = 0; i < GFX_FRAMEBUFFER_COUNT; ++i) {
+    for (int i = 0; i < GFX_FRAMEBUFFER_COUNT; ++i) {
         framebuffer_ptrs[i] = framebuffers[i];
     }
 

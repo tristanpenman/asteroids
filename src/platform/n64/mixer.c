@@ -75,8 +75,6 @@ int mixer_load_sample_from_file(const char *path)
 
 int mixer_play_sample(int sample)
 {
-    int channel;
-
     if (!initialized || sample < 0) {
         return MIXER_INVALID_CHANNEL;
     }
@@ -84,7 +82,7 @@ int mixer_play_sample(int sample)
     /* Retire completed handles before NuSystem has a chance to reuse one. */
     mixer_update();
 
-    channel = nuAuStlSndPlayerPlay(sample);
+    int channel = nuAuStlSndPlayerPlay(sample);
     if (channel == 0) {
         return MIXER_INVALID_CHANNEL;
     }

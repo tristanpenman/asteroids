@@ -37,7 +37,6 @@ static struct highscores scores;
 bool highscores_load(void)
 {
     char buffer[HIGHSCORES_BUFFER_SIZE];
-    int result;
 
     // clear highscores data structure
     memset(&scores, 0, sizeof(struct highscores));
@@ -46,7 +45,7 @@ bool highscores_load(void)
     }
 
     // attempt to load high scores
-    result = storage_read(HIGHSCORES_FILE, buffer, HIGHSCORES_BUFFER_SIZE);
+    const int result = storage_read(HIGHSCORES_FILE, buffer, HIGHSCORES_BUFFER_SIZE);
     if (result < STORAGE_OK) {
         if (result == STORAGE_ERR_OPEN_FILE) {
             debug_printf(" - high scores not available\n");
@@ -63,12 +62,11 @@ bool highscores_load(void)
 bool highscores_save(void)
 {
     char buffer[HIGHSCORES_BUFFER_SIZE];
-    int result;
 
     memset(buffer, 0, HIGHSCORES_BUFFER_SIZE);
     memcpy(buffer, &scores, sizeof(struct highscores));
 
-    result = storage_write(HIGHSCORES_FILE, buffer, HIGHSCORES_BUFFER_SIZE);
+    const int result = storage_write(HIGHSCORES_FILE, buffer, HIGHSCORES_BUFFER_SIZE);
     if (result < STORAGE_OK) {
         debug_printf(" - failed to write high scores: %d\n", result);
         return false;

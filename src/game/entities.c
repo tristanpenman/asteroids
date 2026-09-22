@@ -14,7 +14,6 @@
 
 float calculate_asteroid_radius(unsigned int shape)
 {
-    float r;
     float r_max = 0.0f;
 
     const float *vertices = asteroid_shape_data[shape].vertices;
@@ -22,7 +21,7 @@ float calculate_asteroid_radius(unsigned int shape)
     unsigned int n = asteroid_shape_data[shape].num_vertices;
 
     for (unsigned int i = 0; i < n * 2; i += 2) {
-        r = sqrtf(vertices[i] * vertices[i] + vertices[i + 1] * vertices[i + 1]);
+        const float r = sqrtf(vertices[i] * vertices[i] + vertices[i + 1] * vertices[i + 1]);
         if (r_max < r) {
             r_max = r;
         }
@@ -31,7 +30,7 @@ float calculate_asteroid_radius(unsigned int shape)
     return r_max;
 }
 
-void randomise_asteroid_position(struct asteroid *a)
+static void randomise_asteroid_position(struct asteroid *a)
 {
     float x;
     float y;

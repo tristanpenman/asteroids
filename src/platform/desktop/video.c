@@ -100,8 +100,6 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
     int inner_height;
     int new_width;
     int new_height;
-    int flags;
-    int sdl_gl_doublebuffer;
 
     if (0 > SDL_InitSubSystem(SDL_INIT_VIDEO)) {
         fprintf(stderr, "SDL_InitSubSystem failed: %s\n", SDL_GetError());
@@ -141,7 +139,7 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
 
     debug_printf("new area = (%d, %d)\n", new_width, new_height);
 
-    flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+    int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
     if (fullscreen == true) {
         flags |= SDL_WINDOW_FULLSCREEN;
     }
@@ -178,7 +176,7 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
         return false;
     }
 
-    sdl_gl_doublebuffer = -1;
+    int sdl_gl_doublebuffer = -1;
     if (0 > SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &sdl_gl_doublebuffer)) {
         fprintf(stderr, "SDL_GL_GetAttribute failed: %s\n", SDL_GetError());
         return false;
@@ -221,13 +219,8 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
 
 void video_clear(void)
 {
-#ifdef __EMSCRIPTEN__
-    int swap_interval;
-#endif
     GLfloat viewport_width;
     GLfloat viewport_height;
-    GLfloat x;
-    GLfloat y;
 
     const GLfloat ratio = (GLfloat)logical_height / (GLfloat)logical_width;
 
@@ -237,7 +230,7 @@ void video_clear(void)
     // Can't call SDL_GL_SetSwapInterval until we're in Emscripten's main loop, and even then,
     // calling it repeatedly will cause Emscripten to produce an excessive number of warning
     // messages about using requestAnimationFrame for the main loop.
-    swap_interval = SDL_GL_GetSwapInterval();
+    int swap_interval = SDL_GL_GetSwapInterval();
     if (swap_interval != 0) {
         SDL_GL_SetSwapInterval(0);
     }
@@ -283,8 +276,8 @@ void video_clear(void)
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Playable area
-    x = (canvas_width - viewport_width) / 2.f;
-    y = (canvas_height - viewport_height) / 2.f;
+    GLfloat x = (canvas_width - viewport_width) / 2.f;
+    GLfloat y = (canvas_height - viewport_height) / 2.f;
     glScissor((GLint) x, (GLint) y, (GLsizei) viewport_width, (GLsizei) viewport_height);
     glViewport((GLint) x, (GLint) y, (GLsizei) viewport_width, (GLsizei) viewport_height);
 

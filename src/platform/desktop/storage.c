@@ -19,28 +19,26 @@ int storage_read(const char *filename, char *buffer, int read_size)
     return STORAGE_ERR_NOT_AVAILABLE;
 #endif
 
-    FILE *f;
-    size_t sz;
-
     if (read_size % 32 != 0) {
         debug_printf("Warning: for maximum compatibility, read size should be a multiple of 32");
     }
 
     memset(buffer, 0, read_size);
 
-    f = fopen(filename, "rb");
+    FILE *f = fopen(filename, "rb");
     if (!f) {
         return STORAGE_ERR_OPEN_FILE;
     }
 
-    sz = fread(buffer, 1, read_size, f);
-    fclose(f);
+    size_t sz = fread(buffer, 1, read_size, f);
+    const bool read_failed = ferror(f) != 0;
+    const int close_result = fclose(f);
 
-    if (sz < 0) {
+    if (read_failed || close_result != 0) {
         return STORAGE_ERR_READ_FILE;
     }
 
-    return sz;
+    return (int)sz;
 }
 
 int storage_write(const char *filename, const char *buffer, int write_size)
@@ -49,24 +47,22 @@ int storage_write(const char *filename, const char *buffer, int write_size)
     return STORAGE_ERR_NOT_AVAILABLE;
 #endif
 
-    FILE *f;
-    size_t sz;
-
     if (write_size % 32 != 0) {
         debug_printf("Warning: for maximum compatibility, write size should be a multiple of 32");
     }
 
-    f = fopen(filename, "wb");
+    FILE *f = fopen(filename, "wb");
     if (!f) {
         return STORAGE_ERR_OPEN_FILE;
     }
 
-    sz = fwrite(buffer, 1, write_size, f);
-    fclose(f);
+    size_t sz = fwrite(buffer, 1, write_size, f);
+    const int close_result = fclose(f);
 
-    if (sz != write_size) {
-        debug_printf("fwrite write (%d) != expected (%d)\n", sz, write_size);
-        return STORAGE_ERR_READ_FILE;
+    if (sz != (size_t)write_size || close_result != 0) {
+        debug_printf("storage write failed: wrote %zu of %d bytes, fclose returned %d\n",
+            sz, write_size, close_result);
+        return STORAGE_ERR_WRITE_FILE;
     }
 
     return STORAGE_OK;

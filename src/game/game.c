@@ -12,7 +12,7 @@
 
 #define MAX_SAMPLES 20
 
-static const char *AUDIO_FILES[] = {
+static const char *const audio_files[] = {
     "assets/beat1.wav",
     "assets/beat2.wav",
     "assets/explosion.wav",
@@ -20,19 +20,19 @@ static const char *AUDIO_FILES[] = {
     "assets/thruster.wav"
 };
 
-static const int NUM_SAMPLES = sizeof(AUDIO_FILES) / sizeof(AUDIO_FILES[0]);
+static const int num_samples = sizeof(audio_files) / sizeof(audio_files[0]);
 
 static int samples[MAX_SAMPLES];
 
-int explosion_channel = -1;
-int phaser_channel = -1;
-int thruster_channel = -1;
+int explosion_channel = MIXER_INVALID_CHANNEL;
+int phaser_channel = MIXER_INVALID_CHANNEL;
+int thruster_channel = MIXER_INVALID_CHANNEL;
 
 static bool load_samples(void)
 {
     memset(samples, 0, sizeof(int) * MAX_SAMPLES);
-    for (int i = 0; i < NUM_SAMPLES; ++i) {
-        samples[i] = mixer_load_sample_from_file(AUDIO_FILES[i]);
+    for (int i = 0; i < num_samples; ++i) {
+        samples[i] = mixer_load_sample_from_file(audio_files[i]);
         if (MIXER_INVALID_SAMPLE == samples[i]) {
             return false;
         }
@@ -43,11 +43,11 @@ static bool load_samples(void)
 static void mixer_channel_complete(int channel)
 {
     if (channel == explosion_channel) {
-        explosion_channel = -1;
+        explosion_channel = MIXER_INVALID_CHANNEL;
     } else if (channel == phaser_channel) {
-        phaser_channel = -1;
+        phaser_channel = MIXER_INVALID_CHANNEL;
     } else if (channel == thruster_channel) {
-        thruster_channel = -1;
+        thruster_channel = MIXER_INVALID_CHANNEL;
     }
 }
 

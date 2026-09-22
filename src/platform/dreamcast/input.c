@@ -14,12 +14,10 @@ void input_init(void)
 
 void input_reset(void)
 {
-    int i;
-
     num_handles = 0;
     memset(active, 0, sizeof(active));
     memset(previous, 0, sizeof(previous));
-    for (i = 0; i < __INPUT__COUNT; ++i) {
+    for (int i = 0; i < __INPUT__COUNT; ++i) {
         mappings[i] = INPUT_INVALID_HANDLE;
     }
 }

@@ -1,9 +1,11 @@
-#include <nusys.h>
 #include <string.h>
+
+#include <nusys.h>
 
 #include "input.h"
 
-struct input_check {
+struct input_check
+{
     enum input input;
     int bitmask;
 };
@@ -55,8 +57,6 @@ void input_init(void)
 
 void input_reset(void)
 {
-    int i;
-
     num_handles = 0;
     num_mappings = 0;
     previous_buttons = 0;
@@ -64,22 +64,20 @@ void input_reset(void)
     memset(active, 0, sizeof(active));
     memset(triggered, 0, sizeof(triggered));
 
-    for (i = 0; i < __INPUT__COUNT; ++i) {
+    for (int i = 0; i < __INPUT__COUNT; ++i) {
         mappings[i] = INPUT_INVALID_HANDLE;
     }
 }
 
 void input_update(void)
 {
-    int i;
-
-    for (i = 0; i < num_handles; ++i) {
+    for (int i = 0; i < num_handles; ++i) {
         triggered[i] = false;
     }
 
     nuContDataGetEx(controller_data, 0);
 
-    for (i = 0; i < num_mappings; ++i) {
+    for (int i = 0; i < num_mappings; ++i) {
         input_check_button(checklist[i].input, checklist[i].bitmask);
     }
 

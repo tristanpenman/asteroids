@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -66,23 +67,16 @@ void mixer_set_channel_completion_handler(void (*callback)(int))
 
 int mixer_load_sample_from_file(const char *path)
 {
-    long sz;
-    unsigned long result;
-    FILE *f;
-    void *buffer;
-    Mix_Chunk **realloc_samples;
-    SDL_RWops *rw;
-
-    static const size_t PTR_SIZE = sizeof(Mix_Chunk *);
+    static const size_t ptr_size = sizeof(Mix_Chunk *);
 
     // Do not attempt to allocate more than size_t type can allow
-    if (num_samples * PTR_SIZE > SIZE_MAX - PTR_SIZE) {
+    if (num_samples * ptr_size > SIZE_MAX - ptr_size) {
         fprintf(stderr, "Maximum number of samples (%d) reached while loading audio file (%s)",
                 num_samples, path);
         return MIXER_INVALID_SAMPLE;
     }
 
-    realloc_samples = realloc(samples, (num_samples + 1) * PTR_SIZE);
+    Mix_Chunk **realloc_samples = realloc(samples, (num_samples + 1) * ptr_size);
     if (NULL == realloc_samples) {
         fprintf(stderr, "realloc failed while loading audio file (%s): %s", path, strerror(errno));
         return MIXER_INVALID_SAMPLE;
@@ -90,26 +84,43 @@ int mixer_load_sample_from_file(const char *path)
         samples = realloc_samples;
     }
 
-    f = fopen(path, "rb");
+    FILE *f = fopen(path, "rb");
     if (NULL == f) {
         fprintf(stderr, "Failed to open file (%s): %s\n", path, strerror(errno));
         return MIXER_INVALID_SAMPLE;
     }
 
     // Read sample
-    fseek(f, 0L, SEEK_END);
-    sz = ftell(f);
-    fseek(f, 0L, SEEK_SET);
-    buffer = malloc(sz);
-    result = fread(buffer, sz, 1, f);
+    if (fseek(f, 0L, SEEK_END) != 0) {
+        fprintf(stderr, "Failed to seek audio file (%s)\n", path);
+        fclose(f);
+        return MIXER_INVALID_SAMPLE;
+    }
+
+    const long sz = ftell(f);
+    if (sz <= 0 || sz > INT_MAX || fseek(f, 0L, SEEK_SET) != 0) {
+        fprintf(stderr, "Invalid or unreadable audio file (%s)\n", path);
+        fclose(f);
+        return MIXER_INVALID_SAMPLE;
+    }
+
+    void *buffer = malloc((size_t)sz);
+    if (buffer == NULL) {
+        fprintf(stderr, "Failed to allocate audio buffer for (%s)\n", path);
+        fclose(f);
+        return MIXER_INVALID_SAMPLE;
+    }
+
+    const size_t result = fread(buffer, (size_t)sz, 1, f);
     fclose(f);
     if (result != 1) {
+        free(buffer);
         fprintf(stderr, "Failed to read sample from file (%s)\n", path);
         return MIXER_INVALID_SAMPLE;
     }
 
     // Load sample from temporary buffer, to ensure that Web Audio API is used in Emscripten
-    rw = SDL_RWFromMem(buffer, (int)sz);
+    SDL_RWops *rw = SDL_RWFromMem(buffer, (int)sz);
     if (NULL == rw) {
         free(buffer);
         fprintf(stderr, "SDL_RWFromMem failed while loading audio file (%s): %s\n", path,
@@ -140,7 +151,7 @@ int mixer_load_sample_from_file(const char *path)
 
 int mixer_play_sample(const int sample)
 {
-    static const int ANY_CHANNEL = -1;
+    static const int any_channel = -1;
 
     // Check that sample exists
     if (sample > num_samples - 1 || NULL == samples[sample]) {
@@ -148,7 +159,7 @@ int mixer_play_sample(const int sample)
     }
 
     // Play on first available channel
-    return Mix_PlayChannel(ANY_CHANNEL, samples[sample], 0);
+    return Mix_PlayChannel(any_channel, samples[sample], 0);
 }
 
 bool mixer_stop_playing_on_channel(int channel)
@@ -166,8 +177,8 @@ bool mixer_stop_playing_on_channel(int channel)
 
 void mixer_cleanup(void)
 {
-    static const int ALL_CHANNELS = -1;
-    Mix_HaltChannel(ALL_CHANNELS);
+    static const int all_channels = -1;
+    Mix_HaltChannel(all_channels);
 
     if (NULL != samples) {
         for (int i = 0; i < num_samples; ++i) {

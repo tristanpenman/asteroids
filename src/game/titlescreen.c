@@ -102,8 +102,6 @@ bool titlescreen_init(void)
 
 void titlescreen_loop(bool draw)
 {
-    float residual;
-
     input_update();
 
 #ifndef ASTEROIDS_PLATFORM_N64
@@ -147,7 +145,7 @@ void titlescreen_loop(bool draw)
     }
 
     // Unused simulation time, used to smooth animation
-    residual = (float)timing_residual() / 1000.f;
+    float residual = (float)timing_residual() / 1000.f;
     canvas_start_drawing(true);
 
     for (int i = 0; i < NUM_ASTEROIDS; i++) {

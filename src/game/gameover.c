@@ -28,12 +28,10 @@ void gameover_init(void)
 
 void gameover_loop(bool draw)
 {
-    uint32_t residual;
-
     input_update();
 
     timing_advance(1u);
-    residual = timing_residual();
+    uint32_t residual = timing_residual();
     if (timing_consume(residual)) {
         elapsed += (float) residual;
     }

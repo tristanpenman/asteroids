@@ -16,7 +16,8 @@
 #define GFX_GLIST_LEN 2048
 #define GFX_GLIST_COUNT 15
 
-struct gfx_transform {
+struct gfx_transform
+{
     Mtx modeling;
     Mtx rotation;
     Mtx scale;

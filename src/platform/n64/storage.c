@@ -1,5 +1,6 @@
-#include <nusys.h>
 #include <string.h>
+
+#include <nusys.h>
 
 #include "storage.h"
 
@@ -11,8 +12,6 @@ static NUContPakFile pak_file;
 
 static bool open_controller_pak(void)
 {
-    s32 result;
-
     nuContPakCodeSet(COMPANY_CODE, GAME_CODE);
     nuContQueryRead();
     nuContDataReadStart();
@@ -31,7 +30,7 @@ static bool open_controller_pak(void)
         return false;
     }
 
-    result = nuContPakRepairId(&pak_file);
+    s32 result = nuContPakRepairId(&pak_file);
     if (result != PFS_ERR_NEW_PACK) {
         return false;
     }
