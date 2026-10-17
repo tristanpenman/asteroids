@@ -1,6 +1,9 @@
+#include <stdlib.h>
+
 #include <SDL.h>
 
 #include "input.h"
+#include "loop.h"
 
 // Number of registered input handles
 static int num_handles = 0;
@@ -123,7 +126,8 @@ void input_update(void)
             input_handle_event(event.key.keysym.sym, false);
             break;
         case SDL_QUIT:
-            exit(EXIT_SUCCESS);
+            loop_cancel(EXIT_SUCCESS);
+            return;
         }
     }
 }

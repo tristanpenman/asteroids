@@ -17,10 +17,11 @@ void loop_set_main(main_loop_fn_t new_main_loop)
     main_loop = new_main_loop;
 }
 
-void loop_run(void)
+int loop_run(void)
 {
     nuGfxFuncSet((NUGfxFunc)nusys_loop);
     nuGfxDisplayOn();
+    return 0;
 }
 
 void loop_cancel(int exit_code)

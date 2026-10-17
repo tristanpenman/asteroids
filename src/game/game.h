@@ -8,7 +8,7 @@ extern int phaser_channel;
 extern int thruster_channel;
 
 bool game_init(bool silent);
-void game_play(bool sandbox);
+int game_play(bool sandbox);
 void game_cleanup(void);
 
 #endif

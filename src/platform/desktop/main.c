@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -12,6 +13,7 @@
 #include "game.h"
 #include "highscores.h"
 #include "input.h"
+#include "loop.h"
 #include "mixer.h"
 #include "options.h"
 #include "storage.h"
@@ -22,13 +24,30 @@
 #define SANDBOX_FLAG "--sandbox"
 #define SILENT_FLAG "--silent"
 
-void cleanup(void)
+static bool sdl_initialized;
+static bool video_initialized;
+static bool mixer_initialized;
+static bool game_initialized;
+
+static void cleanup(void)
 {
     debug_printf("cleanup...\n");
-    game_cleanup();
-    mixer_cleanup();
-    video_cleanup();
-    SDL_Quit();
+    if (game_initialized) {
+        game_cleanup();
+        game_initialized = false;
+    }
+    if (mixer_initialized) {
+        mixer_cleanup();
+        mixer_initialized = false;
+    }
+    if (video_initialized) {
+        video_cleanup();
+        video_initialized = false;
+    }
+    if (sdl_initialized) {
+        SDL_Quit();
+        sdl_initialized = false;
+    }
 }
 
 void help(void)
@@ -38,7 +57,6 @@ void help(void)
     printf("  " HELP_FLAG "\n");
     printf("  " SANDBOX_FLAG "\n");
     printf("  " SILENT_FLAG "\n");
-    exit(0);
 }
 
 int main(int argc, char **argv)
@@ -46,6 +64,8 @@ int main(int argc, char **argv)
     bool fullscreen = false;
     bool sandbox = false;
     bool silent = false;
+    bool show_help = false;
+    int exit_code = EXIT_SUCCESS;
 
     debug_init();
 
@@ -54,7 +74,7 @@ int main(int argc, char **argv)
             if (strcmp(argv[i], FULLSCREEN_FLAG) == 0) {
                 fullscreen = true;
             } else if (strcmp(argv[i], HELP_FLAG) == 0) {
-                help();
+                show_help = true;
             } else if (strcmp(argv[i], SANDBOX_FLAG) == 0) {
                 sandbox = true;
             } else if (strcmp(argv[i], SILENT_FLAG) == 0) {
@@ -65,7 +85,17 @@ int main(int argc, char **argv)
         }
     }
 
-    SDL_Init(0);
+    if (show_help) {
+        help();
+        return EXIT_SUCCESS;
+    }
+
+    sdl_initialized = true;
+    if (SDL_Init(0) < 0) {
+        fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
+        exit_code = EXIT_FAILURE;
+        goto shutdown;
+    }
 
     srand(SDL_GetTicks());
 
@@ -74,13 +104,16 @@ int main(int argc, char **argv)
 #endif
 
     debug_printf("video_init...\n");
+    video_initialized = true;
     if (false == video_init(LOGICAL_WIDTH_PX, LOGICAL_HEIGHT_PX, "Asteroids", fullscreen)) {
-        exit(1);
+        exit_code = EXIT_FAILURE;
+        goto shutdown;
     }
 
     if (!silent) {
         debug_printf("mixer_init...\n");
-        if (!mixer_init(MIXER_DEFAULT)) {
+        mixer_initialized = mixer_init(MIXER_DEFAULT);
+        if (!mixer_initialized) {
             debug_printf(" - mixer not available");
         }
     }
@@ -99,14 +132,18 @@ int main(int argc, char **argv)
     }
 
     debug_printf("game_init...\n");
+    game_initialized = true;
     if (false == game_init(silent)) {
-        exit(1);
+        exit_code = EXIT_FAILURE;
+        goto shutdown;
     }
 
     debug_printf("game_play...\n");
-    game_play(sandbox);
+    loop_set_exit_handler(cleanup);
+    exit_code = game_play(sandbox);
 
+shutdown:
     cleanup();
 
-    return 0;
+    return exit_code;
 }

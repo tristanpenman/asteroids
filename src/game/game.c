@@ -74,15 +74,17 @@ void game_cleanup(void)
     mixer_set_channel_completion_handler(NULL);
 }
 
-void game_play(bool sandbox)
+int game_play(bool sandbox)
 {
     if (sandbox) {
         sandbox_init();
         loop_set_main(sandbox_loop);
     } else {
-        titlescreen_init();
+        if (!titlescreen_init()) {
+            return 1;
+        }
         loop_set_main(titlescreen_loop);
     }
 
-    loop_run();
+    return loop_run();
 }

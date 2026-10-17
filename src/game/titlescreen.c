@@ -128,7 +128,7 @@ void titlescreen_loop(bool draw)
 
 #ifndef ASTEROIDS_PLATFORM_N64
     if (input_active(input_quit)) {
-        exit(EXIT_SUCCESS);
+        loop_cancel(EXIT_SUCCESS);
     }
 #endif
 
