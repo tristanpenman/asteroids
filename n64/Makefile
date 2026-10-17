@@ -84,18 +84,18 @@ default: $(ROM)
 clean:
 	$(RM) -r $(BUILD_DIR)
 
-$(BUILD_DIR)/%.o: %.c
+$(BUILD_DIR)/%.o: %.c n64/Makefile
 	@mkdir -p $(dir $@)
 	$(call print,Compiling:,$<,$@)
-	$(V)$(CC) -c $(CFLAGS) -MMD -MF $(@:.o=.d) -o $@ $<
+	$(V)$(CC) -c $(CFLAGS) -MMD -MP -MF $(@:.o=.d) -o $@ $<
 
-$(BUILD_DIR)/%.o: %.s
+$(BUILD_DIR)/%.o: %.s n64/Makefile
 	@mkdir -p $(dir $@)
 	$(call print,Assembling:,$<,$@)
 	$(V)$(CC) -c $(CFLAGS) $(foreach directory,$(INCLUDE_DIRS),-Wa,-I$(directory)) \
-		-x assembler-with-cpp -MMD -MF $(@:.o=.d) -o $@ $<
+		-x assembler-with-cpp -MMD -MP -MF $(@:.o=.d) -o $@ $<
 
-$(BUILD_DIR)/$(LD_SCRIPT): $(LD_SCRIPT_SOURCE)
+$(BUILD_DIR)/$(LD_SCRIPT): $(LD_SCRIPT_SOURCE) n64/Makefile
 	@mkdir -p $(dir $@)
 	$(call print,Preprocessing linker script:,$<,$@)
 	$(V)$(CPP) $(CPPFLAGS) -DBUILD_DIR=$(BUILD_DIR) -MMD -MP -MT $@ \
