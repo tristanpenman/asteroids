@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <limits.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,6 +19,7 @@ static Mix_Chunk **samples = NULL;
 
 // Number of non-NULL pointers in the `samples` array
 static int num_samples = 0;
+static int num_channels = 0;
 
 // Track whether audio device has already been created
 static bool audio_device_open = false;
@@ -35,21 +37,29 @@ bool mixer_init(int mixer_channels)
     static const int channels  = 1;
     static const int chunksize = 512;
 
+    if (mixer_channels < 0 && MIXER_DEFAULT != mixer_channels) {
+        return false;
+    }
+
     Mix_Init(0);
 
     if (false == audio_device_open) {
         if (0 > Mix_OpenAudio(frequency, format, channels, chunksize)) {
             fprintf(stderr, "Failed to open audio device: %s\n", Mix_GetError());
+            Mix_Quit();
             return false;
         }
 
         audio_device_open = true;
     }
 
-    if (MIXER_DEFAULT == mixer_channels) {
-        Mix_AllocateChannels(MIX_CHANNELS);
-    } else {
-        Mix_AllocateChannels(mixer_channels);
+    num_channels = Mix_AllocateChannels(
+        MIXER_DEFAULT == mixer_channels ? MIX_CHANNELS : mixer_channels);
+    if (num_channels <= 0 ||
+        (MIXER_DEFAULT != mixer_channels && num_channels != mixer_channels)) {
+        fprintf(stderr, "Failed to allocate %d mixer channels\n", mixer_channels);
+        mixer_cleanup();
+        return false;
     }
 
     return true;
@@ -69,8 +79,12 @@ int mixer_load_sample_from_file(const char *path)
 {
     static const size_t ptr_size = sizeof(Mix_Chunk *);
 
+    if (!audio_device_open || NULL == path || num_samples == INT_MAX) {
+        return MIXER_INVALID_SAMPLE;
+    }
+
     // Do not attempt to allocate more than size_t type can allow
-    if (num_samples * ptr_size > SIZE_MAX - ptr_size) {
+    if ((size_t)num_samples > SIZE_MAX / ptr_size - 1) {
         fprintf(stderr, "Maximum number of samples (%d) reached while loading audio file (%s)",
                 num_samples, path);
         return MIXER_INVALID_SAMPLE;
@@ -151,19 +165,22 @@ int mixer_load_sample_from_file(const char *path)
 
 int mixer_play_sample(const int sample)
 {
-    static const int any_channel = -1;
-
     // Check that sample exists
-    if (sample > num_samples - 1 || NULL == samples[sample]) {
+    if (!audio_device_open || sample < 0 || sample >= num_samples ||
+        NULL == samples[sample]) {
         return MIXER_INVALID_CHANNEL;
     }
 
     // Play on first available channel
-    return Mix_PlayChannel(any_channel, samples[sample], 0);
+    return Mix_PlayChannel(-1, samples[sample], 0);
 }
 
 bool mixer_stop_playing_on_channel(int channel)
 {
+    if (!audio_device_open || channel < 0 || channel >= num_channels) {
+        return false;
+    }
+
     if (0 == Mix_Playing(channel)) {
         // Channel is not currently playing
         return false;
@@ -178,7 +195,10 @@ bool mixer_stop_playing_on_channel(int channel)
 void mixer_cleanup(void)
 {
     static const int all_channels = -1;
-    Mix_HaltChannel(all_channels);
+    Mix_ChannelFinished(NULL);
+    if (audio_device_open) {
+        Mix_HaltChannel(all_channels);
+    }
 
     if (NULL != samples) {
         for (int i = 0; i < num_samples; ++i) {
@@ -191,9 +211,13 @@ void mixer_cleanup(void)
         free(samples);
         samples = NULL;
     }
+    num_samples = 0;
+    num_channels = 0;
 
-    Mix_CloseAudio();
-    audio_device_open = false;
+    if (audio_device_open) {
+        Mix_CloseAudio();
+        audio_device_open = false;
+    }
 
     Mix_Quit();
 }

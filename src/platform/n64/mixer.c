@@ -1,3 +1,5 @@
+#include <limits.h>
+#include <stddef.h>
 #include <string.h>
 
 #include <nusys.h>
@@ -19,6 +21,12 @@ bool mixer_init(int num_mixer_channels)
 
     if (num_mixer_channels != MIXER_DEFAULT &&
         num_mixer_channels != NU_AU_CHANNELS) {
+        return false;
+    }
+
+    if (AUDIO_POINTER_BANK_START == NULL || AUDIO_POINTER_BANK_SIZE == 0 ||
+        AUDIO_WAVE_BANK_START == NULL || AUDIO_EFFECTS_BANK_START == NULL ||
+        AUDIO_EFFECTS_BANK_SIZE == 0) {
         return false;
     }
 
@@ -70,6 +78,10 @@ void mixer_set_channel_completion_handler(void (*callback)(int channel))
 
 int mixer_load_sample_from_file(const char *path)
 {
+    (void)path;
+    if (!initialized || num_samples == INT_MAX) {
+        return MIXER_INVALID_SAMPLE;
+    }
     return num_samples++;
 }
 
@@ -105,6 +117,9 @@ bool mixer_stop_playing_on_channel(int channel)
         if (active_channels[i] == channel) {
             active_channels[i] = MIXER_INVALID_CHANNEL;
             nuAuStlSndPlayerSndStop(channel, 0);
+            if (channel_completion_handler != NULL) {
+                channel_completion_handler(channel);
+            }
             return true;
         }
     }
@@ -114,7 +129,13 @@ bool mixer_stop_playing_on_channel(int channel)
 
 void mixer_cleanup(void)
 {
+    channel_completion_handler = NULL;
     if (initialized) {
         nuAuStlSndPlayerStop(0);
+    }
+    initialized = false;
+    num_samples = 0;
+    for (int i = 0; i < NU_AU_CHANNELS; ++i) {
+        active_channels[i] = MIXER_INVALID_CHANNEL;
     }
 }
