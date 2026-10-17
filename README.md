@@ -42,33 +42,38 @@ The project's CMake configuration can also be used to generate Visual Studio pro
 
 Once those archives have been extracted, CMake GUI should be able to generate a VS solution using the default configuration.
 
-### Emscripten
+### Web
 
-The project can also be compiled to Javascript using Emscripten.
-
-```bash
-mkdir embuild
-cd embuild
-emcmake cmake ..
-emmake make
-emrun index.html
-```
-
-Emscripten builds are only supported on Linux and macOS systems.
-
-### Emscripten (via Docker)
-
-If you'd rather not install the Emscripten SDK on your host machine, you can build the web version using Docker. This uses the official `emscripten/emsdk` toolchain image, so the only dependency is Docker itself.
-
-Run the build script:
+Use `./scripts/build-web.sh` to build a distributable version of the game with the Dockerised Emscripten toolchain:
 
 ```bash
 ./scripts/build-web.sh
 ```
 
-The build artifacts (`index.html`, `asteroids.js`, `asteroids.wasm` and `asteroids.data`) are written to `embuild` and owned by the current user.
+The build output is written to `embuild` and owned by the current user. It contains `index.html`, `asteroids.js`, `asteroids.wasm`, `asteroids.data`, and the preloaded game assets.
 
-> **Note:** the `emscripten/emsdk` image is only published for `linux/amd64`, so on Apple Silicon (arm64) it runs under emulation. This is fine for building the game, though the build will be a little slower.
+The files must be loaded through an HTTP server rather than opening `embuild/index.html` directly. To build the game and serve it using the same Docker image, run:
+
+```bash
+./scripts/build-web.sh serve
+```
+
+Then open <http://localhost:8000> in a browser. Stop the server with <kbd>Ctrl</kbd>+<kbd>C</kbd>.
+
+The `emscripten/emsdk` image is published for `linux/amd64`, so it runs under emulation on Apple Silicon. This is suitable for building and serving the game, although compilation may be slower.
+
+Alternatively, with Emscripten installed locally, configure and build from the repository root:
+
+```bash
+emcmake cmake -S . -B embuild
+emmake cmake --build embuild
+```
+
+Run the local build with Emscripten's development server:
+
+```bash
+emrun embuild/index.html
+```
 
 ### Nintendo 64 (via Docker)
 

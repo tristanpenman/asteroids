@@ -10,6 +10,7 @@ services:
     working_dir: ${PWD}
     volumes:
       - .:${PWD}
+      - emscripten-cache:/emsdk/upstream/emscripten/cache
 
   n64:
     build:
@@ -25,3 +26,6 @@ services:
       dockerfile: Dockerfile.dreamcast
     volumes:
       - .:/source
+
+volumes:
+  emscripten-cache:
