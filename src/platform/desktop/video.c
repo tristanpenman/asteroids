@@ -19,11 +19,11 @@ EM_JS(int, browser_inner_height, (void), {
 })
 
 EM_JS(int, browser_canvas_width, (void), {
-    return canvas.width;
+    return document.getElementById('canvas').width;
 })
 
 EM_JS(int, browser_canvas_height, (void), {
-    return canvas.height;
+    return document.getElementById('canvas').height;
 })
 #endif
 
@@ -207,9 +207,11 @@ bool video_init(int width, int height, const char *title, bool fullscreen)
     glViewport(0, 0, canvas_width, canvas_height);
     glLineWidth(1.5f * pixel_density);
 
-    // Enable line smooting
+    // Enable line smoothing
+#ifndef __EMSCRIPTEN__
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+#endif
     glEnable(GL_LINE_SMOOTH);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
