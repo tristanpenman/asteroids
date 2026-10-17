@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 export COMPOSE_BAKE=true
 

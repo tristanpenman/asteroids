@@ -1,6 +1,5 @@
 #!/bin/bash
-
-set -e
+set -euo pipefail
 
 serve=false
 if [[ "${1:-}" == "serve" ]]; then
@@ -12,7 +11,7 @@ export COMPOSE_BAKE=true
 
 docker compose run --rm --remove-orphans --user "$(id -u):$(id -g)" \
     emscripten bash -c \
-    'rm -rf embuild && emcmake cmake -S . -B embuild && emmake make -C embuild -j"$(nproc)" "$@"' \
+    'rm -rf embuild && emcmake cmake -S . -B embuild && emmake cmake --build embuild --parallel "$(nproc)" -- "$@"' \
     -- "$@"
 
 if [[ "$serve" == true ]]; then
