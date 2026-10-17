@@ -16,8 +16,8 @@ GFX_UCODE_FILES := /usr/lib/n64/PR/rspboot.o \
 AUDIO_UCODE_FILES := /usr/lib/n64/PR/n_aspMain.o
 
 DEFINES := _FINALROM=1 F3DEX_GBI_2=1 NAUDIO N64 ASTEROIDS_PLATFORM_N64=1
-SRC_DIRS := src/platform/n64 src/platform/n64/unfloader n64/asm n64/assets
-GAME_C_FILES := \
+SRC_DIRS := src/platform src/platform/n64 src/platform/n64/unfloader n64/asm n64/assets
+SHARED_C_FILES := \
 	src/game/collision.c \
 	src/game/data.c \
 	src/game/draw.c \
@@ -31,8 +31,7 @@ GAME_C_FILES := \
 	src/game/text.c \
 	src/game/titlescreen.c \
 	src/game/transition.c \
-	src/game/util.c \
-	src/game/vec.c
+	src/game/util.c
 
 # Hide tool commands by default; use VERBOSE=1 to show them.
 VERBOSE ?= 0
@@ -43,7 +42,7 @@ endif
 # Colorize build status messages by default; use COLOR=0 to disable colors.
 COLOR ?= 1
 
-C_FILES := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c)) $(GAME_C_FILES)
+C_FILES := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c)) $(SHARED_C_FILES)
 S_FILES := $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.s))
 O_FILES := /usr/lib/n64/nusys/nusys_rom.o \
 	$(foreach file,$(C_FILES),$(BUILD_DIR)/$(file:.c=.o)) \

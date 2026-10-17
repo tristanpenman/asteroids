@@ -1,5 +1,5 @@
-#ifndef ASTEROIDS_GAME_VEC_H
-#define ASTEROIDS_GAME_VEC_H
+#ifndef ASTEROIDS_PLATFORM_VEC_H
+#define ASTEROIDS_PLATFORM_VEC_H
 
 struct vec_2d
 {
@@ -16,7 +16,6 @@ extern const struct vec_2d vec_2d_unit;
  * Zero vector (0.0, 0.0)
  */
 extern const struct vec_2d vec_2d_zero;
-
 
 /**
  * Calculate the dot product of a pair of 2D (float) vectors

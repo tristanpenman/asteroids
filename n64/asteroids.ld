@@ -35,8 +35,7 @@ SECTIONS
     {
         BUILD_DIR/n64/asm/entry.o(.start);
         /usr/lib/n64/nusys/nusys_rom.o(.text);
-        BUILD_DIR/src/platform/n64*.o(.text);
-        BUILD_DIR/src/game*.o(.text);
+        BUILD_DIR/src*.o(.text);
         */libultra_rom.a:*.o(.text);
         */libnustd.a:*.o(.text);
         */libnusys.a:*.o(.text);
@@ -54,8 +53,7 @@ SECTIONS
         /usr/lib/n64/PR/gspS2DEX2.fifo.o(.text);
 
         /usr/lib/n64/nusys/nusys_rom.o(.data*);
-        BUILD_DIR/src/platform/n64*.o(.data*);
-        BUILD_DIR/src/game*.o(.data*);
+        BUILD_DIR/src*.o(.data*);
         */libultra_rom.a:*.o(.data*);
         */libnustd.a:*.o(.data*);
         */libnusys.a:*.o(.data*);
@@ -72,8 +70,7 @@ SECTIONS
         /usr/lib/n64/PR/gspS2DEX2.fifo.o(.data*);
 
         /usr/lib/n64/nusys/nusys_rom.o(.*rodata*);
-        BUILD_DIR/src/platform/n64*.o(.*rodata*);
-        BUILD_DIR/src/game*.o(.*rodata*);
+        BUILD_DIR/src*.o(.*rodata*);
         */libultra_rom.a:*.o(.*rodata*);
         */libnustd.a:*.o(.*rodata*);
         */libnusys.a:*.o(.*rodata*);
@@ -89,12 +86,9 @@ SECTIONS
         /usr/lib/n64/nusys/nusys_rom.o(COMMON);
         /usr/lib/n64/nusys/nusys_rom.o(.scommon);
         /usr/lib/n64/nusys/nusys_rom.o(.*bss*);
-        BUILD_DIR/src/platform/n64*.o(COMMON);
-        BUILD_DIR/src/platform/n64*.o(.scommon);
-        BUILD_DIR/src/platform/n64*.o(.*bss*);
-        BUILD_DIR/src/game*.o(COMMON);
-        BUILD_DIR/src/game*.o(.scommon);
-        BUILD_DIR/src/game*.o(.*bss*);
+        BUILD_DIR/src*.o(COMMON);
+        BUILD_DIR/src*.o(.scommon);
+        BUILD_DIR/src*.o(.*bss*);
         */libultra_rom.a:*.o(COMMON);
         */libultra_rom.a:*.o(.scommon);
         */libultra_rom.a:*.o(.*bss*);

@@ -18,10 +18,10 @@ GAME_SRCS := \
 	src/game/text.c \
 	src/game/titlescreen.c \
 	src/game/transition.c \
-	src/game/util.c \
-	src/game/vec.c
+	src/game/util.c
 
 PLATFORM_SRCS := \
+	src/platform/vec.c \
 	src/platform/dreamcast/canvas.c \
 	src/platform/dreamcast/debug.c \
 	src/platform/dreamcast/input.c \

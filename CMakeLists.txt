@@ -70,10 +70,10 @@ set(GAME_SRCS
     src/game/titlescreen.c
     src/game/transition.c
     src/game/util.c
-    src/game/vec.c
 )
 
 set(DESKTOP_PLATFORM_SRCS
+    src/platform/vec.c
     src/platform/desktop/canvas.c
     src/platform/desktop/debug.c
     src/platform/desktop/input.c
