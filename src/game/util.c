@@ -22,11 +22,11 @@ float random_float(float low, float high)
 
 float wrap_angle(float angle)
 {
-    while (angle > 2 * M_PI) {
-        angle = angle - 2 * M_PI;
+    while (angle > 2.0f * PI) {
+        angle = angle - 2.0f * PI;
     }
     while (angle < 0.0f) {
-        angle = 2 * M_PI - angle;
+        angle = 2.0f * PI - angle;
     }
     return angle;
 }

@@ -48,13 +48,13 @@ static void randomise_asteroid_position(struct asteroid *a)
 
 void randomise_asteroid_rotation(struct asteroid *a)
 {
-    a->rot = random_float(0, 2.0f * (float) M_PI);
+    a->rot = random_float(0, 2.0f * PI);
 }
 
 void randomise_asteroid_velocity(struct asteroid *a, float vel_scale)
 {
     const float speed = random_float(ASTEROID_SPEED_MIN, ASTEROID_SPEED_MAX);
-    const float rot = random_float(0, 2.0f * (float) M_PI);
+    const float rot = random_float(0, 2.0f * PI);
 
     a->vel.x = sinf(rot) * speed * vel_scale;
     a->vel.y = 0 - cosf(rot) * speed * vel_scale;

@@ -73,7 +73,7 @@ static float clamp_colour(float colour)
 void draw_load_shapes(void)
 {
     for (unsigned int i = 0; i < EXPLOSION_PARTICLES; ++i) {
-        const float angle = 2.0f * (float)M_PI / (float)EXPLOSION_PARTICLES * (float)i;
+        const float angle = 2.0f * PI / (float)EXPLOSION_PARTICLES * (float)i;
         particle_vertices[i * 2] = sinf(angle);
         particle_vertices[i * 2 + 1] = -cosf(angle);
     }

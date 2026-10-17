@@ -295,8 +295,8 @@ static void explode_player(void)
     player.state = PS_EXPLODING;
 
     for (unsigned int i = 0; i < SHIP_EXPLOSION_SHARDS; i++) {
-        player.shards[i].angle = ((2 * M_PI) / (float) SHIP_EXPLOSION_SHARDS) * (float) i;
-        player.shards[i].rot = random_float(0 - (float) M_PI, (float) M_PI);
+        player.shards[i].angle = (2.0f * PI / (float)SHIP_EXPLOSION_SHARDS) * (float)i;
+        player.shards[i].rot = random_float(-PI, PI);
         if (player.shards[i].rot < 0.0f) {
             player.shards[i].dir = -1;
         } else {
