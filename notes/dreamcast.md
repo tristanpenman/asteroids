@@ -15,23 +15,14 @@ VMU LCD artwork, rumble, multiple controllers, network features, and a custom bo
 
 ## SDK and toolchain choice
 
-### Recommended: KallistiOS
+The project will use [KallistiOS (KOS)](https://github.com/KallistiOS/KallistiOS) and its `sh-elf` GCC/Newlib toolchain. KOS is the actively maintained, open-source, permissively licensed Dreamcast SDK. It already provides the services this port needs: PowerVR rendering, video modes, Maple controller and VMU access, AICA sound-effect playback, timers, an ISO9660 filesystem, `dcload`, and GDB support. It also supports the C99 used by this repository.
 
-Use [KallistiOS (KOS)](https://github.com/KallistiOS/KallistiOS) and its `sh-elf` GCC/Newlib toolchain. KOS is the actively maintained, open-source, permissively licensed Dreamcast SDK. It already provides the services this port needs: PowerVR rendering, video modes, Maple controller and VMU access, AICA sound-effect playback, timers, an ISO9660 filesystem, `dcload`, and GDB support. It also supports the C99 used by this repository.
-
-Pin a known-good KOS release or commit in the build environment. Do not build against an unpinned `master`, because toolchain defaults and APIs can change. Record the KOS version, GCC version, build flags, and required attribution in the release notes. The AICA ARM toolchain is not needed unless the project later introduces a custom sound driver; KOS supplies a standard driver.
+The Docker build currently pins KOS v2.1.0 and a specific `mkdcdisc` commit. Record the selected GCC version, build flags, and required attribution in the release notes. The AICA ARM toolchain is not needed unless the project later introduces a custom sound driver; KOS supplies a standard driver.
 
 Host setup options:
 
 - Linux, macOS, and WSL: use KOS's `utils/kos-chain` toolchain builder and KOS environment directly.
 - Native Windows: [DreamSDK](https://github.com/dreamsdk/dreamsdk) is a ready-to-use KOS distribution and is suitable for contributors who do not want to build the cross-toolchain.
-- Reproducible project/CI builds: add a pinned container image or `Dockerfile.dreamcast`, following the existing N64 workflow. Building GCC and KOS on every game build would be too slow, so publish or cache the completed toolchain image separately.
-
-### Other options considered
-
-- Sega's Katana SDK is historical proprietary software. It is not appropriate for a public, reproducible open-source build and should not be a supported path.
-- libronin is an alternative low-level homebrew library, but adopting it would mean replacing KOS's integrated peripheral, filesystem, audio, debug, and packaging ecosystem. It offers no clear advantage for this small port.
-- SDL/KallistiGL/GLdc are libraries on top of KOS, not complete SDK choices. SDL would reduce some initial porting but retain desktop-oriented abstractions and bring unnecessary dependencies. KallistiGL or GLdc could reproduce the legacy OpenGL renderer quickly, but a small native PVR canvas should be more predictable and easier to tune. Keep GLdc as a time-boxed fallback if native rendering delays the first frame.
 
 ## Relevant hardware and software constraints
 
@@ -44,52 +35,28 @@ Host setup options:
 - A standard controller has D-pad, analogue stick, A/B/X/Y, Start, and analogue triggers, but no N64-style Z button. Map logical actions to Dreamcast buttons without exposing Maple button constants to game code.
 - VMU capacity is small and writes are block-oriented. A BIOS-visible save needs Dreamcast package metadata and an icon. Storage writes must be bounded, checked for free space, and resilient to removal or a full VMU. Do not write every frame.
 - Disc data is read-only and seek latency is high. Load the five small effects once at startup and keep gameplay assets compiled in or loaded in batches.
-- There is no normal process exit on console. `cancel_main_loop()` should stop scheduling game work and enter a safe idle/return-to-loader path; cleanup must not rely on a desktop OS reclaiming resources.
 
 ## Architecture
 
-Create this layout:
+The Dreamcast platform scaffold, explicit source list, Docker toolchain, build script, and optional ELF, `.bin`, and self-boot `.cdi` outputs are in place. Keep Dreamcast-specific APIs in `src/platform/dreamcast` and the dedicated Makefile; the current input, canvas, audio, and storage implementations are still incomplete.
 
-```text
-src/platform/dreamcast/
-    main.c
-    canvas.c
-    debug.c
-    input.c
-    loop.c
-    mixer.c
-    storage.c
-    timing.c
-    video.c
-dreamcast/
-    Makefile
-    romdisk/
-    ip.txt                 # optional dcload network settings; not committed
-scripts/
-    build-dreamcast.sh
-Dockerfile.dreamcast
-```
-
-The Dreamcast Makefile should explicitly list the same `GAME_SRCS` as CMake and exactly one implementation of every platform contract. Define only `ASTEROIDS_PLATFORM_DREAMCAST=1`. Follow KOS's `Makefile.rules` conventions to produce an unscrambled ELF first, then optional `.bin` and self-boot `.cdi` artifacts. Keep Dreamcast build logic out of desktop CMake, matching the N64 precedent.
-
-Before implementing the target, make two small cross-platform corrections:
+Before completing the target, make two small cross-platform corrections:
 
 1. Rewrite the SDL-specific comments in `video.h` as a platform-neutral lifecycle contract. Decide whether `video_set_window_title()` is an optional no-op or should be removed from the shared contract.
 2. Replace `mixer_load_sample_from_file(path)` in game code with logical sample IDs, as already proposed in `notes/platforms.md`. Desktop may map IDs to WAV paths, N64 to bank entries, and Dreamcast to files in `/rd` or `/cd`. This avoids putting Dreamcast disc paths in shared code and also unblocks the incomplete N64 mixer.
 
 ### Lifecycle and main loop
 
-`main.c` should initialize debug output, video/PVR, audio, input, timing, and storage, then call the same game initialization used by desktop. KOS owns low level startup, so no custom CRT or linker script should be needed.
+`main.c` already initializes debug output, video/PVR, input, timing, and the silent audio stub, then enters the shared game flow. Complete audio and storage initialization when those backends are ready. KOS owns low level startup, so no custom CRT or linker script is needed.
 
-Use a simple blocking console loop initially:
+The blocking KOS loop and cancellation flag are implemented. Complete and validate the loop behavior:
 
-1. sample elapsed monotonic time;
-2. update input and mixer bookkeeping;
-3. call the selected `main_loop_fn_t`, allowing drawing when the PVR is ready;
-4. submit the scene and wait/yield as required; and
-5. apply a maximum elapsed-time clamp after pauses, VMU access, or debugging so the fixed-step simulation cannot spend seconds catching up.
+1. sample elapsed monotonic time and update input and mixer bookkeeping;
+2. call the selected `main_loop_fn_t`, allowing drawing when the PVR is ready;
+3. submit the scene and wait/yield as required; and
+4. verify the elapsed-time clamp after pauses, VMU access, or debugging so the fixed-step simulation cannot spend seconds catching up.
 
-`set_main_loop()` can safely switch callbacks between frames. `run_main_loop()` must not recursively start a new loop when game states change. Make `cancel_main_loop()` set a termination flag and preserve the requested exit code for `dcload`, even if a disc build ultimately idles or reboots.
+`loop_set_main()` switches callbacks between frames without starting nested loops, and `loop_cancel()` sets the termination flag and preserves an exit code.
 
 ### Video and canvas
 
@@ -124,7 +91,7 @@ The current input layer permits only one physical input mapping per logical enum
 
 ### Timing
 
-Implement timing from a KOS monotonic timer with millisecond or better resolution. Accumulate the real elapsed duration, retain fractional precision between frames, and cap a single production interval (for example at 100 ms). Continue consuming the shared 10 ms fixed step. Verify game speed at 50 and 60 Hz and after controller/VMU hot-plug events.
+Timing currently uses KOS's monotonic millisecond timer, caps each interval at 16 ms, and consumes the shared 10 ms fixed step. Validate that clamp and simulation behavior at 50 and 60 Hz, after pauses, and during controller/VMU access.
 
 ### Audio
 
@@ -150,13 +117,13 @@ The current storage API cannot distinguish no space, removal, or corrupt data. K
 
 ### Debugging and packaging
 
-Route `debug_printf()` to KOS console output. Support three feedback loops:
+`debug_printf()` is routed to KOS console output, and debug/release build configurations are available. Validate these development paths:
 
 - emulator: launch the ELF directly in a current Dreamcast emulator for the fastest normal iteration;
 - hardware loader: use `dcload-ip` with a Broadband/LAN Adapter, or `dcload-serial` with a coder's cable, for rapid upload and console output;
-- disc image: generate a self-boot `.cdi` for release testing on emulator, optical media, or an optical-drive emulator.
+- disc image: test the generated self-boot `.cdi` on an emulator, optical media, or an optical-drive emulator.
 
-Add symbol-rich debug and optimized release configurations. Preserve the ELF and map file beside packaged outputs. Enable stack traces/assertions in debug builds and document GDB attachment separately; do not make physical debug hardware a prerequisite for ordinary development.
+Preserve the ELF and map file beside packaged outputs. Enable stack traces/assertions in debug builds and document GDB attachment separately; do not make physical debug hardware a prerequisite for ordinary development.
 
 ## Implementation sequence
 
@@ -169,19 +136,17 @@ Add symbol-rich debug and optimized release configurations. Preserve the ELF and
 
 Exit criterion: shared game code has no asset paths or API wording that forces an SDL implementation.
 
-### Phase 1: reproducible toolchain and hello frame
+### Phase 1: hello frame
 
-- Pin KOS/toolchain versions and create the cached container build.
-- Add the Dreamcast Makefile, explicit source lists, and build script.
-- Build a minimal ELF, initialize a safe video mode, clear to black, and print diagnostics.
+- Initialize a safe video mode, clear to black, and print diagnostics.
 - Run that ELF in an emulator and on hardware before integrating the game.
 
-Exit criterion: one documented command produces an ELF and optional CDI, and a black frame appears on both emulator and hardware.
+Exit criterion: the scaffold displays a black frame in an emulator and on hardware.
 
 ### Phase 2: playable silent slice
 
-- Implement timing, loop scheduling, controller input, and the basic native PVR canvas.
-- Stub mixer and storage behind visible debug warnings.
+- Complete controller input and the basic native PVR canvas; the timing and loop scaffolds are already present.
+- The mixer stub already warns and continues silently; add a clear diagnostic for unavailable storage, then implement both backends.
 - Enter the shared title screen, start a game, move, thrust, fire, pause, die, and return through all game states.
 - Fix platform contract bugs in the contract or Dreamcast layer, not with Dreamcast `#ifdef`s in `src/game`.
 
@@ -212,15 +177,13 @@ Exit criterion: no gameplay regressions, stable frame pacing, no PVR overflows o
 - **PAL behavior:** establish whether the first release supports PAL50, PAL60, or both, and make that choice visible rather than silently forcing an unsupported mode.
 - **Save atomicity:** validate the chosen VMU replacement sequence on removal and full-card failures. The payload is small, but corruption recovery matters more than write speed.
 - **Input language:** game screens should use neutral prompts or platform labels; keyboard-only text would make the port technically playable but unfinished.
-- **Build reproducibility:** pinning only KOS while downloading a floating GCC or packaging tool is insufficient. Capture the complete image inputs and licenses.
+- **Build reproducibility:** capture the complete image inputs, including the GCC version and licenses, and keep them reproducible.
 
 ## First concrete work items
 
 1. Introduce logical audio sample IDs on desktop and complete the same contract for N64.
-2. Add `Dockerfile.dreamcast`, `dreamcast/Makefile`, and `scripts/build-dreamcast.sh` with pinned KOS inputs.
-3. Add skeletal Dreamcast implementations that build and log unsupported calls.
-4. Bring up video plus a hard-coded PVR line, then implement `canvas` geometry expansion with host tests.
-5. Connect the title screen and controller, then complete timing and all game states before starting VMU or audio work.
+2. Bring up video plus a hard-coded PVR line, then implement `canvas` geometry expansion with host tests.
+3. Connect the title screen and controller, then validate timing and all game states before starting VMU or audio work.
 
 ## Primary references
 
