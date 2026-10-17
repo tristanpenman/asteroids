@@ -1,7 +1,9 @@
 TARGET := asteroids
-BUILD_DIR := build-dreamcast
+BUILD_DIR ?= build-dreamcast
 ELF := $(BUILD_DIR)/$(TARGET).elf
 BIN := $(BUILD_DIR)/$(TARGET).bin
+CDI := $(BUILD_DIR)/$(TARGET).cdi
+MKDCDISC ?= mkdcdisc
 
 GAME_SRCS := \
 	src/game/collision.c \
@@ -51,6 +53,12 @@ all: $(ELF)
 
 bin: $(BIN)
 
+cdi: $(CDI)
+
+ifndef KOS_BASE
+$(error Source the KOS environ.sh or use scripts/build-dreamcast.sh)
+endif
+
 include $(KOS_BASE)/Makefile.rules
 
 $(BUILD_DIR)/%.o: %.c
@@ -64,9 +72,12 @@ $(ELF): $(OBJS)
 $(BIN): $(ELF)
 	$(KOS_OBJCOPY) -O binary $< $@
 
+$(CDI): $(ELF)
+	$(MKDCDISC) -e $< -o $@ -n Asteroids
+
 clean:
 	$(RM) -r $(BUILD_DIR)
 
-.PHONY: all bin clean
+.PHONY: all bin cdi clean
 
 -include $(DEPS)

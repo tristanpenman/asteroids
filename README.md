@@ -8,7 +8,7 @@ This is a tidied up version of an Asteroids clone that I wrote over the course o
 
 ## Ports
 
-This project has also been ported to the web using Emscripten, which I wrote about in [this blog post](https://tristanpenman.com/blog/posts/2018/01/08/porting-an-asteroids-clone-to-javascript/), and later to the venerable Nintendo 64. The code for the N64 port can be found [here](https://github.com/tristanpenman/asteroids64).
+This project has also been ported to the web using Emscripten, which I wrote about in [this blog post](https://tristanpenman.com/blog/posts/2018/01/08/porting-an-asteroids-clone-to-javascript/), and later to the venerable Nintendo 64 and the SEGA Dreamcast. The code for the N64 port can be found [here](https://github.com/tristanpenman/asteroids64).
 
 ## Demo
 
@@ -84,6 +84,24 @@ The initial Nintendo 64 target can be built with the N64 SDK container:
 ```
 
 The resulting ROM is written to `build-n64/asteroids.z64` and owned by the current user.
+
+### SEGA Dreamcast (via Docker)
+
+The Dreamcast build uses KallistiOS. Run `./scripts/build-dreamcast.sh` to build `build-dreamcast/asteroids.elf` and its linker map. The first build compiles the KOS v2.1.0 toolchain in Docker and can take a long time; subsequent builds reuse the image.
+
+To build a self-bootable CDI image for GDEMU, run:
+
+```bash
+./scripts/build-dreamcast.sh cdi
+```
+
+The image is written to `build-dreamcast/asteroids.cdi`. Use `./scripts/build-dreamcast.sh bin` to create a raw binary instead. Set `BUILD_DIR` to choose a different output directory, for example:
+
+```bash
+./scripts/build-dreamcast.sh BUILD_DIR=build-dreamcast/release BUILD=release cdi
+```
+
+With KallistiOS installed locally, source its `environ.sh` and run `make -f dreamcast/Makefile` from the repository root. The Makefile reports a clear error if `KOS_BASE` is not configured.
 
 ## License
 

@@ -12,10 +12,27 @@ RUN mkdir -p /opt/toolchains/dc \
     && git clone --branch "${KOS_VERSION}" --depth 1 \
         https://github.com/KallistiOS/KallistiOS.git /opt/toolchains/dc/kos \
     && cp /usr/share/misc/config.guess /opt/toolchains/dc/kos/utils/dc-chain/config.guess \
-    && cp /usr/share/misc/config.sub /opt/toolchains/dc/kos/utils/dc-chain/config.sub \
-    && make -C /opt/toolchains/dc/kos/utils/dc-chain build-sh4 \
-    && cp /opt/toolchains/dc/kos/doc/environ.sh.sample /opt/toolchains/dc/kos/environ.sh \
+    && cp /usr/share/misc/config.sub /opt/toolchains/dc/kos/utils/dc-chain/config.sub
+
+# Avoid the rotating mirror redirector, which can select stale mirrors.
+RUN make -C /opt/toolchains/dc/kos/utils/dc-chain gnu_mirror=ftp.gnu.org build-sh4
+
+RUN cp /opt/toolchains/dc/kos/doc/environ.sh.sample /opt/toolchains/dc/kos/environ.sh \
     && /bin/bash -lc 'source /opt/toolchains/dc/kos/environ.sh && make -C /opt/toolchains/dc/kos'
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        libisofs-dev meson ninja-build pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG MKDCDISC_COMMIT=2b98b0d9480e364e3517355648fbc3b49fb19882
+
+RUN git clone https://gitlab.com/simulant/mkdcdisc.git /tmp/mkdcdisc \
+    && git -C /tmp/mkdcdisc checkout "${MKDCDISC_COMMIT}" \
+    && meson setup /tmp/mkdcdisc/build /tmp/mkdcdisc --prefix=/usr/local \
+    && meson compile -C /tmp/mkdcdisc/build \
+    && meson install -C /tmp/mkdcdisc/build \
+    && rm -rf /tmp/mkdcdisc
 
 ENV KOS_BASE=/opt/toolchains/dc/kos
 ENV KOS_CC_BASE=/opt/toolchains/dc/sh-elf
