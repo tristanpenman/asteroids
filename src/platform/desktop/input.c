@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include <SDL.h>
 
@@ -14,15 +15,21 @@ static int mappings[__INPUT__COUNT];
 // Active state of registered input handles
 static bool active[INPUT_MAX_HANDLES];
 
-// Previous active states of registered input handles
-static bool last_active[INPUT_MAX_HANDLES];
+// Pressed this frame (not merely held)
+static bool triggered[INPUT_MAX_HANDLES];
 
 void input_handle_key(int key, bool down)
 {
+    if (key < 0 || key >= __INPUT__COUNT) {
+        return;
+    }
+
     int handle = mappings[key];
 
-    if (handle != INPUT_INVALID_HANDLE) {
-        last_active[handle] = active[handle];
+    if (handle >= 0 && handle < num_handles) {
+        if (down && !active[handle]) {
+            triggered[handle] = true;
+        }
         active[handle] = down;
     }
 }
@@ -35,6 +42,9 @@ void input_handle_event(int sym, bool down)
         break;
     case SDLK_DOWN:
         input_handle_key(INPUT_KEY_DOWN, down);
+        break;
+    case SDLK_DELETE:
+        input_handle_key(INPUT_KEY_DELETE, down);
         break;
     case SDLK_ESCAPE:
         input_handle_key(INPUT_KEY_ESCAPE, down);
@@ -81,7 +91,7 @@ void input_reset(void)
     num_handles = 0;
 
     memset(active, 0, sizeof(bool) * INPUT_MAX_HANDLES);
-    memset(last_active, 0, sizeof(bool) * INPUT_MAX_HANDLES);
+    memset(triggered, 0, sizeof(triggered));
 
     for (int i = 0; i < __INPUT__COUNT; i++) {
         mappings[i] = INPUT_INVALID_HANDLE;
@@ -90,7 +100,7 @@ void input_reset(void)
 
 int input_register(void)
 {
-    if (num_handles == INPUT_MAX_HANDLES) {
+    if (num_handles >= INPUT_MAX_HANDLES) {
         return INPUT_INVALID_HANDLE;
     }
 
@@ -99,7 +109,8 @@ int input_register(void)
 
 bool input_map(int handle, enum input inp)
 {
-    if (mappings[inp] != INPUT_INVALID_HANDLE) {
+    if (handle < 0 || handle >= num_handles || inp < 0 || inp >= __INPUT__COUNT ||
+        mappings[inp] != INPUT_INVALID_HANDLE) {
         return false;
     }
 
@@ -111,11 +122,7 @@ void input_update(void)
 {
     SDL_Event event;
 
-    for (int i = 0; i < num_handles; i++) {
-        if (!last_active[i] && active[i]) {
-            last_active[i] = true;
-        }
-    }
+    memset(triggered, 0, sizeof(triggered));
 
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
@@ -134,15 +141,21 @@ void input_update(void)
 
 bool input_active(int handle)
 {
-    return active[handle];
+    return handle >= 0 && handle < num_handles && active[handle];
 }
 
 bool input_triggered(int handle)
 {
-    return active[handle] && !last_active[handle];
+    return handle >= 0 && handle < num_handles && triggered[handle];
 }
 
 void input_read_joystick(int8_t *x, int8_t *y)
 {
-    // TODO: not implemented
+    // Not implemented
+    if (x != NULL) {
+        *x = 0;
+    }
+    if (y != NULL) {
+        *y = 0;
+    }
 }
